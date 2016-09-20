@@ -22,22 +22,8 @@ int main( int argc, char* argv[] ) {
 	{
 			"./Debug/Ronch_braggPlot_v05", "input", "bragg_events.txt", "hist", "hh", "ranges", "energyRanges"
 	};
-  AnalysisInfo* info = new AnalysisInfo( argc2, argv2 );
 
-  // create data source
-  EventSource* es = SourceFactory::create( info );
 
-  // create a list of analyzers
-  AnalysisFactory::create( info );
-
-  // initialize all analyzers
-  Dispatcher<AnalysisInfo::AnalysisStatus>::notify( AnalysisInfo::begin );
-
-  // loop over events
-  es->run();
-
-  // finalize all analyzers
-  Dispatcher<AnalysisInfo::AnalysisStatus>::notify( AnalysisInfo::end );
 
   return 0;
 
