@@ -1,2 +1,0 @@
-rm -f ../../../lib/librandom.so
-c++ -Wall -fPIC -shared -I../../../include -o ../../../lib/librandom.so Random.cc

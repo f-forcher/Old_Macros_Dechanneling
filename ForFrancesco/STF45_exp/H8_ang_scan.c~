@@ -1,0 +1,18 @@
+#include"func_sim.h"
+#include"func_sim.c"
+
+void H8_ang_scan(){
+
+  gStyle->SetPalette(1);
+  gStyle->SetOptStat(0);
+  gStyle->SetOptTitle(0);
+  TGaxis::SetMaxDigits(3);
+
+ TFile * in_file = new TFile("recoDataSimple_408_1-73.torsion.correction.histo.root");
+
+  TH2F * h = (TH2F*) in_file->Get("dTheta_x_vs_Impact_x_cor");
+
+  TCanvas *c = new TCanvas(1);
+  h->Draw("contz");
+
+}

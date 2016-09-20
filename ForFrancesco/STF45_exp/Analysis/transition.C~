@@ -1,0 +1,524 @@
+//#include "librerie.h"
+#include "func_sim.h"
+
+
+Double_t myfunction(Double_t *x, Double_t *par) {
+  Float_t xx = x[0];
+  Double_t f = par[0]*exp(-xx/par[1]);
+  return f;
+}
+
+Double_t erf(Double_t *x, Double_t *par) {
+  return  par[0]*TMath::Erf(x[0])+par[1];
+  }
+
+// questo programma genera : plot picchi e sigma zona di transizione 
+void transition() {
+
+  gStyle->SetPalette(1);
+  gStyle->SetOptStat(0);
+  gStyle->SetOptTitle(0);
+  TGaxis::SetMaxDigits(3);
+
+  /*
+  //Apre file dati
+  TFile * in_file = new TFile("recoDataSimple_415_1-37.torsion.correction.histo.root");
+   
+  //Salva plot
+  TString outputfile = "recoDataSimple_415.transiction2.graph.root"; 
+  */
+
+  TFile * in_file = new TFile("STF45Rob.root");
+  TString outputfile = "STF45Rob.transition.root"; 
+
+  //xtal length and curvature
+  Double_t z = 2e-3; 
+  Double_t R;
+
+  //Selezione histogramma
+  /*
+  TH2D * h = (TH2D*) in_file->Get("dTheta_x_vs_Impact_x_cor");
+  TH1D * ht = (TH1D*) in_file->Get("dTheta_x"); 
+  */
+
+  TH2F * h = (TH2F*) in_file->Get("hH8");
+  TH1D *ht= h->ProjectionY();
+  
+  TCanvas *c = new TCanvas();
+  h->Draw("colz");
+
+  
+  TCanvas *c1 = new TCanvas();
+  ht->Draw();
+  
+  
+  //fit di porova su picco CH e zona DC
+  Double_t par_ch[3]=0;
+  TF1 *g    = new TF1("g","gaus",110,180);
+  g->SetLineColor(kRed); 
+  ht->Fit(g,"R");
+  g->GetParameters(&par_ch[0]);
+  R = (z / (par_ch[1]*1e-6));
+  cout << R << endl;
+
+  Double_t min_ch = par_ch[1]-(par_ch[2]*3.);
+  Double_t max_ch = par_ch[1]+(par_ch[2]*3.);
+
+  Double_t par_de[3]=0;
+  TF1 *de = new TF1("de","expo",20,110);
+  de->SetLineColor(kGreen+2); 
+  //de->SetParameters(1,1);
+  ht->Fit(de,"R+");
+  de->GetParameters(&par_de[0]);
+
+  cout << par_de[0] << " " << par_de[1] << endl;
+
+
+  Double_t zero = exp(par_de[0]);
+  Double_t uno = -(1/par_de[1]);
+
+  cout << zero << " " << uno << endl;
+
+
+  // crezione istogrammi
+  const int n = 40;  
+  TH1D **h_slice;
+  Int_t *l_x;
+
+  h_slice=(TH1D **)malloc(n*sizeof(TH1D *));
+  // l_x=(Int_t *)malloc(n*sizeof(Int_t));
+
+
+  TAxis *axis = h->GetXaxis();
+  Double_t *imp_ang;
+  Double_t *err_ang;
+  imp_ang = (double *) malloc(n*sizeof(double));
+  err_ang = (double *) malloc(n*sizeof(double));
+ 
+  int min(0),max(0);
+
+  for(int i=0;i<n;i++) {
+
+    min = axis->FindBin(-21+(1*i));
+    max = axis->FindBin(-19+(1*i));
+    cout << min << "  " << max << endl;
+    imp_ang[i] = (-20.+(1*i))/10.;//axis->GetBinCenter(-10+(1*i));
+    err_ang[i] = (0.05);  
+    h_slice[i]=(TH1D *)malloc(n*sizeof(TH1D));
+    h_slice[i] = h->ProjectionY(Form("cut %d > Impact angle x > %d #murad",(-21+(i*1)),(-19+(i*1))),min,max);
+    h_slice[i]->GetXaxis()->SetTitle("#Delta#theta_{x} [#murad]");
+    h_slice[i]->SetLineColor(i);
+    //l_x[i] = 0;
+  }
+
+
+
+  //definizione variabili
+  Double_t *tr_mean;
+  Double_t *err_tr_mean;
+  Double_t *tr_sigma;
+  Double_t *err_tr_sigma;
+
+  tr_mean = (double *) malloc(n*sizeof(double));
+  tr_sigma = (double *) malloc(n*sizeof(double));
+  err_tr_mean = (double *) malloc(n*sizeof(double));
+  err_tr_sigma = (double *) malloc(n*sizeof(double));
+  
+  
+  //TF1 *g1 = new TF1("g1","gaus",-50,50);
+TF1 *g1 = new TF1("g1","gaus",-30,30);
+  //  TF1 *g2 = new TF1("g2","gaus",110,180);
+  
+
+  // int de_min(0), de_max(0), tot_min(0), tot_max(0),bch_min(0), bch_max(0), bam_min(0);
+  double par_am[3];
+  // double par_ch[3];
+  //Double_t par_de5[3]=0;
+
+
+  //generazione parametri dei fit
+  for(int i=0;i<n;i++) {
+
+    h_slice[i]->Fit(g1,"R+");
+    //  h_slice[i]->Fit(g2,"R+");
+   
+    g1->GetParameters(&par_am[0]);
+    //  g2->GetParameters(&par_ch[0]);
+
+    tr_mean[i]=par_am[1];
+    tr_sigma[i] = par_am[2];
+    err_tr_mean[i] = g1->GetParError(1);
+    err_tr_sigma[i] = g1->GetParError(2);
+
+  }
+
+
+
+  //produzione dei plot
+  /*
+  TCanvas *cgr = new TCanvas("cgr","cgr",1100,1100);
+  cgr->SetFillColor(10);
+  cgr->SetGridx(1);
+  cgr->SetGridy(1);
+  //  TGraph *gr = new TGraph(n,imp_ang,tr_mean);
+  TGraphErrors *gr_m = new TGraphErrors(n,imp_ang,tr_mean,err_ang,err_tr_mean);
+  //gr_m->SetTitle("Sigma peak in transition zone");
+  gr_m->GetXaxis()->SetTitle("#theta_{x}^{in}/#theta_{c}");
+  gr_m->GetYaxis()->SetTitle("#Delta#theta_{x} [#murad]");
+  gr_m->GetXaxis()->SetTitleFont(132);
+  gr_m->GetYaxis()->SetTitleFont(132);
+  gr_m->GetXaxis()->SetLabelFont(132);
+  gr_m->GetYaxis()->SetLabelFont(132);
+  gr_m->SetMarkerColor(kRed);
+  gr_m->SetMarkerStyle(20);
+  gr_m->GetXaxis()->SetRangeUser(-1.5,1.5);
+  gr_m->Draw("ap");
+  //TF1 *gerr    = new TF1("gerr","[1]*(x>[0] ? x-[0] : 0.0)*TMath::Erf((x-[0])/2)+[3]",-20.,20.);
+  //gerr->SetParameter(0,2);
+  //gerr->SetLineColor(kRed); 
+  //gr->Fit("gerr");
+
+
+
+  TLine *am = new TLine(-25,0.09987,25,0.09987);
+  am->SetLineColor(kRed);
+  am->SetLineStyle(9);
+
+
+  TLine *vr = new TLine(-25,-14.03,25,-14.03);
+  vr->SetLineColor(kGreen);
+  vr->SetLineStyle(9);
+
+
+  am->Draw("same");
+  vr->Draw("same");
+  leg = new TLegend(0.1,0.7,0.48,0.9);
+  leg->SetHeader("Transiction region at +/- 20 #murad");
+  leg->AddEntry(am,"Amourphous peak position");
+  leg->AddEntry(vr,"Volume Reflection peak position");
+
+  leg->Draw("same");
+
+  */
+
+
+
+
+TCanvas *cgr = new TCanvas("cgr","cgr",1100,1100);
+  cgr->SetFillColor(10);
+  cgr->SetGridx(1);
+  cgr->SetGridy(1);
+  //  TGraph *gr = new TGraph(n,imp_ang,tr_mean);
+  TGraphErrors *gr_s = new TGraphErrors(n,imp_ang,tr_sigma,err_ang,err_tr_sigma);
+  //gr_s->SetTitle("Sigma peak in transition zone");
+  gr_s->GetXaxis()->SetTitle("#theta_{x}^{in}/#theta_{c}");
+  gr_s->GetYaxis()->SetTitle("#Delta#theta_{x} [#murad]");
+  gr_s->GetXaxis()->SetTitleFont(132);
+  gr_s->GetYaxis()->SetTitleFont(132);
+  gr_s->GetXaxis()->SetLabelFont(132);
+  gr_s->GetYaxis()->SetLabelFont(132);
+  gr_s->SetMarkerColor(kRed);
+  gr_s->SetMarkerStyle(20);
+  gr_s->GetXaxis()->SetRangeUser(-1.5,1.5);
+  gr_s->Draw("ap");
+  //TF1 *gerr    = new TF1("gerr","[1]*(x>[0] ? x-[0] : 0.0)*TMath::Erf((x-[0])/2)+[3]",-20.,20.);
+  //gerr->SetParameter(0,2);
+  //gerr->SetLineColor(kRed); 
+  //gr->Fit("gerr");
+
+   TPaveText *legP=new TPaveText(0.55,0.85,0.95,0.95,"NDC");
+  legP->SetFillColor(10);
+  legP->SetTextFont(132);
+  
+  legP->AddText("Sigma mean deflection of non-channeled particles");
+  legP->SetTextSize(0.035);
+  legP->Draw();
+
+  TCanvas *cslice = new TCanvas();
+  cslice->SetFillColor(41);
+  for(i=0;i<n;i++) {
+    h_slice[i]->Draw("same");
+  }
+
+ 
+
+ 
+
+ TFile *outfile = new TFile(outputfile,"RECREATE");
+ // cde->Write("d_pop");
+ // grt->Write("tr_pop");
+ // grc->Write("ch_pop");
+ // grd->Write("dech_pop");
+ gr_s->Write("tr_sigma");
+ //gr_m->Write("tr_zone");
+ // gr_len->("dech_len");
+
+
+  /*
+  TAxis *axis = h->GetXaxis();
+  
+  int min1 = axis->FindBin(-10.);
+  int max1 = axis->FindBin(-8.); 
+
+  int min2 = axis->FindBin(-8.);
+  int max2 = axis->FindBin(-6.); 
+
+  int min3 = axis->FindBin(-6.);
+  int max3 = axis->FindBin(-4.); 
+
+  int min4 = axis->FindBin(-4.);
+  int max4 = axis->FindBin(-2.); 
+
+  int min5 = axis->FindBin(-2.);
+  int max5 = axis->FindBin(0.); 
+
+  int min6 = axis->FindBin(0.);
+  int max6 = axis->FindBin(2.); 
+
+  int min7 = axis->FindBin(2.);
+  int max7 = axis->FindBin(4.); 
+
+  int min8 = axis->FindBin(4.);
+  int max8 = axis->FindBin(6.); 
+
+  int min9 = axis->FindBin(6.);
+  int max9 = axis->FindBin(8.); 
+
+  int min10 = axis->FindBin(8.);
+  int max10 = axis->FindBin(10.); 
+
+  cout << "bin cut" << endl;
+ 
+  cout << "  -5 -> "<< min5 <<"   5 -> "<< max5 << endl;
+  cout << " -10 -> "<< min10 <<"  10 -> "<< max10 << endl;
+
+  TH1D *h1= h->ProjectionY("cut (-10,-8) #murad",min1,max1);
+  h1->GetXaxis()->SetTitle("#Delta#theta_{x} [#murad]");
+  h1->SetLineColor(kBlue);
+  TH1D *h2= h->ProjectionY("cut (-8,-6) #murad",min2,max2);
+  h2->GetXaxis()->SetTitle("#Delta#theta_{x} [#murad]");
+  h2->SetLineColor(kBlue+2);  
+  TH1D *h3= h->ProjectionY("cut (-6,-4) #murad",min3,max3);
+  h3->GetXaxis()->SetTitle("#Delta#theta_{x} [#murad]");
+  h3->SetLineColor(kBlue+4);
+  TH1D *h4= h->ProjectionY("cut (-4,-2) #murad",min4,max4);
+  h4->GetXaxis()->SetTitle("#Delta#theta_{x} [#murad]");
+  h4->SetLineColor(kBlue+6);
+  TH1D *h5= h->ProjectionY("cut (-2,0) #murad",min5,max5);
+  h5->GetXaxis()->SetTitle("#Delta#theta_{x} [#murad]");
+  h5->SetLineColor(kRed);
+  TH1D *h6= h->ProjectionY("cut (0,2) #murad",min6,max6);
+  h6->GetXaxis()->SetTitle("#Delta#theta_{x} [#murad]");
+  h6->SetLineColor(kRed+2);
+  TH1D *h7= h->ProjectionY("cut (2,4) #murad",min7,max7);
+  h7->GetXaxis()->SetTitle("#Delta#theta_{x} [#murad]");
+  h7->SetLineColor(kGreen);
+  TH1D *h8= h->ProjectionY("cut (4,6) #murad",min8,max8);
+  h8->GetXaxis()->SetTitle("#Delta#theta_{x} [#murad]");
+  h8->SetLineColor(kGreen+2);
+  TH1D *h9= h->ProjectionY("cut (6,8) #murad",min9,max9);
+  h9->GetXaxis()->SetTitle("#Delta#theta_{x} [#murad]");
+  h9->SetLineColor(kGreen+4);
+  TH1D *h10= h->ProjectionY("cut (8,10) #murad",min10,max10);
+  h10->GetXaxis()->SetTitle("#Delta#theta_{x} [#murad]");
+  h10->SetLineColor(kGreen+6);
+
+ //plot e fit
+
+ 
+  TCanvas *c5 = new TCanvas();
+  h1->Draw();
+  h2->Draw("same");
+  h3->Draw("same");
+  h4->Draw("same");
+  h5->Draw("same");
+  h6->Draw("same");
+  h7->Draw("same");
+  h8->Draw("same");
+  h9->Draw("same");
+  h10->Draw("same");
+
+ TCanvas *c2 = new TCanvas();
+  h1->Draw();
+  h2->Draw("same");
+  h3->Draw("same");
+TCanvas *c3 = new TCanvas();
+  h4->Draw("same");
+  h5->Draw("same");
+  h6->Draw("same");
+  h7->Draw("same");
+TCanvas *c4 = new TCanvas();
+  h8->Draw("same");
+  h9->Draw("same");
+  h10->Draw("same");
+
+  */
+
+
+  /*
+  TCanvas *c5 = new TCanvas();
+  h5->Draw();
+ 
+  Double_t par_am5[3]=0;
+  Double_t par_ch5[3]=0;
+  TF1 *g5    = new TF1("g5","gaus",min_ch,max_ch);
+  TF1 *g5am    = new TF1("g5am","gaus",-50,50);
+  
+  g5->SetLineColor(kRed); 
+  g5am->SetLineColor(kYellow); 
+  h5->Fit(g5,"R");
+  h5->Fit(g5am,"R+");
+
+  g5->GetParameters(&par_ch5[0]);
+  g5am->GetParameters(&par_am5[0]);
+  
+  cout << "paramteri fit picco channeling"<<endl;
+  cout << par_ch5[2] << endl;
+  cout << par_ch5[1] << endl;
+  
+
+  cout << "paramteri fit picco amorfo"<<endl;
+  cout << par_am5[2] << endl;
+  cout << par_am5[1] << endl;
+
+  Double_t ch_min5 = par_ch5[1]-(par_ch5[2]*3);
+  Double_t ch_max5 = par_ch5[1]+(par_ch5[2]*3);
+  Double_t R5 = (z / (par_ch5[1]*1e-6));
+
+  Double_t am_min5 = par_am5[1]-(par_am5[2]*3);
+  Double_t am_max5 = par_am5[1]+(par_am5[2]*3);
+
+  Double_t ch_min51 = par_ch5[1]-(par_ch5[2]*3.5);
+  Double_t am_max51 = par_am5[1]+(par_am5[2]*3.5);
+
+  Double_t ch_min52 = par_ch5[1]-(par_ch5[2]*4.);
+  Double_t am_max52 = par_am5[1]+(par_am5[2]*4.);
+
+
+    Double_t par_de5[3]=0;
+  TF1 *de5   = new TF1("de5",myfunction,am_max5,ch_min5,2);
+  de5->SetLineColor(kGreen); 
+  de5->SetParameters(zero,uno);
+  h5->Fit(de5,"R+");
+
+ de5->GetParameters(&par_de5[0]);
+  cout << "lunghezza di dechanneling " << R5*(par_de5[1]*1e-6) << endl; 
+
+  Double_t par_de51[3]=0;
+  TF1 *de51   = new TF1("de51",myfunction,am_max51,ch_min5,2);
+  de51->SetLineColor(kGreen+2); 
+  de51->SetParameters(zero,uno);
+  h5->Fit(de51,"R+");
+
+ de51->GetParameters(&par_de51[0]);
+  cout << "lunghezza di dechanneling " << R5*(par_de51[1]*1e-6) << endl; 
+
+  Double_t par_de52[3]=0;
+  TF1 *de52   = new TF1("de52",myfunction,am_max52,ch_min5,2);
+  de52->SetLineColor(kGreen+4); 
+  de52->SetParameters(zero,uno);
+  h5->Fit(de52,"R+");
+  
+  de52->GetParameters(&par_de52[0]);
+  cout << "lunghezza di dechanneling " << R5*(par_de52[1]*1e-6) << endl; 
+
+  leg5 = new TLegend(0.1,0.7,0.48,0.9);
+  leg5->SetHeader("dechanneling legth at +/- 5 #murad");
+  leg5->AddEntry(de5,Form("L_{D} = %5.3f mm",R5*(par_de5[1]*1e-3)));
+  leg5->AddEntry(de51,Form("L_{D} = %5.3f mm",R5*(par_de51[1]*1e-3)));
+  leg5->AddEntry(de52,Form("L_{D} = %5.3f mm",R5*(par_de52[1]*1e-3)));
+  leg5->Draw();
+
+
+
+  TCanvas *c10 = new TCanvas();
+  h10->Draw();
+
+
+  Double_t par_am10[3]=0;
+  Double_t par_ch10[3]=0;
+  TF1 *g10    = new TF1("g10","gaus",min_ch,max_ch);
+  TF1 *g10am    = new TF1("g10am","gaus",-50,50);
+  g10->SetLineColor(kRed); 
+  h10->Fit(g10,"R");
+  g10->GetParameters(&par_ch10[0]);
+  g10am->SetLineColor(kYellow); 
+  h10->Fit(g10am,"R+");
+  g10am->GetParameters(&par_am10[0]);
+    
+  cout << "paramteri fit"<<endl;
+  cout << par_ch10[2] << endl;
+  cout << par_ch10[1] << endl;
+  
+  Double_t ch_min10 = par_ch10[1]-(par_ch10[2]*3);
+  Double_t ch_max10 = par_ch10[1]+(par_ch10[2]*3);
+
+
+  cout << "paramteri fit"<<endl;
+  cout << par_am10[2] << endl;
+  cout << par_am10[1] << endl;
+  
+  Double_t am_min10 = par_am10[1]-(par_am10[2]*3);
+  Double_t am_max10 = par_am10[1]+(par_am10[2]*3);
+
+  Double_t R10 = (z / (par_ch10[1]*1e-6));
+
+  Double_t ch_min101 = par_ch10[1]-(par_ch10[2]*3.5);
+  Double_t am_max101 = par_am10[1]+(par_am10[2]*3.5);
+
+  Double_t ch_min102 = par_ch10[1]-(par_ch10[2]*4.);
+  Double_t am_max102 = par_am10[1]+(par_am10[2]*4.);
+
+  Double_t par_de10[3]=0;
+  TF1 *de10   = new TF1("de10",myfunction,am_max10,ch_min10,2);
+  de10->SetLineColor(kGreen); 
+  de10->SetParameters(zero,uno);
+  h10->Fit(de10,"R+");
+  gStyle->SetOptFit(1111);
+  
+  de10->GetParameters(&par_de10[0]);
+  cout << "lunghezza di dechanneling " << R10*(par_de10[1]*1e-6) << endl; 
+
+  Double_t par_de101[3]=0;
+  TF1 *de101   = new TF1("de101",myfunction,am_max101,ch_min10,2);
+  de101->SetLineColor(kGreen+2); 
+  de101->SetParameters(zero,uno);
+  h10->Fit(de101,"R+");
+
+ de101->GetParameters(&par_de101[0]);
+  cout << "lunghezza di dechanneling " << R10*(par_de101[1]*1e-6) << endl; 
+
+  Double_t par_de102[3]=0;
+  TF1 *de102   = new TF1("de102",myfunction,am_max102,ch_min10,2);
+  de102->SetLineColor(kGreen+4); 
+  de102->SetParameters(zero,uno);
+  h10->Fit(de102,"R+");
+  
+  de102->GetParameters(&par_de102[0]);
+  cout << "lunghezza di dechanneling " << R10*(par_de102[1]*1e-6) << endl; 
+
+
+  leg10 = new TLegend(0.1,0.7,0.48,0.9);
+  leg10->SetHeader("dechanneling legth at +/- 10 #murad");
+  leg10->AddEntry(de10,Form("L_{D} = %5.3f mm",R10*(par_de10[1]*1e-3)));
+  leg10->AddEntry(de101,Form("L_{D} = %5.3f mm",R10*(par_de101[1]*1e-3)));
+ leg10->AddEntry(de102,Form("L_{D} = %5.3f mm",R10*(par_de102[1]*1e-3)));
+  leg10->Draw();
+
+
+
+  */
+
+
+
+} 
+
+
+
+
+
+
+
+
+
+

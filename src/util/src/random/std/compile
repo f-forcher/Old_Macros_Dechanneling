@@ -1,2 +1,0 @@
-rm -f librandom_std.so
-c++ -Wall -fPIC -shared -I ../../../include -o librandom_std.so StdRandom.cc -L../../../lib -lrandom
