@@ -38,7 +38,7 @@ Float_t *normalization(TTree *tr,Long64_t n,Float_t *sci,Int_t tmin,Int_t tmax){
 
   }
 
-  TH1F *ints=new TH1F("ints","intensity",dim,0,dim);
+  TH1F *ints = new TH1F("ints","intensity",dim,0,dim);
 
   for(i=0;i<dim;i++)
     ints->SetBinContent(i,b[i]);
