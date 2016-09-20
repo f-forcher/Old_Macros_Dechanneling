@@ -1,0 +1,26 @@
+http://askubuntu.com/questions/26498/choose-gcc-and-g-version#26518
+
+
+//Build using C++14 compatible mode, requires gcc > 4.9.x or clang
+cxx14:BOOL=ON
+
+//Perform installation following the GNU guidelines
+gnuinstall:BOOL=ON
+
+//Install path prefix, prepended onto install directories.
+CMAKE_INSTALL_PREFIX:PATH=/home/francesco/ROOT/ROOT_6_06_08
+
+
+
+
+
+
+
+
+
+
+
+
+Nota Eclipse con ROOT
+
+Mi arrendo. Setto le variabili di root 5.34.36 su eclipse Path and Symbols
