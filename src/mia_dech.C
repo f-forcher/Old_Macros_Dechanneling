@@ -27,6 +27,7 @@ void mia_dech(std::string nome_cristallo) {
 	gStyle->SetOptTitle(0);
 	TGaxis::SetMaxDigits(3);
 
+	// TODO Togliere i nomi specifici e usare quelli _renamed
 	std::string cartella_cristallo = "ForFrancesco/" + nome_cristallo
 			+ "_exp/Analysis/";
 	gSystem->ChangeDirectory(cartella_cristallo.c_str());
@@ -68,6 +69,7 @@ void mia_dech(std::string nome_cristallo) {
 
 	//test preliminare e inizializzazione parametri
 
+	// TODO chiedere dei nomi, dei numeri, etc
 	Double_t par_ch[3] = { 0 };
 	TF1 *g = new TF1("g", "gaus", 110, 180);
 	g->SetLineColor(kRed);
