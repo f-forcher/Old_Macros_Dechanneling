@@ -17,6 +17,7 @@ Double_t myfunction(Double_t *x, Double_t *par) {
   return f;
 }
 
+// TODO Provata con STF45, "generalizzare" agli altri
 void mia_dech(std::string nome_cristallo) {
 
   gStyle->SetPalette(1);
@@ -28,6 +29,8 @@ void mia_dech(std::string nome_cristallo) {
   std::string cartella_cristallo = "ForFrancesco/" + nome_cristallo + "_exp/Analysis/";
   gSystem->ChangeDirectory(cartella_cristallo.c_str());
   std::string pathfiledati = cartella_cristallo + "recoDataSimple_415_1-37.torsion.correction.histo.root";
+
+  // TODO Generalizzare il nome del file
   std::string filedati = "recoDataSimple_415_1-37.torsion.correction.histo.root";
 
   //Apre file dati
@@ -125,8 +128,8 @@ void mia_dech(std::string nome_cristallo) {
   h10->Draw();
 
   Double_t par_10[8];
-  Double_t par_am10[3]=0;
-  Double_t par_ch10[3]=0;
+  Double_t par_am10[3]={0};
+  Double_t par_ch10[3]={0};
   TF1 *g10    = new TF1("g10","gaus",120,180);
   TF1 *g10am    = new TF1("g10am","gaus",-50,10);
   g10->SetLineColor(kRed);
@@ -178,7 +181,7 @@ void mia_dech(std::string nome_cristallo) {
   */
 
   //fit dechanneling  uso sempre R10
-  Double_t par_de10[3]=0;
+  Double_t par_de10[3]={0};
   TF1 *de10   = new TF1("de10",myfunction,am_max101,ch_min102,2);
   de10->SetLineColor(kGreen);
   de10->SetParameters(zero,uno);
@@ -262,7 +265,7 @@ void mia_dech(std::string nome_cristallo) {
   leg10->Draw();
   */
 
-  leg10 = new TLegend(0.35,0.25,0.7,0.4);
+  auto leg10 = new TLegend(0.35,0.25,0.7,0.4);
   leg10->SetHeader("Dechanneling length for - #theta_{c} < #theta_{in} < #theta_{c}");
   leg10->AddEntry(de10,Form("L_{D} = %.2f mm",R10*(par_de10[1]*1e-3)),"l");
   leg10->SetFillColor(10);
@@ -279,8 +282,8 @@ void mia_dech(std::string nome_cristallo) {
   h5->GetYaxis()->SetTitle("Entries");
   h5->Draw();
 
-  Double_t par_am5[3]=0;
-  Double_t par_ch5[3]=0;
+  Double_t par_am5[3]={0};
+  Double_t par_ch5[3]={0};
   TF1 *g5    = new TF1("g5","gaus",min_ch,max_ch);
   TF1 *g5am    = new TF1("g5am","gaus",-50,50);
 
@@ -315,7 +318,7 @@ void mia_dech(std::string nome_cristallo) {
   Double_t am_max52 = par_am5[1]+(par_am5[2]*4.);
 
   //fit dechanneling uso sempre R10
-  Double_t par_de5[3]=0;
+  Double_t par_de5[3]={0};
   gStyle->SetOptFit(1111);
   TF1 *de5   = new TF1("de5",myfunction,am_max5,ch_min51,2);
   de5->SetLineColor(kGreen);
@@ -349,7 +352,7 @@ void mia_dech(std::string nome_cristallo) {
   */
 
 
-  leg5 = new TLegend(0.35,0.25,0.7,0.4);
+  auto leg5 = new TLegend(0.35,0.25,0.7,0.4);
   leg5->SetHeader("Dechanneling length for - #frac{#theta_{c}}{2} < #theta_{in} < #frac{#theta_{c}}{2}");
   leg5->AddEntry(de5,Form("L_{D} = %.2f mm",R10*(par_de5[1]*1e-3)),"l");
   leg5->SetFillColor(10);
