@@ -16,7 +16,7 @@ Double_t myfunction(Double_t *x, Double_t *par) {
   return f;
 }
 
-void dech(const char* nome_infile) {
+void mia_dech(const char* nome_infile) {
 
   gStyle->SetPalette(1);
   gStyle->SetOptStat(0);
@@ -33,7 +33,7 @@ void dech(const char* nome_infile) {
   //TFile * in_file = new TFile("STF45Rob_Exp.root");
   TString outputfile = "STF45Rob.dechanneling_Exp_new.root";
 
-  //xtal length and curvature
+  //xtal length and curvature TODO Controllare!
   Double_t z = 2e-3;
   Double_t R;
 
@@ -57,7 +57,7 @@ void dech(const char* nome_infile) {
 
   //test preliminare e inizializzazione parametri
 
-  Double_t par_ch[3]=0;
+  Double_t par_ch[3]={0,0,0};
   TF1 *g    = new TF1("g","gaus",110,180);
   g->SetLineColor(kRed);
   h1->Fit(g,"R");
