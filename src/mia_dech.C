@@ -10,21 +10,29 @@
 //#include "librerie.h"
 #include "func_sim.h"
 
+
 Double_t myfunction(Double_t *x, Double_t *par) {
   Float_t xx = x[0];
   Double_t f = par[0]*exp(-xx/par[1]);
   return f;
 }
 
-void mia_dech(const char* nome_infile) {
+void mia_dech(std::string nome_cristallo) {
 
   gStyle->SetPalette(1);
   gStyle->SetOptStat(0);
   gStyle->SetOptTitle(0);
   TGaxis::SetMaxDigits(3);
 
+
+  std::string cartella_cristallo = "ForFrancesco/" + nome_cristallo + "_exp/Analysis/";
+  gSystem->ChangeDirectory(cartella_cristallo.c_str());
+  std::string pathfiledati = cartella_cristallo + "recoDataSimple_415_1-37.torsion.correction.histo.root";
+  std::string filedati = "recoDataSimple_415_1-37.torsion.correction.histo.root";
+
   //Apre file dati
-  TFile * in_file = new TFile("./ForFrancesco/QMP32_exp/Analysis/recoDataSimple_415_1-37.torsion.correction.histo.root");
+  // TFile * in_file = new TFile("./ForFrancesco/STF45_exp/Analysis/recoDataSimple_415_1-37.torsion.correction.histo.root");
+  TFile * in_file = new TFile(filedati.c_str());
   //TString outputfile = "recoDataSimple_415.dechanneling.root";
 
   //TFile * in_file = new TFile("STF45Rob.root");
@@ -57,7 +65,7 @@ void mia_dech(const char* nome_infile) {
 
   //test preliminare e inizializzazione parametri
 
-  Double_t par_ch[3]={0,0,0};
+  Double_t par_ch[3]={0};
   TF1 *g    = new TF1("g","gaus",110,180);
   g->SetLineColor(kRed);
   h1->Fit(g,"R");
@@ -68,7 +76,7 @@ void mia_dech(const char* nome_infile) {
   Double_t min_ch = par_ch[1]-(par_ch[2]*3.);
   Double_t max_ch = par_ch[1]+(par_ch[2]*3.);
 
-  Double_t par_de[3]=0;
+  Double_t par_de[3]={0};
   TF1 *de = new TF1("de","expo",20,110);
   de->SetLineColor(kGreen+2);
   //de->SetParameters(1,1);

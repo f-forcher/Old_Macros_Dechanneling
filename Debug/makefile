@@ -8,9 +8,6 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
--include src/util/src/random/std/subdir.mk
--include src/util/src/random/root/subdir.mk
--include src/util/src/random/base/subdir.mk
 -include src/cpp/subdir.mk
 -include src/subdir.mk
 -include subdir.mk
@@ -42,19 +39,19 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: ROOT_Eclipse_project
+all: Old_Macros_Dechanneling
 
 # Tool invocations
-ROOT_Eclipse_project: $(OBJS) $(USER_OBJS)
+Old_Macros_Dechanneling: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	g++ $(OBJS) $(USER_OBJS) $(LIBS) `root-config --libs` -o "ROOT_Eclipse_project"
+	g++ $(OBJS) $(USER_OBJS) $(LIBS) `root-config --libs` -o "Old_Macros_Dechanneling"
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(CC_DEPS)$(C++_DEPS)$(EXECUTABLES)$(C_UPPER_DEPS)$(CXX_DEPS)$(OBJS)$(CPP_DEPS)$(C_DEPS) ROOT_Eclipse_project
+	-$(RM) $(CC_DEPS)$(C++_DEPS)$(EXECUTABLES)$(C_UPPER_DEPS)$(CXX_DEPS)$(OBJS)$(CPP_DEPS)$(C_DEPS) Old_Macros_Dechanneling
 	-@echo ' '
 
 .PHONY: all clean dependents

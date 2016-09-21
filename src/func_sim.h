@@ -41,6 +41,7 @@
 #include "TSystem.h"
 #include "TBenchmark.h"
 #include "TPaletteAxis.h"
+#include <string>
 
 using namespace std;
 
