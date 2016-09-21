@@ -1,3 +1,11 @@
+/*
+ * main_macro.C
+ *
+ *  Created on: Sep 21, 2016
+ *      Author: fforcher
+ */
+
+
 //============================================================================
 // Name        : bP_05.cpp
 // Author      : Francesco Forcher
@@ -11,25 +19,25 @@
 //#include "SourceFactory.h"
 //#include "util/include/Dispatcher.h"
 
-using namespace std;
+#include <iostream>
 
-int main_macro(int argc, const char* argv[]);
+int main_macro(int argc, const char* argv[]) {
 
-int main(int argc, const char* argv[]) {
+	using namespace std;
 
 	// store command line parameters
 
-	//int argc2 = 7;
-	//const char* argv2[] = { "./Debug/Ronch_braggPlot_v05", "input",
-	//		"bragg_events.txt", "hist", "hh", "ranges", "energyRanges" };
+	int argc2 = 7;
+	const char* argv2[] = { "./Debug/Ronch_braggPlot_v05", "input",
+			"bragg_events.txt", "hist", "hh", "ranges", "energyRanges" };
 
-	//cout << "Test main";
-
-	int return_macro = main_macro(argc, argv);
+	cout << "Test main macro" << endl;
 
 	//mia_dech();
 
-	return return_macro;
+	return 0;
 
 }
+
+
 
