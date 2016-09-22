@@ -26,7 +26,7 @@ int main(int argc, char* argv[]) {
 
 	//cout << "Test main";
 
-
+	//TApplication Necessary for the graphics
 	TApplication theApp("App",&argc, argv);
 	int return_macro = main_macro(argc, argv);
 
