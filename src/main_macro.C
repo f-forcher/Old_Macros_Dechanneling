@@ -25,7 +25,7 @@
 // https://root.cern.ch/root/htmldoc/guides/users-guide/ROOTUsersGuide.html#moving-between-interpreter-and-compiler
 #ifndef __CLING__
 // Se non siamo nell'interprete, metti la forward declaration perche' verra' linkata quando compili eclipse
-void mia_dech(std::string nome_cristallo);
+void mia_dech(std::string nome_cristallo, std::ofstream* output_dech);
 
 #else
 // Altrimenti includi il file della macro. Nel compilatore naturalmente direbbe multiple definition quando linka l'altro
