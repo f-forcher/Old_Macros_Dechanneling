@@ -105,9 +105,7 @@
 							<tool commandLinePattern="${COMMAND} ${INPUTS} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT}" id="cdt.managedbuild.tool.gnu.cpp.linker.exe.release.502186828" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.release">
 								<option id="gnu.cpp.link.option.flags.529096376" name="Linker flags" superClass="gnu.cpp.link.option.flags" useByScannerDiscovery="false" value="`root-config --libs`" valueType="string"/>
 								<option id="gnu.cpp.link.option.paths.550142623" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" useByScannerDiscovery="false"/>
-								<option id="gnu.cpp.link.option.libs.1149193618" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="~/ROOT/v5-34-36/lib"/>
-								</option>
+								<option id="gnu.cpp.link.option.libs.1149193618" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" useByScannerDiscovery="false" valueType="libs"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1032517643" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>

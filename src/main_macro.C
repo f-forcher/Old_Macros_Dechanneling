@@ -21,10 +21,11 @@
 
 #include <iostream>
 #include <vector>
+#include <fstream>
 
 void mia_dech(std::string nome_cristallo);
 
-int main_macro(int argc, const char* argv[]) {
+int main_macro(int argc, char* argv[]) {
 
 	using namespace std;
 
@@ -38,6 +39,11 @@ int main_macro(int argc, const char* argv[]) {
 	std::vector<const char*> elenco_cristalli = {"STF45", "STF38"};
 
 	cout << "Test main macro" << endl;
+
+	// Corso root lunardon/garfagnini
+	  // carica la macro generica che legge il file di testo
+	  //gROOT->LoadMacro("ReadHistoFromTextFile.C");
+	  //gSystem->Load("ReadHistoFromTextFile_C.so"); // altra opzione per la precompilata
 
 	/* TODO Chiamare mia_dech su tutti i cristalli
 	 * 1. Ottenere i file recoDataSimple_546_31-59.torsion.correction.histo.root
@@ -53,12 +59,19 @@ int main_macro(int argc, const char* argv[]) {
 	 */
 	// TODO Okkio al c++11! ROOT 5 compatibile? Probabilmente si comunque
 	for (const auto& ch : elenco_cristalli){
+		cout << endl << endl;
 		mia_dech(ch);
 	}
+
+
+
 	//mia_dech();
 
-	return 0;
+	//char t = 'a';
+	//while (cin >> t)
+	//	return 0;
 
+	return 0;
 }
 
 

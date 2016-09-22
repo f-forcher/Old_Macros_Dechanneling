@@ -8,10 +8,6 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
--include src/util/src/random/std/subdir.mk
--include src/util/src/random/root/subdir.mk
--include src/util/src/random/base/subdir.mk
--include src/cpp/subdir.mk
 -include src/subdir.mk
 -include subdir.mk
 -include objects.mk
@@ -42,19 +38,19 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: Ronch_braggPlot_v05
+all: Old_Macros_Dechanneling
 
 # Tool invocations
-Ronch_braggPlot_v05: $(OBJS) $(USER_OBJS)
+Old_Macros_Dechanneling: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	g++ $(OBJS) $(USER_OBJS) $(LIBS) `~/ROOT/v5-34-36/bin/root-config --libs` -o "Ronch_braggPlot_v05"
+	g++ $(OBJS) $(USER_OBJS) $(LIBS) `root-config --libs` -o "Old_Macros_Dechanneling"
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(CC_DEPS)$(C++_DEPS)$(EXECUTABLES)$(C_UPPER_DEPS)$(CXX_DEPS)$(OBJS)$(CPP_DEPS)$(C_DEPS) Ronch_braggPlot_v05
+	-$(RM) $(CC_DEPS)$(C++_DEPS)$(EXECUTABLES)$(C_UPPER_DEPS)$(CXX_DEPS)$(OBJS)$(CPP_DEPS)$(C_DEPS) Old_Macros_Dechanneling
 	-@echo ' '
 
 .PHONY: all clean dependents

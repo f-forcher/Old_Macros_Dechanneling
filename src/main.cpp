@@ -10,12 +10,13 @@
 //#include "EventSource.h"
 //#include "SourceFactory.h"
 //#include "util/include/Dispatcher.h"
-
+#include <TApplication.h>
 using namespace std;
 
-int main_macro(int argc, const char* argv[]);
 
-int main(int argc, const char* argv[]) {
+int main_macro(int argc, char* argv[]);
+
+int main(int argc, char* argv[]) {
 
 	// store command line parameters
 
@@ -25,8 +26,11 @@ int main(int argc, const char* argv[]) {
 
 	//cout << "Test main";
 
+
+	TApplication theApp("App",&argc, argv);
 	int return_macro = main_macro(argc, argv);
 
+	theApp.Run();
 	//mia_dech();
 
 	return return_macro;
