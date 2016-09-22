@@ -22,8 +22,24 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <TROOT.h>
 
+
+// Per poter usare questa macro sia compilando che eseguendo.
+// https://root.cern.ch/root/htmldoc/guides/users-guide/ROOTUsersGuide.html#moving-between-interpreter-and-compiler
+#ifndef __CLING__
+// Se non siamo nell'interprete, metti la forward declaration perche' verra' linkata quando compili eclipse
 void mia_dech(std::string nome_cristallo);
+
+#else
+// Altrimenti includi il file della macro. Nel compilatore naturalmente direbbe multiple definition quando linka l'altro
+// file.
+
+#include "mia_dech.C"
+
+#endif
+
+
 
 int main_macro(int argc, char* argv[]) {
 
@@ -40,11 +56,23 @@ int main_macro(int argc, char* argv[]) {
 
 	cout << "Test main macro" << endl;
 
+
 	// Corso root lunardon/garfagnini
 	  // carica la macro generica che legge il file di testo
 	  //gROOT->LoadMacro("ReadHistoFromTextFile.C");
 	  //gSystem->Load("ReadHistoFromTextFile_C.so"); // altra opzione per la precompilata
 
+
+/*
+	#if defined(__ROOTCLING__)
+	#pragma link C++ class MyOtherClass;
+	#endif
+*/
+	//gROOT->LoadMacro("src/mia_dech.C");
+	//gSystem->AddIncludePath(" -I./src/ ");
+
+	//gROOT->ProcessLine(".L ./src/mia_dech.C+");
+	cout << "Fin qua";
 	/* TODO Chiamare mia_dech su tutti i cristalli
 	 * 1. Ottenere i file recoDataSimple_546_31-59.torsion.correction.histo.root
 	 *
@@ -58,6 +86,7 @@ int main_macro(int argc, char* argv[]) {
 	 * 4. Profit!
 	 */
 	// TODO Okkio al c++11! ROOT 5 compatibile? Probabilmente si comunque
+	std::ofstream outputdechanneling("../../../dechanneling_table.txt", std::ofstream::out | std::ofstream::trunc);
 	for (const auto& ch : elenco_cristalli){
 		cout << endl << endl;
 		mia_dech(ch);
