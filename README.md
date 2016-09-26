@@ -14,8 +14,11 @@ Old ROOT macros for dechanneling, wich I`m modifying to analyze (old and new) cr
 3. Put Eclipse (or modify the scripts, obviously...) in `~/bin/eclipse`
 4. Put the scripts to run eclipse (eg `~/SCRIPT_ROOT_ECLIPSE/eclipse_root534.sh`) for example on the Desktop
 
-###Usage
+###Compile/run
 1. Open a terminal and select the root to use with the aliases (eg `root_534_select`) or soucing the scripts in `~/Documents/root_varie`
 2. Open eclipse using the script corresponding the selected ROOT
 * From terminal you can compile (assuming as usual you are in the folder) for example with Debug congfig with `cd ./Debug; make` and then you go back up `cd ..` and execute `./Debug/Old_Macros_Dechanelling`
 * Alternatively you can load and execute the macro main_macro() (the equivalent of main) from root, with for example
+
+#Usage
+The file .dat to analyze (not in github as they are too big to use) are

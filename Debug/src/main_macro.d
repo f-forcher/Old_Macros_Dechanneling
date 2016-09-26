@@ -26,7 +26,7 @@ src/main_macro.o: ../src/main_macro.C \
  /home/fforcher/ROOT/v6-06-08/include/TCollection.h \
  /home/fforcher/ROOT/v6-06-08/include/TIterator.h \
  /home/fforcher/ROOT/v6-06-08/include/TDatime.h \
- /home/fforcher/ROOT/v6-06-08/include/TUUID.h
+ /home/fforcher/ROOT/v6-06-08/include/TUUID.h ../src/dbg_macro.h
 
 /home/fforcher/ROOT/v6-06-08/include/TROOT.h:
 
@@ -83,3 +83,5 @@ src/main_macro.o: ../src/main_macro.C \
 /home/fforcher/ROOT/v6-06-08/include/TDatime.h:
 
 /home/fforcher/ROOT/v6-06-08/include/TUUID.h:
+
+../src/dbg_macro.h:
