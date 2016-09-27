@@ -13,9 +13,10 @@
 #include "dbg_macro.h"
 #include "func_sim.h"
 #include "dech.h"
+#include "DatiChanneling.h"
 
 extern TDirectory* PROJDIR;
-
+extern 	std::vector<TH1*> vHistograms;
 namespace mions {
 
 Double_t myfunction(Double_t *x, Double_t *par) {
@@ -54,6 +55,9 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 	gStyle->SetOptTitle(0);
 	TGaxis::SetMaxDigits(3);
 
+	//TODO Trovare un modo di tornare su di cartella con ROOT
+	PROJDIR->cd();
+
 	std::string cartella_cristallo = "ForFrancesco/" + nome_cristallo
 			+ "_exp/";
 	gSystem->ChangeDirectory(cartella_cristallo.c_str());
@@ -61,35 +65,69 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 			  "recoDataSimple_" + nome_cristallo + ".torsion.correction.histo.dat";
 
 	// TODO Generalizzare il nome del file
-	std::string filedati = "recoDataSimple_" + nome_cristallo + ".torsion.correction.histo.dat";
+	std::string nomefiledati = "recoDataSimple_" + nome_cristallo + ".torsion.correction.histo.dat";
 
 	std::ifstream file_dat(pathfiledati);
 
-	dati_channeling dc;
+	//600 bin ,da -200 a 400
+	// Scelti guardando i grafici fatti da dech.C
+
+	vHistograms.push_back( new TH1D(
+	/* name */"hdati",
+	/* title */"Istogramma Dati",
+	/* X-dimension */600, -200, 400));
+
 
 	if (file_dat) {
-		DBG(clog << pathfiledati << endl;, ;)
+		gStyle->SetPalette(1);
+		gStyle->SetOptStat(1);
+		gStyle->SetOptTitle(1);
+		TGaxis::SetMaxDigits(3);
+
+
+		DBG(
+			clog << "[LOG]: " << "Crystal " << nome_cristallo << endl;
+			clog << "[LOG]: File "<< pathfiledati << endl << endl;
+			, ; )
 		// TODO il mio codice qua
 
+		DatiChanneling dati(nomefiledati);
 
-		while (file_dat >> dc.x_entrata) {
-			file_dat >> dc.y_entrata;
-			file_dat >> dc.x_uscita;
-			file_dat >> dc.y_uscita;
-		};
+		EventoDechanneling ev;
+		auto datisize = dati.getSize();
+
+		//dati.print(datisize);
+
+		//Read events and select those with entry angle between -+5 microrad
+		for (ULong64_t i = 0; i < datisize; ++i) {
+
+			ev = dati.getEvent(i);
+			Double_t x_entrata = ev[0];
+			Double_t x_uscita = ev[2];
 
 
+			if (x_entrata > -5 and x_entrata < 5) {
+				vHistograms.back()->Fill(x_uscita-x_entrata);
+			}
+		}
+
+		std::vector<TCanvas* > vCanvases;
+
+		//TCanvas* mio_c1 = new TCanvas();
+		vCanvases.push_back(new TCanvas());
+		vHistograms.back()->Draw();
 
 	} else {
 		DBG(
 			clog << nome_cristallo << ": File .dat not found" << endl;
 			clog << "Nome cercato: " << pathfiledati << endl;
-			clog << "Current Dir: " << system("pwd") << endl;,
-			; )
+			clog << "Current Dir: " << system("pwd") << endl;
+			, ; )
 		clog << "[WARNING] For crystal " << nome_cristallo << ", File .dat not found" << endl <<
 				"          Trying to use old dech.C macro and .root data file" << endl << endl;
 		PROJDIR->cd();
-		dech(nome_cristallo,output_dech);
+		//Todo rimetterla;
+		//dech(nome_cristallo,output_dech);
 	}
 
 }

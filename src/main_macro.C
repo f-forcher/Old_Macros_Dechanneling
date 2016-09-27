@@ -21,14 +21,30 @@
 #include <fstream>
 #include <memory>
 #include <TROOT.h>
+#include <TH1.h>
 #include <cstdlib>
 #include "dbg_macro.h"
 
 #include "mia_dech.h"
 
+// Per poter usare questa macro sia compilando che eseguendo.
+// https://root.cern.ch/root/htmldoc/guides/users-guide/ROOTUsersGuide.html#moving-between-interpreter-and-compiler
+#ifndef __CLING__
 
+#include "DatiChanneling.h"
+
+#else
+	// Altrimenti includi il file della macro. Nel compilatore naturalmente direbbe multiple definition quando linka l'altro
+	// file.
+
+	#include "DatiChanneling.cpp"
+
+#endif
+
+//GLOBALS meglio in un file a parte
 //Directory del progetto
 TDirectory* PROJDIR = nullptr;
+std::vector<TH1*> vHistograms;
 
 int main_macro(int argc, char* argv[]) {
 
@@ -41,7 +57,7 @@ int main_macro(int argc, char* argv[]) {
 			"bragg_events.txt", "hist", "hh", "ranges", "energyRanges" };
 
 	// TODO da leggere da un file eventualmente
-	std::vector<const char*> elenco_cristalli { "STF45", "STF38" };
+	std::vector<const char*> elenco_cristalli { "STF45", "STF38", "STF47", "STF49", "STF51" };
 
 	cout << "Test main macro" << endl;
 

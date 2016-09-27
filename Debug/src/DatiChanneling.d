@@ -1,4 +1,4 @@
-src/main_macro.o: ../src/main_macro.C \
+src/DatiChanneling.o: ../src/DatiChanneling.cpp ../src/DatiChanneling.h \
  /home/fforcher/ROOT/v6-06-08/include/TROOT.h \
  /home/fforcher/ROOT/v6-06-08/include/TDirectory.h \
  /home/fforcher/ROOT/v6-06-08/include/TNamed.h \
@@ -26,24 +26,9 @@ src/main_macro.o: ../src/main_macro.C \
  /home/fforcher/ROOT/v6-06-08/include/TCollection.h \
  /home/fforcher/ROOT/v6-06-08/include/TIterator.h \
  /home/fforcher/ROOT/v6-06-08/include/TDatime.h \
- /home/fforcher/ROOT/v6-06-08/include/TUUID.h \
- /home/fforcher/ROOT/v6-06-08/include/TH1.h \
- /home/fforcher/ROOT/v6-06-08/include/TAxis.h \
- /home/fforcher/ROOT/v6-06-08/include/TAttAxis.h \
- /home/fforcher/ROOT/v6-06-08/include/TArrayD.h \
- /home/fforcher/ROOT/v6-06-08/include/TArray.h \
- /home/fforcher/ROOT/v6-06-08/include/TAttLine.h \
- /home/fforcher/ROOT/v6-06-08/include/TAttFill.h \
- /home/fforcher/ROOT/v6-06-08/include/TAttMarker.h \
- /home/fforcher/ROOT/v6-06-08/include/TArrayC.h \
- /home/fforcher/ROOT/v6-06-08/include/TArrayS.h \
- /home/fforcher/ROOT/v6-06-08/include/TArrayI.h \
- /home/fforcher/ROOT/v6-06-08/include/TArrayF.h \
- /home/fforcher/ROOT/v6-06-08/include/Foption.h \
- /home/fforcher/ROOT/v6-06-08/include/TVectorFfwd.h \
- /home/fforcher/ROOT/v6-06-08/include/TVectorDfwd.h \
- /home/fforcher/ROOT/v6-06-08/include/TFitResultPtr.h ../src/dbg_macro.h \
- ../src/mia_dech.h ../src/DatiChanneling.h
+ /home/fforcher/ROOT/v6-06-08/include/TUUID.h
+
+../src/DatiChanneling.h:
 
 /home/fforcher/ROOT/v6-06-08/include/TROOT.h:
 
@@ -100,41 +85,3 @@ src/main_macro.o: ../src/main_macro.C \
 /home/fforcher/ROOT/v6-06-08/include/TDatime.h:
 
 /home/fforcher/ROOT/v6-06-08/include/TUUID.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TH1.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TAxis.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TAttAxis.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TArrayD.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TArray.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TAttLine.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TAttFill.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TAttMarker.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TArrayC.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TArrayS.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TArrayI.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TArrayF.h:
-
-/home/fforcher/ROOT/v6-06-08/include/Foption.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TVectorFfwd.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TVectorDfwd.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TFitResultPtr.h:
-
-../src/dbg_macro.h:
-
-../src/mia_dech.h:
-
-../src/DatiChanneling.h:

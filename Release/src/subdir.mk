@@ -4,22 +4,28 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_UPPER_SRCS += \
+../src/dech.C \
 ../src/main_macro.C \
 ../src/mia_dech.C 
 
 CPP_SRCS += \
+../src/DatiChanneling.cpp \
 ../src/main.cpp 
 
 C_UPPER_DEPS += \
+./src/dech.d \
 ./src/main_macro.d \
 ./src/mia_dech.d 
 
 OBJS += \
+./src/DatiChanneling.o \
+./src/dech.o \
 ./src/main.o \
 ./src/main_macro.o \
 ./src/mia_dech.o 
 
 CPP_DEPS += \
+./src/DatiChanneling.d \
 ./src/main.d 
 
 
