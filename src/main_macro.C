@@ -24,27 +24,8 @@
 #include <cstdlib>
 #include "dbg_macro.h"
 
-// Per poter usare questa macro sia compilando che eseguendo.
-// https://root.cern.ch/root/htmldoc/guides/users-guide/ROOTUsersGuide.html#moving-between-interpreter-and-compiler
-#ifndef __CLING__
-// Se non siamo nell'interprete, metti la forward declaration perche' verra' linkata quando compili eclipse
-void dech(std::string nome_cristallo,
-		std::shared_ptr<std::ofstream> output_dech);
+#include "mia_dech.h"
 
-namespace mions {
-void mia_dech(std::string nome_cristallo,
-		std::shared_ptr<std::ofstream> output_dech);
-}
-
-#else
-// Altrimenti includi il file della macro. Nel compilatore naturalmente direbbe multiple definition quando linka l'altro
-// file.
-
-#include "dech.C"
-#include "mia_dech.C"
-
-
-#endif
 
 //Directory del progetto
 TDirectory* PROJDIR = nullptr;

@@ -8,8 +8,11 @@
 
 
 #include <cstdio> //system()
+#include <iostream>
+
 #include "dbg_macro.h"
 #include "func_sim.h"
+#include "dech.h"
 
 extern TDirectory* PROJDIR;
 
@@ -22,7 +25,7 @@ Double_t myfunction(Double_t *x, Double_t *par) {
 	Float_t xx = x[0];
 	Double_t f = par[0] * exp(-xx / par[1]);
 	return f;
-}
+
 
 // TODO Provata con STF45, "generalizzare" agli altri
 /*
@@ -31,13 +34,18 @@ Double_t myfunction(Double_t *x, Double_t *par) {
  * @output_dech: file in which to append the "Ldech"s, in the format
  *               Crystal | dechanneling L at +-5 microrad [m] | dechanneling L at +-10 microrad [m]
  */
+}
 
-struct dati_channeling {
+/*
+class dati_channeling {
 		Double_t x_entrata;
 		Double_t y_entrata;
 		Double_t x_uscita;
 		Double_t y_uscita;
 };
+*/
+
+
 
 void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_dech) {
 
@@ -57,9 +65,18 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 
 	std::ifstream file_dat(pathfiledati);
 
+	dati_channeling dc;
+
 	if (file_dat) {
 		DBG(clog << pathfiledati << endl;, ;)
 		// TODO il mio codice qua
+
+
+		while (file_dat >> dc.x_entrata) {
+			file_dat >> dc.y_entrata;
+			file_dat >> dc.x_uscita;
+			file_dat >> dc.y_uscita;
+		};
 
 
 
