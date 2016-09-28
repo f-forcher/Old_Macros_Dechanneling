@@ -34,7 +34,7 @@ Double_t myfunction(Double_t *x, Double_t *par) {
 	return f;
 
 
-// TODO Provata con STF45, "generalizzare" agli altri
+
 /*
  * Macro to calculate dechanneling lenght for a crystal.
  * @nome_cristallo: Nabe of the folder with the crystal data
@@ -55,10 +55,12 @@ class dati_channeling {
 
 
 
+
+
 void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_dech, std::shared_ptr<TFile> root_output) {
 
-	//TODO Trovare un modo di tornare su di cartella
 	//PROJDIR->cd();
+	// Go to the project's "home" folder
 	chdir(PROJECT_DIR);
 
 	gStyle->SetPalette(1);
@@ -76,7 +78,7 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 	std::string pathfiledati = //cartella_cristallo +
 			  "recoDataSimple_" + nome_cristallo + ".torsion.correction.histo.dat";
 
-	// TODO Generalizzare il nome del file
+
 	std::string nomefiledati = "recoDataSimple_" + nome_cristallo + ".torsion.correction.histo.dat";
 
 	std::ifstream file_dat(pathfiledati);
@@ -107,11 +109,12 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 			 /* title */titlehisto10.c_str(),
 			 /* X-dimension */600, -200, 400);
 
-	//TODO ??? gli hist han tutti lo stesso nome
 	//vHistograms.front()->SetNameTitle(nomehisto.c_str(),nome_cristallo.c_str());
 
 
 	if (file_dat) {
+		// Il codice per la mia analisi qua
+
 		gStyle->SetPalette(1);
 		gStyle->SetOptStat(1);
 		gStyle->SetOptTitle(1);
@@ -122,8 +125,8 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 			clog << "[LOG]: " << "Crystal " << nome_cristallo << endl;
 			clog << "[LOG]: File "<< pathfiledati << endl << endl;
 			, ; )
-		// TODO il mio codice qua
 
+		//Riempi gli istogrammi
 		DatiChanneling dati(nomefiledati);
 
 		EventoDechanneling ev;
@@ -153,11 +156,21 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 		//std::vector<TCanvas* > vCanvases;
 
 		//TCanvas* mio_c1 = new TCanvas();
-		//Canvases.push_back(new TCanvas(nome_cristallo.c_str()));
+		//vCanvases.push_back(new TCanvas(nome_cristallo.c_str()));
 		//vHistograms.front()->Draw();
-		//histogram5->Draw();
-
+		histogram5->Draw();
 		root_output->Write();
+
+
+
+
+
+		//TODO FITTING
+		//Alla fine dovro' scrivere sul file dechanneling_table.txt
+
+		//Read the Crystal data
+
+
 
 	} else {
 		DBG(

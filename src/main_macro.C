@@ -65,10 +65,13 @@ int main_macro(int argc, char* argv[]) {
 	const char* argv2[] = { "./Debug/Ronch_braggPlot_v05", "input",
 			"bragg_events.txt", "hist", "hh", "ranges", "energyRanges" };
 
-	// TODO da leggere da un file eventualmente
+	//Elenco dei cristalli
 	std::vector<const char*> elenco_cristallistf { "STF38", "STF45", "STF47", "STF49", "STF51" };
 	std::vector<const char*> elenco_cristalliqmp { "QMP27", "QMP29", "QMP32" };
 	std::vector<const char*> elenco_cristalli { "STF38", "STF45", "STF47", "STF49", "STF51", "QMP27", "QMP29", "QMP32" };
+
+	std::vector<const char*> elenco_cristalli_buoni { "STF45", "STF49", "QMP27", "QMP32" };
+
 	//std::vector<const char*> elenco_cristalli { "QMP32" };
 	clog << "Start main_macro..." << endl;
 
@@ -89,7 +92,7 @@ int main_macro(int argc, char* argv[]) {
 	DBG(clog << "Current Project Dir: " << PROJECT_DIR << endl
 	; , ;)
 
-	/* TODO Chiamare mia_dech su tutti i cristalli
+	/* Chiamare mia_dech su tutti i cristalli
 	 * 1. Ottenere i file recoDataSimple_546_31-59.torsion.correction.histo.root
 	 *
 	 * 2. Scoprire dove sono le variabili
@@ -121,7 +124,7 @@ int main_macro(int argc, char* argv[]) {
 	auto file_output_root = std::make_shared<TFile>(path_file_output_root.c_str(), "RECREATE");
 
 
-	for (const auto& ch : elenco_cristalli) {
+	for (const auto& ch : elenco_cristalli_buoni) {
 		cout << endl << endl;
 		//dech(ch, outputdechanneling);
 		mions::mia_dech(ch, outputdechanneling, file_output_root);

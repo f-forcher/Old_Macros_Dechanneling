@@ -44,7 +44,7 @@ all: Old_Macros_Dechanneling
 Old_Macros_Dechanneling: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	g++ -flto -O3 `root-config --libs` -o "Old_Macros_Dechanneling" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ $(OBJS) $(USER_OBJS) $(LIBS) -flto -O3 `root-config --libs` -o "Old_Macros_Dechanneling"
 	@echo 'Finished building target: $@'
 	@echo ' '
 
