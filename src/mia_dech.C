@@ -5,12 +5,11 @@
  *      Author: fforcher
  */
 
-
-
 //#include <cstdio> //system()
 #include <iostream>
 #include <unistd.h> // chdir
-
+#include <sstream>
+//#include <map>
 
 #include "dbg_macro.h"
 #include "func_sim.h"
@@ -20,7 +19,7 @@
 extern TDirectory* ROOT_PROJDIR;
 //extern 	std::vector<TH1*> vHistograms;
 //extern 	std::vector<TH1*> vHistograms10;
-extern std::vector<TCanvas* > vCanvases;
+extern std::vector<TCanvas*> vCanvases;
 extern char PROJECT_DIR[FILENAME_MAX];
 
 namespace mions {
@@ -33,84 +32,78 @@ Double_t myfunction(Double_t *x, Double_t *par) {
 	Double_t f = par[0] * exp(-xx / par[1]);
 	return f;
 
-
-
-/*
- * Macro to calculate dechanneling lenght for a crystal.
- * @nome_cristallo: Nabe of the folder with the crystal data
- * @output_dech: file in which to append the "Ldech"s, in the format
- *               Crystal | dechanneling L at +-5 microrad [m] | dechanneling L at +-10 microrad [m]
- */
+	/*
+	 * Macro to calculate dechanneling lenght for a crystal.
+	 * @nome_cristallo: Nabe of the folder with the crystal data
+	 * @output_dech: file in which to append the "Ldech"s, in the format
+	 *               Crystal | dechanneling L at +-5 microrad [m] | dechanneling L at +-10 microrad [m]
+	 */
 }
 
 /*
-class dati_channeling {
-		Double_t x_entrata;
-		Double_t y_entrata;
-		Double_t x_uscita;
-		Double_t y_uscita;
-};
-*/
+ class dati_channeling {
+ Double_t x_entrata;
+ Double_t y_entrata;
+ Double_t x_uscita;
+ Double_t y_uscita;
+ };
+ */
 
-
-
-
-
-
-void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_dech, std::shared_ptr<TFile> root_output) {
+void mia_dech(std::string nome_cristallo,
+		std::shared_ptr<std::ofstream> output_dech,
+		std::shared_ptr<TFile> root_output,
+		std::map<std::string, Double_t> raggi_cristalli) {
 
 	//PROJDIR->cd();
 	// Go to the project's "home" folder
 	chdir(PROJECT_DIR);
+
+	using std::string;
+	using std::ifstream;
+	using std::stringstream;
 
 	gStyle->SetPalette(1);
 	gStyle->SetOptStat(0);
 	gStyle->SetOptTitle(0);
 	TGaxis::SetMaxDigits(3);
 
-
-
-
-
-	std::string cartella_cristallo = "ForFrancesco/" + nome_cristallo
-			+ "_exp/";
+	string cartella_cristallo = "ForFrancesco/" + nome_cristallo + "_exp/";
 	gSystem->ChangeDirectory(cartella_cristallo.c_str());
-	std::string pathfiledati = //cartella_cristallo +
-			  "recoDataSimple_" + nome_cristallo + ".torsion.correction.histo.dat";
+	string pathfiledati = //cartella_cristallo +
+			"recoDataSimple_" + nome_cristallo
+					+ ".torsion.correction.histo.dat";
 
+	string nomefiledati = "recoDataSimple_" + nome_cristallo
+			+ ".torsion.correction.histo.dat";
 
-	std::string nomefiledati = "recoDataSimple_" + nome_cristallo + ".torsion.correction.histo.dat";
-
-	std::ifstream file_dat(pathfiledati);
+	ifstream file_dat(pathfiledati);
 
 	//600 bin ,da -200 a 400
 	// Scelti guardando i grafici fatti da dech.C
 
 	// select +- 5 microrad in nomehisto5, +-10 in nomehisto10
-	std::string nomehisto5 = "hdati5_" + nome_cristallo;
-	std::string nomehisto10 = "hdati10_" + nome_cristallo;
-	std::string titlehisto5 = nome_cristallo + ", cuts at +- 5 microrad";
-	std::string titlehisto10 = nome_cristallo + ", cuts at +- 10 microrad";
+	string nomehisto5 = "hdati5_" + nome_cristallo;
+	string nomehisto10 = "hdati10_" + nome_cristallo;
+	string titlehisto5 = nome_cristallo + ", cuts at +- 5 microrad";
+	string titlehisto10 = nome_cristallo + ", cuts at +- 10 microrad";
 	clog << nomehisto5 << endl;
-
 
 	// vHistograms.push_back( new TH1D(
 	// /* name */nomehisto.c_str(),
 	// /* title */nome_cristallo.c_str(),
 	// /* X-dimension */600, -200, 400));
 
-	auto histogram5 = std::make_unique<TH1D>(
-			 /* name */nomehisto5.c_str(),
-			 /* title */titlehisto5.c_str(),
-			 /* X-dimension */600, -200, 400);
+	auto histogram5 = std::make_unique < TH1D > (
+	/* name */nomehisto5.c_str(),
+	/* title */titlehisto5.c_str(),
+	/* X-dimension */600, -200, 400);
 
-	auto histogram10 = std::make_unique<TH1D>(
-			 /* name */nomehisto10.c_str(),
-			 /* title */titlehisto10.c_str(),
-			 /* X-dimension */600, -200, 400);
+	auto histogram10 = std::make_unique < TH1D > (
+	/* name */nomehisto10.c_str(),
+	/* title */titlehisto10.c_str(),
+	/* X-dimension */600, -200, 400);
 
 	//vHistograms.front()->SetNameTitle(nomehisto.c_str(),nome_cristallo.c_str());
-
 
 	if (file_dat) {
 		// Il codice per la mia analisi qua
@@ -120,11 +113,9 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 		gStyle->SetOptTitle(1);
 		TGaxis::SetMaxDigits(3);
 
-
 		DBG(
-			clog << "[LOG]: " << "Crystal " << nome_cristallo << endl;
-			clog << "[LOG]: File "<< pathfiledati << endl << endl;
-			, ; )
+				clog << "[LOG]: " << "Crystal " << nome_cristallo << endl; clog << "[LOG]: File "<< pathfiledati << endl << endl;,
+				;)
 
 		//Riempi gli istogrammi
 		DatiChanneling dati(nomefiledati);
@@ -141,15 +132,14 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 			Double_t x_entrata = ev[0];
 			Double_t x_uscita = ev[2];
 
-
 			if (x_entrata > -5 and x_entrata < 5) {
 				//vHistograms.front()->Fill(x_uscita-x_entrata);
-				histogram5->Fill(x_uscita-x_entrata);
+				histogram5->Fill(x_uscita - x_entrata);
 			}
 
 			if (x_entrata > -10 and x_entrata < 10) {
 				//vHistograms.front()->Fill(x_uscita-x_entrata);
-				histogram10->Fill(x_uscita-x_entrata);
+				histogram10->Fill(x_uscita - x_entrata);
 			}
 		}
 
@@ -161,26 +151,22 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 		histogram5->Draw();
 		root_output->Write();
 
-
-
-
-
 		//TODO FITTING
 		//Alla fine dovro' scrivere sul file dechanneling_table.txt
 
-		//Read the Crystal data
 
+		//Read the Crystal data
+		//Spostato nel main_macro
 
 
 	} else {
 		DBG(
-			clog << nome_cristallo << ": File .dat not found" << endl;
-			clog << "Nome cercato: " << pathfiledati << endl;
-			clog << "Current Dir: " << system("pwd") << endl;
-			, ; )
-		clog << "[WARNING] For crystal " << nome_cristallo << ", File .dat not found" << endl <<
-				"          Trying to use old dech.C macro and .root data file" << endl << endl;
-
+				clog << nome_cristallo << ": File .dat not found" << endl; clog << "Nome cercato: " << pathfiledati << endl; clog << "Current Dir: " << system("pwd") << endl;,
+				;)
+		clog << "[WARNING] For crystal " << nome_cristallo
+				<< ", File .dat not found" << endl
+				<< "          Trying to use old dech.C macro and .root data file"
+				<< endl << endl;
 
 		//ROOT_PROJDIR->cd();
 		//Todo rimetterla;
@@ -188,6 +174,5 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 	}
 
 }
-
 
 }

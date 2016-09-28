@@ -22,6 +22,7 @@
 #include <memory>
 #include <cstdlib>
 #include <unistd.h>
+#include <map>
 
 #include <TROOT.h>
 #include <TH1.h>
@@ -122,6 +123,37 @@ int main_macro(int argc, char* argv[]) {
 
 	std::string path_file_output_root = string(PROJECT_DIR) + "/Dechanneling_Histograms.root";
 	auto file_output_root = std::make_shared<TFile>(path_file_output_root.c_str(), "RECREATE");
+
+
+
+	//Read crystal data
+	// File format: Crystal name | Rc [m]
+	string nome_file_raggio_cristallo = PROJECT_DIR
+			+ "/tabella_dati_cristalli.txt";
+	ifstream file_raggi_cristalli(nome_file_raggio_cristallo);
+
+	string riga_estratta;
+	stringstream ss;
+	map<string, Double_T> map_raggi_crist;
+
+	// Contenuto di una riga del file
+	//Ignora la prima linea con i nomi delle colonne
+	getline(riga_estratta, file_raggi_cristalli);
+
+	while (file_raggi_cristalli) {
+		string cristallo;
+		Double_t raggio_curvatura;
+
+		getline(riga_estratta, raggio_cristallo);
+		ss << riga_estratta;
+
+		ss >> cristallo;
+		ss >> raggio_curvatura;
+
+		map_raggi_crist[cristallo] = raggio_curvatura;
+	}
+
+
 
 
 	for (const auto& ch : elenco_cristalli_buoni) {

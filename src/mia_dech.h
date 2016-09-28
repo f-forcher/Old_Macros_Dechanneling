@@ -17,7 +17,8 @@ class TFile;
 	namespace mions {
 	void mia_dech(std::string nome_cristallo,
 			std::shared_ptr<std::ofstream> output_dech,
-			std::shared_ptr<TFile> root_output);
+			std::shared_ptr<TFile> root_output,
+			std::map<std::string, Double_t> raggi_cristalli);
 	}
 
 #else

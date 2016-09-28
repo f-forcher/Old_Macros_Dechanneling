@@ -1,4 +1,4 @@
-# Cristalli	Rc [m]
+# Cristalli	| Rc [m]
 STF45	13.33
 STF49	2.96
 STF38	9
