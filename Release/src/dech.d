@@ -1,4 +1,4 @@
-src/mia_dech.o: ../src/mia_dech.C ../src/dbg_macro.h ../src/func_sim.h \
+src/dech.o: ../src/dech.C ../src/func_sim.h \
  /home/fforcher/ROOT/v6-06-08/include/TNtuple.h \
  /home/fforcher/ROOT/v6-06-08/include/TTree.h \
  /home/fforcher/ROOT/v6-06-08/include/TBranch.h \
@@ -120,10 +120,7 @@ src/mia_dech.o: ../src/mia_dech.C ../src/dbg_macro.h ../src/func_sim.h \
  /home/fforcher/ROOT/v6-06-08/include/THStack.h \
  /home/fforcher/ROOT/v6-06-08/include/TBenchmark.h \
  /home/fforcher/ROOT/v6-06-08/include/TStopwatch.h \
- /home/fforcher/ROOT/v6-06-08/include/TPaletteAxis.h ../src/dech.h \
- ../src/DatiChanneling.h
-
-../src/dbg_macro.h:
+ /home/fforcher/ROOT/v6-06-08/include/TPaletteAxis.h
 
 ../src/func_sim.h:
 
@@ -370,7 +367,3 @@ src/mia_dech.o: ../src/mia_dech.C ../src/dbg_macro.h ../src/func_sim.h \
 /home/fforcher/ROOT/v6-06-08/include/TStopwatch.h:
 
 /home/fforcher/ROOT/v6-06-08/include/TPaletteAxis.h:
-
-../src/dech.h:
-
-../src/DatiChanneling.h:

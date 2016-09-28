@@ -7,16 +7,22 @@
 
 
 
-#include <cstdio> //system()
+//#include <cstdio> //system()
 #include <iostream>
+#include <unistd.h> // chdir
+
 
 #include "dbg_macro.h"
 #include "func_sim.h"
 #include "dech.h"
 #include "DatiChanneling.h"
 
-extern TDirectory* PROJDIR;
-extern 	std::vector<TH1*> vHistograms;
+extern TDirectory* ROOT_PROJDIR;
+//extern 	std::vector<TH1*> vHistograms;
+//extern 	std::vector<TH1*> vHistograms10;
+extern std::vector<TCanvas* > vCanvases;
+extern char PROJECT_DIR[FILENAME_MAX];
+
 namespace mions {
 
 Double_t myfunction(Double_t *x, Double_t *par) {
@@ -48,15 +54,21 @@ class dati_channeling {
 
 
 
-void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_dech) {
+
+void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_dech, std::shared_ptr<TFile> root_output) {
+
+	//TODO Trovare un modo di tornare su di cartella
+	//PROJDIR->cd();
+	chdir(PROJECT_DIR);
 
 	gStyle->SetPalette(1);
 	gStyle->SetOptStat(0);
 	gStyle->SetOptTitle(0);
 	TGaxis::SetMaxDigits(3);
 
-	//TODO Trovare un modo di tornare su di cartella con ROOT
-	PROJDIR->cd();
+
+
+
 
 	std::string cartella_cristallo = "ForFrancesco/" + nome_cristallo
 			+ "_exp/";
@@ -72,10 +84,31 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 	//600 bin ,da -200 a 400
 	// Scelti guardando i grafici fatti da dech.C
 
-	vHistograms.push_back( new TH1D(
-	/* name */"hdati",
-	/* title */"Istogramma Dati",
-	/* X-dimension */600, -200, 400));
+	// select +- 5 microrad in nomehisto5, +-10 in nomehisto10
+	std::string nomehisto5 = "hdati5_" + nome_cristallo;
+	std::string nomehisto10 = "hdati10_" + nome_cristallo;
+	std::string titlehisto5 = nome_cristallo + ", cuts at +- 5 microrad";
+	std::string titlehisto10 = nome_cristallo + ", cuts at +- 10 microrad";
+	clog << nomehisto5 << endl;
+
+
+	// vHistograms.push_back( new TH1D(
+	// /* name */nomehisto.c_str(),
+	// /* title */nome_cristallo.c_str(),
+	// /* X-dimension */600, -200, 400));
+
+	auto histogram5 = std::make_unique<TH1D>(
+			 /* name */nomehisto5.c_str(),
+			 /* title */titlehisto5.c_str(),
+			 /* X-dimension */600, -200, 400);
+
+	auto histogram10 = std::make_unique<TH1D>(
+			 /* name */nomehisto10.c_str(),
+			 /* title */titlehisto10.c_str(),
+			 /* X-dimension */600, -200, 400);
+
+	//TODO ??? gli hist han tutti lo stesso nome
+	//vHistograms.front()->SetNameTitle(nomehisto.c_str(),nome_cristallo.c_str());
 
 
 	if (file_dat) {
@@ -107,15 +140,24 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 
 
 			if (x_entrata > -5 and x_entrata < 5) {
-				vHistograms.back()->Fill(x_uscita-x_entrata);
+				//vHistograms.front()->Fill(x_uscita-x_entrata);
+				histogram5->Fill(x_uscita-x_entrata);
+			}
+
+			if (x_entrata > -10 and x_entrata < 10) {
+				//vHistograms.front()->Fill(x_uscita-x_entrata);
+				histogram10->Fill(x_uscita-x_entrata);
 			}
 		}
 
-		std::vector<TCanvas* > vCanvases;
+		//std::vector<TCanvas* > vCanvases;
 
 		//TCanvas* mio_c1 = new TCanvas();
-		vCanvases.push_back(new TCanvas());
-		vHistograms.back()->Draw();
+		//Canvases.push_back(new TCanvas(nome_cristallo.c_str()));
+		//vHistograms.front()->Draw();
+		//histogram5->Draw();
+
+		root_output->Write();
 
 	} else {
 		DBG(
@@ -125,7 +167,9 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 			, ; )
 		clog << "[WARNING] For crystal " << nome_cristallo << ", File .dat not found" << endl <<
 				"          Trying to use old dech.C macro and .root data file" << endl << endl;
-		PROJDIR->cd();
+
+
+		//ROOT_PROJDIR->cd();
 		//Todo rimetterla;
 		//dech(nome_cristallo,output_dech);
 	}

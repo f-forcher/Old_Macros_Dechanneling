@@ -20,12 +20,16 @@
 #include <vector>
 #include <fstream>
 #include <memory>
+#include <cstdlib>
+#include <unistd.h>
+
 #include <TROOT.h>
 #include <TH1.h>
-#include <cstdlib>
-#include "dbg_macro.h"
+#include <TFile.h>
+
 
 #include "mia_dech.h"
+#include "dbg_macro.h"
 
 // Per poter usare questa macro sia compilando che eseguendo.
 // https://root.cern.ch/root/htmldoc/guides/users-guide/ROOTUsersGuide.html#moving-between-interpreter-and-compiler
@@ -34,22 +38,27 @@
 #include "DatiChanneling.h"
 
 #else
-	// Altrimenti includi il file della macro. Nel compilatore naturalmente direbbe multiple definition quando linka l'altro
-	// file.
+// Altrimenti includi il file della macro. Nel compilatore naturalmente direbbe multiple definition quando linka l'altro
+// file.
 
-	#include "DatiChanneling.cpp"
+#include "DatiChanneling.cpp"
 
 #endif
 
 //GLOBALS meglio in un file a parte
 //Directory del progetto
-TDirectory* PROJDIR = nullptr;
+TDirectory* ROOT_PROJDIR = nullptr;
+char PROJECT_DIR[FILENAME_MAX] = "[NOT SET]";
 std::vector<TH1*> vHistograms;
+std::vector<TCanvas* > vCanvases;
 
 int main_macro(int argc, char* argv[]) {
 
 	using namespace std;
 
+	// Save the directory of the project (remember you are expected to start it from the
+	// top folder of the repo)
+	getcwd(PROJECT_DIR, FILENAME_MAX);
 	// store command line parameters
 
 	int argc2 = 7;
@@ -57,9 +66,11 @@ int main_macro(int argc, char* argv[]) {
 			"bragg_events.txt", "hist", "hh", "ranges", "energyRanges" };
 
 	// TODO da leggere da un file eventualmente
-	std::vector<const char*> elenco_cristalli { "STF45", "STF38", "STF47", "STF49", "STF51" };
-
-	cout << "Test main macro" << endl;
+	std::vector<const char*> elenco_cristallistf { "STF38", "STF45", "STF47", "STF49", "STF51" };
+	std::vector<const char*> elenco_cristalliqmp { "QMP27", "QMP29", "QMP32" };
+	std::vector<const char*> elenco_cristalli { "STF38", "STF45", "STF47", "STF49", "STF51", "QMP27", "QMP29", "QMP32" };
+	//std::vector<const char*> elenco_cristalli { "QMP32" };
+	clog << "Start main_macro..." << endl;
 
 	// Corso root lunardon/garfagnini
 	// carica la macro generica che legge il file di testo
@@ -75,8 +86,7 @@ int main_macro(int argc, char* argv[]) {
 	//gSystem->AddIncludePath(" -I./src/ ");
 	//gROOT->ProcessLine(".L ./src/mia_dech.C+");
 	//clog << "Fin qua" << endl;
-
-	DBG(clog << "Current Dir: " << system("pwd") << endl
+	DBG(clog << "Current Project Dir: " << PROJECT_DIR << endl
 	; , ;)
 
 	/* TODO Chiamare mia_dech su tutti i cristalli
@@ -103,12 +113,18 @@ int main_macro(int argc, char* argv[]) {
 	*outputdechanneling
 			<< "# Crystal | dechanneling L at +-5 microrad [m] | dechanneling L at +-10 microrad [m]"
 			<< endl;
-	PROJDIR = gDirectory;
+
+	ROOT_PROJDIR = gDirectory;
 	TDirectory* currentDir = gDirectory;
+
+	std::string path_file_output_root = string(PROJECT_DIR) + "/Dechanneling_Histograms.root";
+	auto file_output_root = std::make_shared<TFile>(path_file_output_root.c_str(), "RECREATE");
+
+
 	for (const auto& ch : elenco_cristalli) {
 		cout << endl << endl;
 		//dech(ch, outputdechanneling);
-		mions::mia_dech(ch, outputdechanneling);
+		mions::mia_dech(ch, outputdechanneling, file_output_root);
 		//currentDir->cd();
 	}
 	currentDir->cd();

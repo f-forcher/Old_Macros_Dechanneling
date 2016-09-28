@@ -1,5 +1,7 @@
-src/main.o: ../src/main.cpp \
- /home/fforcher/ROOT/v6-06-08/include/TApplication.h \
+src/DatiChanneling.o: ../src/DatiChanneling.cpp ../src/DatiChanneling.h \
+ /home/fforcher/ROOT/v6-06-08/include/TROOT.h \
+ /home/fforcher/ROOT/v6-06-08/include/TDirectory.h \
+ /home/fforcher/ROOT/v6-06-08/include/TNamed.h \
  /home/fforcher/ROOT/v6-06-08/include/TObject.h \
  /home/fforcher/ROOT/v6-06-08/include/Rtypes.h \
  /home/fforcher/ROOT/v6-06-08/include/RtypesCore.h \
@@ -15,7 +17,6 @@ src/main.o: ../src/main.cpp \
  /home/fforcher/ROOT/v6-06-08/include/TVersionCheck.h \
  /home/fforcher/ROOT/v6-06-08/include/Riosfwd.h \
  /home/fforcher/ROOT/v6-06-08/include/TBuffer.h \
- /home/fforcher/ROOT/v6-06-08/include/TQObject.h \
  /home/fforcher/ROOT/v6-06-08/include/TString.h \
  /home/fforcher/ROOT/v6-06-08/include/TMathBase.h \
  /home/fforcher/ROOT/v6-06-08/include/RStringView.h \
@@ -24,17 +25,16 @@ src/main.o: ../src/main.cpp \
  /home/fforcher/ROOT/v6-06-08/include/TSeqCollection.h \
  /home/fforcher/ROOT/v6-06-08/include/TCollection.h \
  /home/fforcher/ROOT/v6-06-08/include/TIterator.h \
- /home/fforcher/ROOT/v6-06-08/include/TQObjectEmitVA.h \
- /home/fforcher/ROOT/v6-06-08/include/TQConnection.h \
- /home/fforcher/ROOT/v6-06-08/include/Varargs.h \
- /home/fforcher/ROOT/v6-06-08/include/TInterpreter.h \
- /home/fforcher/ROOT/v6-06-08/include/TDictionary.h \
- /home/fforcher/ROOT/v6-06-08/include/TNamed.h \
- /home/fforcher/ROOT/v6-06-08/include/ESTLType.h \
- /home/fforcher/ROOT/v6-06-08/include/TVirtualMutex.h \
- /home/fforcher/ROOT/v6-06-08/include/TApplicationImp.h
+ /home/fforcher/ROOT/v6-06-08/include/TDatime.h \
+ /home/fforcher/ROOT/v6-06-08/include/TUUID.h
 
-/home/fforcher/ROOT/v6-06-08/include/TApplication.h:
+../src/DatiChanneling.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TROOT.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TDirectory.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TNamed.h:
 
 /home/fforcher/ROOT/v6-06-08/include/TObject.h:
 
@@ -66,8 +66,6 @@ src/main.o: ../src/main.cpp \
 
 /home/fforcher/ROOT/v6-06-08/include/TBuffer.h:
 
-/home/fforcher/ROOT/v6-06-08/include/TQObject.h:
-
 /home/fforcher/ROOT/v6-06-08/include/TString.h:
 
 /home/fforcher/ROOT/v6-06-08/include/TMathBase.h:
@@ -84,20 +82,6 @@ src/main.o: ../src/main.cpp \
 
 /home/fforcher/ROOT/v6-06-08/include/TIterator.h:
 
-/home/fforcher/ROOT/v6-06-08/include/TQObjectEmitVA.h:
+/home/fforcher/ROOT/v6-06-08/include/TDatime.h:
 
-/home/fforcher/ROOT/v6-06-08/include/TQConnection.h:
-
-/home/fforcher/ROOT/v6-06-08/include/Varargs.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TInterpreter.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TDictionary.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TNamed.h:
-
-/home/fforcher/ROOT/v6-06-08/include/ESTLType.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TVirtualMutex.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TApplicationImp.h:
+/home/fforcher/ROOT/v6-06-08/include/TUUID.h:

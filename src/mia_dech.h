@@ -12,9 +12,12 @@
 // https://root.cern.ch/root/htmldoc/guides/users-guide/ROOTUsersGuide.html#moving-between-interpreter-and-compiler
 #ifndef __CLING__
 
+class TFile;
+
 	namespace mions {
 	void mia_dech(std::string nome_cristallo,
-			std::shared_ptr<std::ofstream> output_dech);
+			std::shared_ptr<std::ofstream> output_dech,
+			std::shared_ptr<TFile> root_output);
 	}
 
 #else

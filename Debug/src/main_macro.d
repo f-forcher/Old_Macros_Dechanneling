@@ -42,8 +42,13 @@ src/main_macro.o: ../src/main_macro.C \
  /home/fforcher/ROOT/v6-06-08/include/Foption.h \
  /home/fforcher/ROOT/v6-06-08/include/TVectorFfwd.h \
  /home/fforcher/ROOT/v6-06-08/include/TVectorDfwd.h \
- /home/fforcher/ROOT/v6-06-08/include/TFitResultPtr.h ../src/dbg_macro.h \
- ../src/mia_dech.h ../src/DatiChanneling.h
+ /home/fforcher/ROOT/v6-06-08/include/TFitResultPtr.h \
+ /home/fforcher/ROOT/v6-06-08/include/TFile.h \
+ /home/fforcher/ROOT/v6-06-08/include/TDirectoryFile.h \
+ /home/fforcher/ROOT/v6-06-08/include/TMap.h \
+ /home/fforcher/ROOT/v6-06-08/include/THashTable.h \
+ /home/fforcher/ROOT/v6-06-08/include/TUrl.h ../src/mia_dech.h \
+ ../src/dbg_macro.h ../src/DatiChanneling.h
 
 /home/fforcher/ROOT/v6-06-08/include/TROOT.h:
 
@@ -133,8 +138,18 @@ src/main_macro.o: ../src/main_macro.C \
 
 /home/fforcher/ROOT/v6-06-08/include/TFitResultPtr.h:
 
-../src/dbg_macro.h:
+/home/fforcher/ROOT/v6-06-08/include/TFile.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TDirectoryFile.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TMap.h:
+
+/home/fforcher/ROOT/v6-06-08/include/THashTable.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TUrl.h:
 
 ../src/mia_dech.h:
+
+../src/dbg_macro.h:
 
 ../src/DatiChanneling.h:
