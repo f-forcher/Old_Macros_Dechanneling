@@ -28,6 +28,7 @@ int main(int argc, char* argv[]) {
 
 	//TApplication Necessary for the graphics
 	TApplication theApp("App",&argc, argv);
+
 	int return_macro = main_macro(argc, argv);
 
 	theApp.Run();

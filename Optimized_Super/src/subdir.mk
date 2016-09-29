@@ -10,7 +10,6 @@ C_UPPER_SRCS += \
 
 CPP_SRCS += \
 ../src/DatiChanneling.cpp \
-../src/TableFile.cpp \
 ../src/main.cpp 
 
 C_UPPER_DEPS += \
@@ -20,7 +19,6 @@ C_UPPER_DEPS += \
 
 OBJS += \
 ./src/DatiChanneling.o \
-./src/TableFile.o \
 ./src/dech.o \
 ./src/main.o \
 ./src/main_macro.o \
@@ -28,7 +26,6 @@ OBJS += \
 
 CPP_DEPS += \
 ./src/DatiChanneling.d \
-./src/TableFile.d \
 ./src/main.d 
 
 

@@ -23,11 +23,12 @@
 #include <cstdlib>
 #include <unistd.h>
 #include <map>
+#include <sstream>
+#include <array>
 
 #include <TROOT.h>
 #include <TH1.h>
 #include <TFile.h>
-
 
 #include "mia_dech.h"
 #include "dbg_macro.h"
@@ -51,7 +52,7 @@
 TDirectory* ROOT_PROJDIR = nullptr;
 char PROJECT_DIR[FILENAME_MAX] = "[NOT SET]";
 std::vector<TH1*> vHistograms;
-std::vector<TCanvas* > vCanvases;
+std::vector<TCanvas*> vCanvases;
 
 int main_macro(int argc, char* argv[]) {
 
@@ -67,11 +68,14 @@ int main_macro(int argc, char* argv[]) {
 			"bragg_events.txt", "hist", "hh", "ranges", "energyRanges" };
 
 	//Elenco dei cristalli
-	std::vector<const char*> elenco_cristallistf { "STF38", "STF45", "STF47", "STF49", "STF51" };
+	std::vector<const char*> elenco_cristallistf { "STF38", "STF45", "STF47",
+			"STF49", "STF51" };
 	std::vector<const char*> elenco_cristalliqmp { "QMP27", "QMP29", "QMP32" };
-	std::vector<const char*> elenco_cristalli { "STF38", "STF45", "STF47", "STF49", "STF51", "QMP27", "QMP29", "QMP32" };
+	std::vector<const char*> elenco_cristalli { "STF38", "STF45", "STF47",
+			"STF49", "STF51", "QMP27", "QMP29", "QMP32" };
 
-	std::vector<const char*> elenco_cristalli_buoni { "STF45", "STF49", "QMP27", "QMP32" };
+	std::vector<const char*> elenco_cristalli_buoni { "STF45", "STF49", "QMP27",
+			"QMP32" };
 
 	//std::vector<const char*> elenco_cristalli { "QMP32" };
 	clog << "Start main_macro..." << endl;
@@ -121,45 +125,64 @@ int main_macro(int argc, char* argv[]) {
 	ROOT_PROJDIR = gDirectory;
 	TDirectory* currentDir = gDirectory;
 
-	std::string path_file_output_root = string(PROJECT_DIR) + "/Dechanneling_Histograms.root";
-	auto file_output_root = std::make_shared<TFile>(path_file_output_root.c_str(), "RECREATE");
+	std::string path_file_output_root = string(PROJECT_DIR)
+			+ "/Dechanneling_Histograms.root";
+	auto file_output_root = std::make_shared<TFile>(
+			path_file_output_root.c_str(), "RECREATE");
 
 
 
 	//Read crystal data
 	// File format: Crystal name | Rc [m]
-	string nome_file_raggio_cristallo = PROJECT_DIR
-			+ "/tabella_dati_cristalli.txt";
-	ifstream file_raggi_cristalli(nome_file_raggio_cristallo);
+	map<string, std::array<Double_t, 2> > map_dati_crist;
+	{
+		string nome_file_raggio_cristallo = string(PROJECT_DIR)
+				+ "/tabella_dati_cristalli.txt";
+		ifstream file_raggi_cristalli(nome_file_raggio_cristallo);
 
-	string riga_estratta;
-	stringstream ss;
-	map<string, Double_T> map_raggi_crist;
+		string riga_estratta;
+		stringstream ss;
 
-	// Contenuto di una riga del file
-	//Ignora la prima linea con i nomi delle colonne
-	getline(riga_estratta, file_raggi_cristalli);
 
-	while (file_raggi_cristalli) {
-		string cristallo;
-		Double_t raggio_curvatura;
+		// Contenuto di una riga del file
+		//Ignora la prima linea con i nomi delle colonne
+		std::getline(file_raggi_cristalli, riga_estratta);
 
-		getline(riga_estratta, raggio_cristallo);
-		ss << riga_estratta;
+		while (file_raggi_cristalli) {
+			string cristallo;
+			Double_t raggio_curvatura;
+			Double_t bending_angle;
 
-		ss >> cristallo;
-		ss >> raggio_curvatura;
+			std::getline(file_raggi_cristalli, riga_estratta);
+			//cout << riga_estratta << endl;
+			ss << riga_estratta;
 
-		map_raggi_crist[cristallo] = raggio_curvatura;
+			//TODO finire!
+			// TODO Perche' i raggi di pag 88 e di pag 66 non coincidono? Che fare?
+			ss >> cristallo;
+			ss >> raggio_curvatura;
+			ss >> bending_angle;
+
+			if (cristallo != string("")) {
+				DBG(clog << cristallo << ": " << raggio_curvatura << endl
+				; , ;)
+				map_dati_crist[cristallo] = {raggio_curvatura, bending_angle};
+			}
+			ss.clear();
+		}
 	}
 
 
 
 
-	for (const auto& ch : elenco_cristalli_buoni) {
+
+	for (const auto& ch : elenco_cristalli) {
 		cout << endl << endl;
 		//dech(ch, outputdechanneling);
-		mions::mia_dech(ch, outputdechanneling, file_output_root);
+		cout << "Crystal: " << ch << " Rc[m]: " << map_dati_crist[ch][0];
+
+		mions::mia_dech(ch, outputdechanneling, file_output_root,
+				map_dati_crist);
 		//currentDir->cd();
 	}
 	currentDir->cd();

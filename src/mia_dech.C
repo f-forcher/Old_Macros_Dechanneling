@@ -16,10 +16,10 @@
 #include "dech.h"
 #include "DatiChanneling.h"
 
-extern TDirectory* ROOT_PROJDIR;
+//extern TDirectory* ROOT_PROJDIR;
 //extern 	std::vector<TH1*> vHistograms;
 //extern 	std::vector<TH1*> vHistograms10;
-extern std::vector<TCanvas*> vCanvases;
+//extern std::vector<TCanvas*> vCanvases;
 extern char PROJECT_DIR[FILENAME_MAX];
 
 namespace mions {
@@ -28,7 +28,7 @@ Double_t myfunction(Double_t *x, Double_t *par) {
 	// TODO Float?
 	// Float_t xx = x[0];
 
-	Float_t xx = x[0];
+	Double_t xx = x[0];
 	Double_t f = par[0] * exp(-xx / par[1]);
 	return f;
 
@@ -52,7 +52,7 @@ Double_t myfunction(Double_t *x, Double_t *par) {
 void mia_dech(std::string nome_cristallo,
 		std::shared_ptr<std::ofstream> output_dech,
 		std::shared_ptr<TFile> root_output,
-		std::map<std::string, Double_t> raggi_cristalli) {
+		std::map<std::string, Double_t> dati_cristalli) {
 
 	//PROJDIR->cd();
 	// Go to the project's "home" folder
@@ -103,7 +103,7 @@ void mia_dech(std::string nome_cristallo,
 	/* title */titlehisto10.c_str(),
 	/* X-dimension */600, -200, 400);
 
-	//vHistograms.front()->SetNameTitle(nomehisto.c_str(),nome_cristallo.c_str());
+	//vHistograms.front()->SetNameTitle(nomehisto5.c_str(),nome_cristallo.c_str());
 
 	if (file_dat) {
 		// Il codice per la mia analisi qua
@@ -143,35 +143,70 @@ void mia_dech(std::string nome_cristallo,
 			}
 		}
 
-		//std::vector<TCanvas* > vCanvases;
 
-		//TCanvas* mio_c1 = new TCanvas();
-		//vCanvases.push_back(new TCanvas(nome_cristallo.c_str()));
-		//vHistograms.front()->Draw();
-		histogram5->Draw();
-		root_output->Write();
 
 		//TODO FITTING
 		//Alla fine dovro' scrivere sul file dechanneling_table.txt
 
-
 		//Read the Crystal data
 		//Spostato nel main_macro
 
+		//FIT
+		//FIT!
+	    //TH1::Fit(const char* fname, Option_t* option, Option_t* graphicoption, Axis_t xmin, Axis_t xmax ) a;
+		/* Option_T* option =
+				"W" Set all errors to 1
+				"I" Use integral of function in bin instead of value at bin center
+				"L" Use Loglikelihood m ethod (default is chisquare method)
+				"LL" Use Loglikelihood method and bin contents are not integers)
+				"U" Use a User specified fitting algorithm (via SetFCN)
+				"Q" Quiet mode (minimum printing)
+				"V" Verbose mode (default is between Q and V)
+				"E" Perform better Errors estimation using Minos technique
+				"B" Use this option when you want to fix one or more parameters
+				and the fitting function is like "gaus","expo","poln","landau".
+				“M" More. Improve fit results
+				"R" Use the Range specified in the function range
+				"N" Do not store the graphics function, do not draw
+				"0" Do not plot the result of the fit.
+				"+" Add this new fitted function to the list of fitted functions.
+		 *
+		 */
 
-	} else {
-		DBG(
-				clog << nome_cristallo << ": File .dat not found" << endl; clog << "Nome cercato: " << pathfiledati << endl; clog << "Current Dir: " << system("pwd") << endl;,
-				;)
-		clog << "[WARNING] For crystal " << nome_cristallo
-				<< ", File .dat not found" << endl
-				<< "          Trying to use old dech.C macro and .root data file"
-				<< endl << endl;
+		/*
+		 * Peak around zero fAmor, peak around thetab fChan, nuclear expo fDech
+		 */
+		// xmin = -30 and xmax=10 are for now empirical values estimeted looking at the graphs.
+		TF1* fAmor= new TF1("fAmor","gaus",-30,10);
+		//
+		TF1* fChan = new TF1("fChan","gaus",-30,10);
+		TF1* fDech = new TF1("fDech","gaus",-30,10);
 
-		//ROOT_PROJDIR->cd();
-		//Todo rimetterla;
-		//dech(nome_cristallo,output_dech);
-	}
+
+
+
+		histogram5->Fit();
+
+
+		//TCanvas* mio_c1 = new TCanvas();
+		//vCanvases.push_back(new TCanvas(nome_cristallo.c_str()));
+		//vHistograms.front()->Draw();
+		//histogram5->Draw();
+		root_output->Write();
+
+} else {
+	DBG(
+			clog << nome_cristallo << ": File .dat not found" << endl; clog << "Nome cercato: " << pathfiledati << endl; clog << "Current Dir: " << system("pwd") << endl;,
+			;)
+	clog << "[WARNING] For crystal " << nome_cristallo
+			<< ", File .dat not found" << endl
+			<< "          Trying to use old dech.C macro and .root data file"
+			<< endl << endl;
+
+	//ROOT_PROJDIR->cd();
+	//Todo rimetterla;
+	//dech(nome_cristallo,output_dech);
+}
 
 }
 
