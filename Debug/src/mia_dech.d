@@ -121,7 +121,8 @@ src/mia_dech.o: ../src/mia_dech.C ../src/dbg_macro.h ../src/func_sim.h \
  /home/fforcher/ROOT/v6-06-08/include/TBenchmark.h \
  /home/fforcher/ROOT/v6-06-08/include/TStopwatch.h \
  /home/fforcher/ROOT/v6-06-08/include/TPaletteAxis.h ../src/dech.h \
- ../src/DatiChanneling.h
+ ../src/DatiChanneling.h ../src/my_typedefs.h \
+ /home/fforcher/ROOT/v6-06-08/include/Rtypes.h
 
 ../src/dbg_macro.h:
 
@@ -374,3 +375,7 @@ src/mia_dech.o: ../src/mia_dech.C ../src/dbg_macro.h ../src/func_sim.h \
 ../src/dech.h:
 
 ../src/DatiChanneling.h:
+
+../src/my_typedefs.h:
+
+/home/fforcher/ROOT/v6-06-08/include/Rtypes.h:

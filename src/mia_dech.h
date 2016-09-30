@@ -12,13 +12,15 @@
 // https://root.cern.ch/root/htmldoc/guides/users-guide/ROOTUsersGuide.html#moving-between-interpreter-and-compiler
 #ifndef __CLING__
 
+#include "my_typedefs.h"
+
 class TFile;
 
 	namespace mions {
-	void mia_dech(std::string nome_cristallo,
+	void mia_dech(const std::string nome_cristallo,
 			std::shared_ptr<std::ofstream> output_dech,
 			std::shared_ptr<TFile> root_output,
-			std::map<std::string, Double_t> dati_cristalli);
+			const mions::CrystalDataTable& dati_cristalli);
 	}
 
 #else

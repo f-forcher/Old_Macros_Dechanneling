@@ -15,6 +15,7 @@
 #include "func_sim.h"
 #include "dech.h"
 #include "DatiChanneling.h"
+#include "my_typedefs.h"
 
 //extern TDirectory* ROOT_PROJDIR;
 //extern 	std::vector<TH1*> vHistograms;
@@ -52,7 +53,7 @@ Double_t myfunction(Double_t *x, Double_t *par) {
 void mia_dech(std::string nome_cristallo,
 		std::shared_ptr<std::ofstream> output_dech,
 		std::shared_ptr<TFile> root_output,
-		std::map<std::string, Double_t> dati_cristalli) {
+		const mions::CrystalDataTable& dati_cristalli) {
 
 	//PROJDIR->cd();
 	// Go to the project's "home" folder
@@ -62,10 +63,10 @@ void mia_dech(std::string nome_cristallo,
 	using std::ifstream;
 	using std::stringstream;
 
-	gStyle->SetPalette(1);
-	gStyle->SetOptStat(0);
-	gStyle->SetOptTitle(0);
-	TGaxis::SetMaxDigits(3);
+	//gStyle->SetPalette(1);
+	//gStyle->SetOptStat(0);
+	//gStyle->SetOptTitle(0);
+	//Gaxis::SetMaxDigits(3);
 
 	string cartella_cristallo = "ForFrancesco/" + nome_cristallo + "_exp/";
 	gSystem->ChangeDirectory(cartella_cristallo.c_str());
@@ -108,10 +109,10 @@ void mia_dech(std::string nome_cristallo,
 	if (file_dat) {
 		// Il codice per la mia analisi qua
 
-		gStyle->SetPalette(1);
-		gStyle->SetOptStat(1);
-		gStyle->SetOptTitle(1);
-		TGaxis::SetMaxDigits(3);
+		//gStyle->SetPalette(1);
+		//gStyle->SetOptStat(1);
+		//gStyle->SetOptTitle(1);
+		//TGaxis::SetMaxDigits(3);
 
 		DBG(
 				clog << "[LOG]: " << "Crystal " << nome_cristallo << endl; clog << "[LOG]: File "<< pathfiledati << endl << endl;,
@@ -143,49 +144,136 @@ void mia_dech(std::string nome_cristallo,
 			}
 		}
 
-
-
 		//TODO FITTING
 		//Alla fine dovro' scrivere sul file dechanneling_table.txt
 
-		//Read the Crystal data
-		//Spostato nel main_macro
+		/*
+		 ****************
+		 *				*
+		 *      FIT!    *
+		 *				*
+		 ****************
+		 */
 
-		//FIT
-		//FIT!
-	    //TH1::Fit(const char* fname, Option_t* option, Option_t* graphicoption, Axis_t xmin, Axis_t xmax ) a;
+		// Peak around zero fAmor, peak around thetab fChan, nuclear expo fDech
+		// xmin = -30 and xmax=10 are for now empirical values estimeted looking at the graphs.
+		// gaus = [0]*exp( ((x-[1])/[2])^2 )
+		//const Double_t mean_fchan_estim = dati_cristalli[nome_cristallo][(int)FieldCrystalDataTable::bending_angle];
+		const Double_t mean_fchan_estim =
+				dati_cristalli.at(nome_cristallo)[(int) FieldCrystalDataTable::bending_angle];
+
+		DBG(clog << "mean_dech_estim:" << mean_fchan_estim << endl
+		; , ;)
+
+		// First peak
+		TF1* fAmor = new TF1("fAmor", "gaus", -30, 10);
+
+		// Second peak
+		TF1* fChan = new TF1("fChan", "gaus", mean_fchan_estim - 20,
+				mean_fchan_estim + 20);
+
+		// Clearer syntax than f->SetParameters(&param[0]); ...
+		fAmor->SetParNames("ConstAm", "MeanAm", "SigmaAm");
+
+		fChan->SetParNames("ConstCh", "MeanCh", "SigmaCh");
+
+		// Starting numbers guessed by looking at the graphs
+		fAmor->SetParameter("ConstAm", histogram5->GetEntries() / 2.0);
+		fAmor->SetParameter("MeanAm", -5);
+		fAmor->SetParameter("SigmaAm", 8);
+
+		// Starting numbers guessed by looking at the graphs
+		fChan->SetParameter("ConstCh", histogram5->GetEntries() / 2.0);
+		fChan->SetParameter("MeanCh", mean_fchan_estim);
+		fChan->SetParameter("SigmaCh", 6.5);
+
+		//TH1::Fit(const char* fname, Option_t* option, Option_t* graphicoption, Axis_t xmin, Axis_t xmax ) a;
 		/* Option_T* option =
-				"W" Set all errors to 1
-				"I" Use integral of function in bin instead of value at bin center
-				"L" Use Loglikelihood m ethod (default is chisquare method)
-				"LL" Use Loglikelihood method and bin contents are not integers)
-				"U" Use a User specified fitting algorithm (via SetFCN)
-				"Q" Quiet mode (minimum printing)
-				"V" Verbose mode (default is between Q and V)
-				"E" Perform better Errors estimation using Minos technique
-				"B" Use this option when you want to fix one or more parameters
-				and the fitting function is like "gaus","expo","poln","landau".
-				“M" More. Improve fit results
-				"R" Use the Range specified in the function range
-				"N" Do not store the graphics function, do not draw
-				"0" Do not plot the result of the fit.
-				"+" Add this new fitted function to the list of fitted functions.
+		 "W" Set all errors to 1
+		 "I" Use integral of function in bin instead of value at bin center
+		 "L" Use Loglikelihood m ethod (default is chisquare method)
+		 "LL" Use Loglikelihood method and bin contents are not integers)
+		 "U" Use a User specified fitting algorithm (via SetFCN)
+		 "Q" Quiet mode (minimum printing)
+		 "V" Verbose mode (default is between Q and V)
+		 "E" Perform better Errors estimation using Minos technique
+		 "B" Use this option when you want to fix one or more parameters
+		 and the fitting function is like "gaus","expo","poln","landau".
+		 “M" More. Improve fit results
+		 "R" Use the Range specified in the function range
+		 "N" Do not store the graphics function, do not draw
+		 "0" Do not plot the result of the fit.
+		 "+" Add this new fitted function to the list of fitted functions.
 		 *
 		 */
+		histogram5->Fit(fAmor, "IREM+");
+		histogram10->Fit(fAmor, "IREM+");
+
+		histogram5->Fit(fChan, "IREM+");
+		histogram10->Fit(fChan, "IREM+");
+
+		TF1 *fitResultAm5 = histogram5->GetFunction("fAmor");
+		TF1 *fitResultCh5 = histogram5->GetFunction("fChan");
+
+		TF1 *fitResultAm10 = histogram10->GetFunction("fAmor");
+		TF1 *fitResultCh10 = histogram10->GetFunction("fChan");
+
+
 
 		/*
-		 * Peak around zero fAmor, peak around thetab fChan, nuclear expo fDech
+		 *  Dechanneling exponential
 		 */
-		// xmin = -30 and xmax=10 are for now empirical values estimeted looking at the graphs.
-		TF1* fAmor= new TF1("fAmor","gaus",-30,10);
-		//
-		TF1* fChan = new TF1("fChan","gaus",-30,10);
-		TF1* fDech = new TF1("fDech","gaus",-30,10);
 
 
+		// Lets fit the exponential of the dechanneling starting from +3 sigma right of amorphous peak to -3 sigma left of channeling peak
 
 
-		histogram5->Fit();
+		// GetFunction does not copy the parameters' name?
+		constexpr int MeanAm = 1;
+		constexpr int MeanCh = 1;
+
+		constexpr int SigmaAm = 2;
+		constexpr int SigmaCh = 2;
+
+
+		auto meanAm5  = fitResultAm5->GetParameter(MeanAm);
+		auto sigmaAm5 = fitResultAm5->GetParameter(SigmaAm);
+
+		DBG(clog << " meanAm5: " << meanAm5 << endl
+				 << " sigmaAm5: " << sigmaAm5 << endl;, ; )
+
+		auto meanCh5  = fitResultCh5->GetParameter(MeanCh);
+		auto sigmaCh5 = fitResultCh5->GetParameter(SigmaCh);
+
+		DBG(clog << " meanCh5: " << meanCh5 << endl
+				 << " sigmaCh5: " << sigmaCh5 << endl;, ; )
+
+
+		auto meanAm10  = fitResultAm10->GetParameter(MeanAm);
+		auto sigmaAm10 = fitResultAm10->GetParameter(SigmaAm);
+
+		auto meanCh10  = fitResultCh10->GetParameter(MeanCh);
+		auto sigmaCh10 = fitResultCh10->GetParameter(SigmaCh);
+
+		TF1* fDech5  = new TF1("fDech", "expo", meanAm5 + 3 * sigmaAm5, meanCh5 - 3 * sigmaCh5);
+		TF1* fDech10 = new TF1("fDech", "expo", meanAm10 + 3 * sigmaAm10, meanCh10 - 3 * sigmaCh10);
+
+		DBG(clog << "xmindech: " << meanAm5 + 3 * sigmaAm5
+				<< " xmaxdech: " << meanCh5 - 3 * sigmaCh5 << endl;, ;)
+
+		// expo:  exp([0]+[1]*x)
+		fDech5->SetParNames("ConstDc", "SlopeDc");
+		fDech10->SetParNames("ConstDc", "SlopeDc");
+
+		//fDech->SetParameter("MeanAm",-5);
+
+		histogram5 ->Fit(fDech5, "IREM+");
+		histogram10->Fit(fDech10, "IREM+");
+
+
+		// Ld = [1]*10e6*Rc
+
+
 
 
 		//TCanvas* mio_c1 = new TCanvas();
@@ -194,19 +282,19 @@ void mia_dech(std::string nome_cristallo,
 		//histogram5->Draw();
 		root_output->Write();
 
-} else {
-	DBG(
-			clog << nome_cristallo << ": File .dat not found" << endl; clog << "Nome cercato: " << pathfiledati << endl; clog << "Current Dir: " << system("pwd") << endl;,
-			;)
-	clog << "[WARNING] For crystal " << nome_cristallo
-			<< ", File .dat not found" << endl
-			<< "          Trying to use old dech.C macro and .root data file"
-			<< endl << endl;
+	} else {
+		DBG(
+				clog << nome_cristallo << ": File .dat not found" << endl; clog << "Nome cercato: " << pathfiledati << endl; clog << "Current Dir: " << system("pwd") << endl;,
+				;)
+		clog << "[WARNING] For crystal " << nome_cristallo
+				<< ", File .dat not found" << endl
+				<< "          Trying to use old dech.C macro and .root data file"
+				<< endl << endl;
 
-	//ROOT_PROJDIR->cd();
-	//Todo rimetterla;
-	//dech(nome_cristallo,output_dech);
-}
+		//ROOT_PROJDIR->cd();
+		//Todo rimetterla;
+		//dech(nome_cristallo,output_dech);
+	}
 
 }
 

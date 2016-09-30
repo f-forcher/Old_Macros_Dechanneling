@@ -32,6 +32,7 @@
 
 #include "mia_dech.h"
 #include "dbg_macro.h"
+#include "my_typedefs.h"
 
 // Per poter usare questa macro sia compilando che eseguendo.
 // https://root.cern.ch/root/htmldoc/guides/users-guide/ROOTUsersGuide.html#moving-between-interpreter-and-compiler
@@ -57,6 +58,8 @@ std::vector<TCanvas*> vCanvases;
 int main_macro(int argc, char* argv[]) {
 
 	using namespace std;
+	using mions::FieldCrystalDataTable;
+	using mions::CrystalDataTable;
 
 	// Save the directory of the project (remember you are expected to start it from the
 	// top folder of the repo)
@@ -79,6 +82,9 @@ int main_macro(int argc, char* argv[]) {
 
 	//std::vector<const char*> elenco_cristalli { "QMP32" };
 	clog << "Start main_macro..." << endl;
+
+	DBG(clog << "DEBUG VERSION " << endl; ,
+	    clog << "RELEASE VERSION " << endl;)
 
 	// Corso root lunardon/garfagnini
 	// carica la macro generica che legge il file di testo
@@ -134,7 +140,8 @@ int main_macro(int argc, char* argv[]) {
 
 	//Read crystal data
 	// File format: Crystal name | Rc [m]
-	map<string, std::array<Double_t, 2> > map_dati_crist;
+	CrystalDataTable map_dati_crist;
+
 	{
 		string nome_file_raggio_cristallo = string(PROJECT_DIR)
 				+ "/tabella_dati_cristalli.txt";
@@ -164,8 +171,11 @@ int main_macro(int argc, char* argv[]) {
 			ss >> bending_angle;
 
 			if (cristallo != string("")) {
-				DBG(clog << cristallo << ": " << raggio_curvatura << endl
+				DBG(clog << cristallo << ": Rc " << raggio_curvatura << " Thb " << bending_angle << endl;
 				; , ;)
+				//map_dati_crist[cristallo][(int)FieldCrystalDataTable::raggio_curvatura] = raggio_curvatura;
+				//map_dati_crist[cristallo][(int)FieldCrystalDataTable::bending_angle] = bending_angle;
+
 				map_dati_crist[cristallo] = {raggio_curvatura, bending_angle};
 			}
 			ss.clear();
@@ -176,15 +186,22 @@ int main_macro(int argc, char* argv[]) {
 
 
 
-	for (const auto& ch : elenco_cristalli) {
+	for (const auto& ch : elenco_cristalli_buoni) {
 		cout << endl << endl;
 		//dech(ch, outputdechanneling);
-		cout << "Crystal: " << ch << " Rc[m]: " << map_dati_crist[ch][0];
+		cout << "Crystal: " << ch
+				<< " Rc[m]: " << map_dati_crist[ch][(int)FieldCrystalDataTable::raggio_curvatura]
+				<< " Thetab[muRad]: " << map_dati_crist[ch][(int)FieldCrystalDataTable::bending_angle];
 
 		mions::mia_dech(ch, outputdechanneling, file_output_root,
 				map_dati_crist);
 		//currentDir->cd();
+
+		cout << endl << endl;
 	}
+
+	cout << "Analyzed all Crystals in list" << endl;
+
 	currentDir->cd();
 	//mia_dech();
 
