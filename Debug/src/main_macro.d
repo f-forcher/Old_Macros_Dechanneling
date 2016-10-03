@@ -49,7 +49,8 @@ src/main_macro.o: ../src/main_macro.C \
  /home/fforcher/ROOT/v6-06-08/include/THashTable.h \
  /home/fforcher/ROOT/v6-06-08/include/TUrl.h ../src/mia_dech.h \
  ../src/my_typedefs.h /home/fforcher/ROOT/v6-06-08/include/Rtypes.h \
- ../src/dbg_macro.h ../src/DatiChanneling.h
+ ../src/analizza_dechanneling.h ../src/dbg_macro.h ../src/dech.h \
+ ../src/DatiChanneling.h
 
 /home/fforcher/ROOT/v6-06-08/include/TROOT.h:
 
@@ -155,6 +156,10 @@ src/main_macro.o: ../src/main_macro.C \
 
 /home/fforcher/ROOT/v6-06-08/include/Rtypes.h:
 
+../src/analizza_dechanneling.h:
+
 ../src/dbg_macro.h:
+
+../src/dech.h:
 
 ../src/DatiChanneling.h:

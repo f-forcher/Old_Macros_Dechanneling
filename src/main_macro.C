@@ -31,8 +31,10 @@
 #include <TFile.h>
 
 #include "mia_dech.h"
+#include "analizza_dechanneling.h"
 #include "dbg_macro.h"
 #include "my_typedefs.h"
+#include "dech.h"
 
 // Per poter usare questa macro sia compilando che eseguendo.
 // https://root.cern.ch/root/htmldoc/guides/users-guide/ROOTUsersGuide.html#moving-between-interpreter-and-compiler
@@ -140,7 +142,7 @@ int main_macro(int argc, char* argv[]) {
 
 	//Read crystal data
 	// File format: Crystal name | Rc [m]
-	CrystalDataTable map_dati_crist;
+	CrystalDataTable map_dati_crist_orig;
 
 	{
 		string nome_file_raggio_cristallo = string(PROJECT_DIR)
@@ -159,6 +161,7 @@ int main_macro(int argc, char* argv[]) {
 			string cristallo;
 			Double_t raggio_curvatura;
 			Double_t bending_angle;
+			Double_t thickness;
 
 			std::getline(file_raggi_cristalli, riga_estratta);
 			//cout << riga_estratta << endl;
@@ -169,6 +172,7 @@ int main_macro(int argc, char* argv[]) {
 			ss >> cristallo;
 			ss >> raggio_curvatura;
 			ss >> bending_angle;
+			ss >> thickness;
 
 			if (cristallo != string("")) {
 				DBG(clog << cristallo << ": Rc " << raggio_curvatura << " Thb " << bending_angle << endl;
@@ -176,8 +180,10 @@ int main_macro(int argc, char* argv[]) {
 				//map_dati_crist[cristallo][(int)FieldCrystalDataTable::raggio_curvatura] = raggio_curvatura;
 				//map_dati_crist[cristallo][(int)FieldCrystalDataTable::bending_angle] = bending_angle;
 
-				map_dati_crist[cristallo] = {raggio_curvatura, bending_angle};
+				// The other elements will be initialized to zero
+				map_dati_crist_orig[cristallo] = {raggio_curvatura, bending_angle, thickness};
 			}
+
 			ss.clear();
 		}
 	}
@@ -185,22 +191,37 @@ int main_macro(int argc, char* argv[]) {
 
 
 
+	//Here we store the results of the analysis (ie the fit parameters)
+	mions::CrystalDataTable510 map_dati_crist_calc;
 
 	for (const auto& ch : elenco_cristalli_buoni) {
 		cout << endl << endl;
 		//dech(ch, outputdechanneling);
 		cout << "Crystal: " << ch
-				<< " Rc[m]: " << map_dati_crist[ch][(int)FieldCrystalDataTable::raggio_curvatura]
-				<< " Thetab[muRad]: " << map_dati_crist[ch][(int)FieldCrystalDataTable::bending_angle];
+				<< " Rc[m]: " << map_dati_crist_orig[ch][(int)FieldCrystalDataTable::raggio_curvatura]
+				<< " Thetab[muRad]: " << map_dati_crist_orig[ch][(int)FieldCrystalDataTable::bending_angle];
 
 		mions::mia_dech(ch, outputdechanneling, file_output_root,
-				map_dati_crist);
+				map_dati_crist_orig,map_dati_crist_calc);
 		//currentDir->cd();
 
 		cout << endl << endl;
 	}
+	//file_output_root->Close();
 
-	cout << "Analyzed all Crystals in list" << endl;
+
+	// TODO test
+	//dech("STF45", outputdechanneling);
+
+	cout << "Analyzed all crystals in list" << endl;
+
+
+	/*
+	 * Now make the file with the data for the plot Rc-Ld
+	 */
+
+
+
 
 	currentDir->cd();
 	//mia_dech();

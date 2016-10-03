@@ -1,9 +1,9 @@
-# Cristalli	| Rc [m] | theta_bending_misurato [microRad]
-STF38	9		211.23
-STF45	13.33	143.78
-STF47	68.89	34.10
-STF49	2.96	246.65
-STF51	66.67	33.40
-QMP27	15.26	108.13
-QMP29	120		33.95
-QMP32	5.48	170.69
+# Cristalli	| Rc [m] | theta_bending_misurato [microRad] | Thickness [mm]
+STF38	9		211.23	1.89
+STF45	13.33	143.78	2.00
+STF47	68.89	34.10	3.10
+STF49	2.96	246.65	0.80
+STF51	66.67	33.40	3.00
+QMP27	15.26	108.13	1.77
+QMP29	120		33.95	6.00
+QMP32	5.48	170.69	0.96

@@ -9,6 +9,7 @@
 #include <iostream>
 #include <unistd.h> // chdir
 #include <sstream>
+#include <cmath>
 //#include <map>
 
 #include "dbg_macro.h"
@@ -25,6 +26,7 @@ extern char PROJECT_DIR[FILENAME_MAX];
 
 namespace mions {
 
+//TODO serve? Non penso
 Double_t myfunction(Double_t *x, Double_t *par) {
 	// TODO Float?
 	// Float_t xx = x[0];
@@ -33,12 +35,6 @@ Double_t myfunction(Double_t *x, Double_t *par) {
 	Double_t f = par[0] * exp(-xx / par[1]);
 	return f;
 
-	/*
-	 * Macro to calculate dechanneling lenght for a crystal.
-	 * @nome_cristallo: Nabe of the folder with the crystal data
-	 * @output_dech: file in which to append the "Ldech"s, in the format
-	 *               Crystal | dechanneling L at +-5 microrad [m] | dechanneling L at +-10 microrad [m]
-	 */
 }
 
 /*
@@ -50,10 +46,18 @@ Double_t myfunction(Double_t *x, Double_t *par) {
  };
  */
 
+
+/*
+ * Macro to calculate dechanneling lenght for a crystal.
+ * @nome_cristallo: Name of the folder with the crystal data
+ * @output_dech: file in which to append the "Ldech"s, in the format
+ *               Crystal | dechanneling L at +-5 microrad [m] | dechanneling L at +-10 microrad [m]
+ */
 void mia_dech(std::string nome_cristallo,
-		std::shared_ptr<std::ofstream> output_dech,
-		std::shared_ptr<TFile> root_output,
-		const mions::CrystalDataTable& dati_cristalli) {
+			std::shared_ptr<std::ofstream> output_analisi_dech,
+			std::shared_ptr<TFile> root_output,
+			const mions::CrystalDataTable& dati_cristalli_orig,
+			mions::CrystalDataTable510& dati_cristalli_calcolati) {
 
 	//PROJDIR->cd();
 	// Go to the project's "home" folder
@@ -62,6 +66,7 @@ void mia_dech(std::string nome_cristallo,
 	using std::string;
 	using std::ifstream;
 	using std::stringstream;
+	using std::pow;
 
 	//gStyle->SetPalette(1);
 	//gStyle->SetOptStat(0);
@@ -97,12 +102,12 @@ void mia_dech(std::string nome_cristallo,
 	auto histogram5 = std::make_unique < TH1D > (
 	/* name */nomehisto5.c_str(),
 	/* title */titlehisto5.c_str(),
-	/* X-dimension */600, -200, 400);
+	/* X-dimension */600/4, -200, 400);
 
 	auto histogram10 = std::make_unique < TH1D > (
 	/* name */nomehisto10.c_str(),
 	/* title */titlehisto10.c_str(),
-	/* X-dimension */600, -200, 400);
+	/* X-dimension */600/4, -200, 400);
 
 	//vHistograms.front()->SetNameTitle(nomehisto5.c_str(),nome_cristallo.c_str());
 
@@ -158,9 +163,10 @@ void mia_dech(std::string nome_cristallo,
 		// Peak around zero fAmor, peak around thetab fChan, nuclear expo fDech
 		// xmin = -30 and xmax=10 are for now empirical values estimeted looking at the graphs.
 		// gaus = [0]*exp( ((x-[1])/[2])^2 )
+		// expo:  exp([0]+[1]*x)
 		//const Double_t mean_fchan_estim = dati_cristalli[nome_cristallo][(int)FieldCrystalDataTable::bending_angle];
 		const Double_t mean_fchan_estim =
-				dati_cristalli.at(nome_cristallo)[(int) FieldCrystalDataTable::bending_angle];
+				dati_cristalli_orig.at(nome_cristallo)[(int) FieldCrystalDataTable::bending_angle];
 
 		DBG(clog << "mean_dech_estim:" << mean_fchan_estim << endl
 		; , ;)
@@ -229,20 +235,24 @@ void mia_dech(std::string nome_cristallo,
 
 
 		// GetFunction does not copy the parameters' name?
+		// These variables have the same name as those above
+		// gaus = [0]*exp( ((x-[1])/[2])^2 )
 		constexpr int MeanAm = 1;
 		constexpr int MeanCh = 1;
 
 		constexpr int SigmaAm = 2;
 		constexpr int SigmaCh = 2;
 
-
+		//Extracting the fitted parameters
 		auto meanAm5  = fitResultAm5->GetParameter(MeanAm);
+		auto meanAm5_err  = fitResultAm5->GetParError(MeanAm);
 		auto sigmaAm5 = fitResultAm5->GetParameter(SigmaAm);
 
 		DBG(clog << " meanAm5: " << meanAm5 << endl
 				 << " sigmaAm5: " << sigmaAm5 << endl;, ; )
 
 		auto meanCh5  = fitResultCh5->GetParameter(MeanCh);
+		auto meanCh5_err  = fitResultCh5->GetParError(MeanCh);
 		auto sigmaCh5 = fitResultCh5->GetParameter(SigmaCh);
 
 		DBG(clog << " meanCh5: " << meanCh5 << endl
@@ -250,13 +260,17 @@ void mia_dech(std::string nome_cristallo,
 
 
 		auto meanAm10  = fitResultAm10->GetParameter(MeanAm);
+		auto meanAm10_err  = fitResultAm10->GetParError(MeanAm);
 		auto sigmaAm10 = fitResultAm10->GetParameter(SigmaAm);
 
 		auto meanCh10  = fitResultCh10->GetParameter(MeanCh);
+		auto meanCh10_err  = fitResultCh10->GetParError(MeanCh);
 		auto sigmaCh10 = fitResultCh10->GetParameter(SigmaCh);
 
-		TF1* fDech5  = new TF1("fDech", "expo", meanAm5 + 3 * sigmaAm5, meanCh5 - 3 * sigmaCh5);
-		TF1* fDech10 = new TF1("fDech", "expo", meanAm10 + 3 * sigmaAm10, meanCh10 - 3 * sigmaCh10);
+
+		// Dechanneling exponentials
+		TF1* fDech5  = new TF1("fDech5", "expo", meanAm5 + 3 * sigmaAm5, meanCh5 - 3 * sigmaCh5);
+		TF1* fDech10 = new TF1("fDech10", "expo", meanAm10 + 3 * sigmaAm10, meanCh10 - 3 * sigmaCh10);
 
 		DBG(clog << "xmindech: " << meanAm5 + 3 * sigmaAm5
 				<< " xmaxdech: " << meanCh5 - 3 * sigmaCh5 << endl;, ;)
@@ -270,8 +284,98 @@ void mia_dech(std::string nome_cristallo,
 		histogram5 ->Fit(fDech5, "IREM+");
 		histogram10->Fit(fDech10, "IREM+");
 
+		TF1 *fitResultDech5 = histogram5->GetFunction("fDech5");
+		TF1 *fitResultDech10 = histogram10->GetFunction("fDech10");
 
-		// Ld = [1]*10e6*Rc
+
+
+
+		//expo:  exp([0]+[1]*x)
+		constexpr int ConstDc = 0;
+		constexpr int SlopeDc = 1;
+
+		//Extracting the fitted parameters
+		auto slopeDc5 = fitResultDech5->GetParameter(SlopeDc);
+		auto slopeDc5_err = fitResultDech5->GetParError(SlopeDc);
+		auto slopeDc10 = fitResultDech10->GetParameter(SlopeDc);
+		auto slopeDc10_err = fitResultDech10->GetParError(SlopeDc);
+
+		DBG( std::clog << "slopeDc5: " << slopeDc5 << std::endl; , ; )
+		DBG( std::clog << "slopeDc10: " << slopeDc10 << std::endl; , ; )
+
+
+		//Weighted means
+
+		//auto final_bending_angle = ( meanCh5*pow(meanCh5_err,-2) + meanCh10*pow(meanCh10_err,-2) ) /
+	    //	  	  	  	  	   ( pow(meanCh5_err,-2) + pow(meanCh10_err,-2) );
+
+		//Thickness [mm]
+		auto thickness = dati_cristalli_orig.at(nome_cristallo)[(int) FieldCrystalDataTable::thickness];
+		DBG( std::clog << "thickness: " << thickness << std::endl; , ; )
+
+		// bending angle [microrad]
+		auto bending_angle5 = meanCh5;
+		auto bending_angle5_err = meanCh5_err;
+		auto bending_angle10 = meanCh10;
+		auto bending_angle10_err = meanCh10_err;
+
+		// Rc [m] = z / thetaBend
+		auto Rc5 = (thickness * MILLI_) / (bending_angle5 * MICRO_);
+		// Error propagation: sigmaRc = (thickness / bending_angle^2) * sigmaBendingAngle
+		auto Rc5_err = (thickness * MILLI_) / pow(bending_angle5 * MICRO_, 2) * bending_angle5_err * MICRO_;
+		auto Rc10 = (thickness * MILLI_) / (bending_angle10 * MICRO_);
+		auto Rc10_err = (thickness * MILLI_) / pow(bending_angle10 * MICRO_, 2) * bending_angle10_err * MICRO_;
+
+		// e^(s*theta) = e^(-theta/thetad) --> thetad = -1/s
+		// Angular dechanneling characteristic angle ThetaD [microrad]
+		auto thetad5 = -1.0 / slopeDc5;
+		// Error prop on theta = 1/s
+		auto thetad5_err = slopeDc5_err / pow(slopeDc5, 2);
+		auto thetad10 = -1.0 / slopeDc10;
+		auto thetad10_err = slopeDc10_err / pow(slopeDc10, 2);
+
+
+		// Ld [m] = thetad * Rc
+		auto dechanneling_lenght5 = (thetad5 * MICRO_) * Rc5;
+		// Error prop: sqrt( (Rc*sigmaThetaD)^2 + (ThetaD*sigmaRc)^2 )
+		auto dechanneling_lenght5_err = sqrt( pow(Rc5 * thetad5_err * MICRO_,2) +
+											  pow(thetad5 * MICRO_ * Rc5_err,2) );
+		auto dechanneling_lenght10 = (thetad10 * MICRO_) * Rc10;
+		auto dechanneling_lenght10_err = sqrt( pow(Rc10 * thetad10_err * MICRO_,2) +
+											  pow(thetad10 * MICRO_ * Rc10_err,2) );
+
+
+		DBG( std::clog << "dechanneling_lenght5: " << dechanneling_lenght5 << std::endl; , ; )
+		DBG( std::clog << "dechanneling_lenght5_err: " << dechanneling_lenght5_err << std::endl; , ; )
+		DBG( std::clog << "dechanneling_lenght10: " << dechanneling_lenght10 << std::endl; , ; )
+		DBG( std::clog << "dechanneling_lenght10_err: " << dechanneling_lenght10_err << std::endl; , ; )
+
+		//Weighted mean for the bending angle
+		//Create key with name nome_cristallo
+		auto crystal_calc_ref = dati_cristalli_calcolati[nome_cristallo];
+
+
+		crystal_calc_ref[(int) FieldCrystalDataTable510::bending_angle5] = bending_angle5;
+		crystal_calc_ref[(int) FieldCrystalDataTable510::bending_angle5_err] = bending_angle5;
+		crystal_calc_ref[(int) FieldCrystalDataTable510::bending_angle10] = bending_angle10;
+		crystal_calc_ref[(int) FieldCrystalDataTable510::bending_angle10_err] = bending_angle10;
+		crystal_calc_ref[(int) FieldCrystalDataTable510::raggio_curvatura5] = Rc5;
+		crystal_calc_ref[(int) FieldCrystalDataTable510::raggio_curvatura5_err] = Rc5_err;
+		crystal_calc_ref[(int) FieldCrystalDataTable510::raggio_curvatura10] = Rc10;
+		crystal_calc_ref[(int) FieldCrystalDataTable510::raggio_curvatura10_err] = Rc10_err;
+		crystal_calc_ref[(int) FieldCrystalDataTable510::thickness] = thickness;
+		crystal_calc_ref[(int) FieldCrystalDataTable510::dechanneling_lenght5] = dechanneling_lenght5;
+		crystal_calc_ref[(int) FieldCrystalDataTable510::dechanneling_lenght5_err] = dechanneling_lenght5_err;
+		crystal_calc_ref[(int) FieldCrystalDataTable510::dechanneling_lenght10] = dechanneling_lenght10;
+		crystal_calc_ref[(int) FieldCrystalDataTable510::dechanneling_lenght10_err] = dechanneling_lenght10_err;
+
+
+
+		/*
+		 * TODO Test con somma
+		 */
+
+		TF1* fTot = new TF1("fAmor", "gaus(0) + expo(3) + gaus(5)", -30, 10);
 
 
 
@@ -284,8 +388,8 @@ void mia_dech(std::string nome_cristallo,
 
 	} else {
 		DBG(
-				clog << nome_cristallo << ": File .dat not found" << endl; clog << "Nome cercato: " << pathfiledati << endl; clog << "Current Dir: " << system("pwd") << endl;,
-				;)
+				clog << nome_cristallo << ": File .dat not found" << endl; clog << "Nome cercato: " << pathfiledati << endl; clog << "Current Dir: " << system("pwd") << endl;
+				, ; )
 		clog << "[WARNING] For crystal " << nome_cristallo
 				<< ", File .dat not found" << endl
 				<< "          Trying to use old dech.C macro and .root data file"
