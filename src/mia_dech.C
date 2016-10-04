@@ -212,11 +212,11 @@ void mia_dech(std::string nome_cristallo,
 		 "+" Add this new fitted function to the list of fitted functions.
 		 *
 		 */
-		histogram5->Fit(fAmor, "IREM+");
-		histogram10->Fit(fAmor, "IREM+");
+		histogram5->Fit(fAmor, "I0REM+");
+		histogram10->Fit(fAmor, "I0REM+");
 
-		histogram5->Fit(fChan, "IREM+");
-		histogram10->Fit(fChan, "IREM+");
+		histogram5->Fit(fChan, "I0REM+");
+		histogram10->Fit(fChan, "I0REM+");
 
 		TF1 *fitResultAm5 = histogram5->GetFunction("fAmor");
 		TF1 *fitResultCh5 = histogram5->GetFunction("fChan");
@@ -294,8 +294,8 @@ void mia_dech(std::string nome_cristallo,
 
 		//fDech->SetParameter("MeanAm",-5);
 
-		histogram5 ->Fit(fDech5, "IREM+");
-		histogram10->Fit(fDech10, "IREM+");
+		histogram5 ->Fit(fDech5, "I0REM+");
+		histogram10->Fit(fDech10, "I0REM+");
 
 		TF1 *fitResultDech5 = histogram5->GetFunction("fDech5");
 		TF1 *fitResultDech10 = histogram10->GetFunction("fDech10");
@@ -393,57 +393,58 @@ void mia_dech(std::string nome_cristallo,
 
 		// Expanded range
 		//TF1* fDech5_2  = new TF1("fDech5_2", "expo(3)", meanAm5, meanCh5);
-		TF1* fTot5 = new TF1("fTot5", "gaus(0) + expo(3)*( x > [5] && x < [6] ) + gaus(7)", meanAm5 - 3*sigmaAm5, meanCh5 + 3*sigmaCh5);
+		TF1* fTot5 = new TF1("fTot5", "gaus(0) + expo(3)*( x > [5] && x < [6] ) + gaus(7)", meanAm5 - 4*sigmaAm5, meanCh5 + 4*sigmaCh5);
 		const Double_t param5[10] = {
 				//Amorphous peak
-				constAm5,
-				meanAm5,
-				sigmaAm5,
+				constAm5,          // 0
+				meanAm5,           // 1
+				sigmaAm5,          // 2
 				//Dechanneling
-				constDc5,
-				slopeDc5,
-				meanAm5+sigmaAm5,
-				meanCh5-sigmaCh5,
+				constDc5,          // 3
+				slopeDc5,          // 4
+				meanAm5+sigmaAm5,  // 5
+				meanCh5-sigmaCh5,  // 6
 				//Channeling peak
-				constCh5,
-				meanCh5,
-				sigmaCh5
+				constCh5,          // 7
+				meanCh5,           // 8
+				sigmaCh5           // 9
 		};
+
 
 		fTot5->SetParameters(param5);
 
-		fTot5->FixParameter(5,meanAm5+sigmaAm5);
-		fTot5->FixParameter(6,meanCh5-sigmaCh5);
+		fTot5->FixParameter(5,meanAm5+2*sigmaAm5);
+		fTot5->FixParameter(6,meanCh5-2*sigmaCh5);
 
 		histogram5->Fit("fTot5", "ILREM+");
 
 
 
 		//TF1* fDech10_2  = new TF1("fDech10_2", "expo(3)", meanAm10+sigmaAm10, meanCh10-sigmaCh10);
-		TF1* fTot10 = new TF1("fTot10", "gaus(0) + expo(3)*( x > [5] && x < [6] ) + gaus(7)", meanAm10 - 3*sigmaAm10, meanCh10 + 3*sigmaCh10);
+		TF1* fTot10 = new TF1("fTot10", "gaus(0) + expo(3)*( x > [5] && x < [6] ) + gaus(7)", meanAm10 - 4*sigmaAm10, meanCh10 + 4*sigmaCh10);
 		const Double_t param10[10] = {
 				//Amorphous peak
-				constAm10,
-				meanAm10,
-				sigmaAm10,
+				constAm10,          // 0
+				meanAm10,           // 1
+				sigmaAm10,          // 2
 				//Dechanneling
-				constDc10,
-				slopeDc10,
-				meanAm10+sigmaAm10,
-				meanCh10-sigmaCh10,
+				constDc10,          // 3
+				slopeDc10,          // 4
+				meanAm10+sigmaAm10, // 5
+				meanCh10-sigmaCh10, // 6
 				//Channeling peak
-				constCh10,
-				meanCh10,
-				sigmaCh10
+				constCh10,          // 7
+				meanCh10,           // 8
+				sigmaCh10           // 9
 		};
 
 		fTot10->SetParameters(param10);
 		//fTot10->FixParameter(2,meanAm10);
 		//fTot10->FixParameter(8,meanCh10);
-		fTot10->FixParameter(5,meanAm10+sigmaAm10);
-		fTot10->FixParameter(6,meanCh10-sigmaCh10);
+		fTot10->FixParameter(5,meanAm10+2*sigmaAm10);
+		fTot10->FixParameter(6,meanCh10-2*sigmaCh10);
 
-		histogram10->Fit("fTot10", "ILREM+");
+		histogram10->Fit("fTot10", "IREM+");
 
 
 
