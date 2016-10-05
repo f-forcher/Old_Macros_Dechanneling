@@ -10,7 +10,8 @@
 #include <unistd.h> // chdir
 #include <sstream>
 #include <cmath>
-//#include <map>
+#include <map>
+#include <string>
 
 #include "dbg_macro.h"
 #include "func_sim.h"
@@ -37,15 +38,42 @@ Double_t myfunction(Double_t *x, Double_t *par) {
 
 }
 
-/*
- class dati_channeling {
- Double_t x_entrata;
- Double_t y_entrata;
- Double_t x_uscita;
- Double_t y_uscita;
- };
- */
+std::unique_ptr<std::map<std::string,Double_t> >
+calculate_cystal_params_from_fit (
+		Double_t thickness,
+		Double_t bending_angle,
+		Double_t bending_angle_err,
+		Double_t slopeDc,
+		Double_t slopeDc_err) {
 
+
+	using std::map;
+	using std::pow;
+	using std::string;
+	using std::unique_ptr;
+
+	unique_ptr< map<string, Double_t> > mapc = std::make_unique<map<string, Double_t> >();
+	mapc->emplace("thickness",thickness);
+	mapc->emplace("bending_angle" , bending_angle);
+	mapc->emplace("bending_angle_err" , bending_angle_err);
+
+	auto Rc = (thickness * MILLI_) / (bending_angle * MICRO_);
+	auto Rc_err = (thickness * MILLI_) / pow(bending_angle * MICRO_, 2) * bending_angle_err * MICRO_;
+	auto thetad = -1.0 / slopeDc;
+	auto thetad_err = slopeDc_err / pow(slopeDc, 2);
+	auto dechanneling_lenght = (thetad * MICRO_) * Rc;
+	auto dechanneling_lenght_err = sqrt( pow(Rc * thetad_err * MICRO_,2) +
+										  pow(thetad * MICRO_ * Rc_err,2) );
+
+	mapc->emplace("Rc", Rc);
+	mapc->emplace("Rc_err", Rc_err);
+	mapc->emplace("ThetaD", thetad);
+	mapc->emplace("ThetaD_err", thetad_err);
+	mapc->emplace("dechanneling_lenght", dechanneling_lenght);
+	mapc->emplace("dechanneling_lenght_err", dechanneling_lenght_err);
+
+	return mapc;
+}
 
 /*
  * Macro to calculate dechanneling lenght for a crystal.
@@ -316,8 +344,8 @@ void mia_dech(std::string nome_cristallo,
 		auto slopeDc10 = fitResultDech10->GetParameter(SlopeDc);
 		auto slopeDc10_err = fitResultDech10->GetParError(SlopeDc);
 
-		DBG( std::clog << "slopeDc5: " << slopeDc5 << std::endl; , ; )
-		DBG( std::clog << "slopeDc10: " << slopeDc10 << std::endl; , ; )
+		DBG( std::clog << "slopeDc5: " << slopeDc5 << " +- " << slopeDc5_err << std::endl; , ; )
+		DBG( std::clog << "slopeDc10: " << slopeDc10 << " +- " << slopeDc10_err << std::endl; , ; )
 
 
 		//Weighted means
@@ -335,6 +363,7 @@ void mia_dech(std::string nome_cristallo,
 		auto bending_angle10 = meanCh10;
 		auto bending_angle10_err = meanCh10_err;
 
+		/*
 		// Rc [m] = z / thetaBend
 		auto Rc5 = (thickness * MILLI_) / (bending_angle5 * MICRO_);
 		// Error propagation: sigmaRc = (thickness / bending_angle^2) * sigmaBendingAngle
@@ -359,12 +388,15 @@ void mia_dech(std::string nome_cristallo,
 		auto dechanneling_lenght10 = (thetad10 * MICRO_) * Rc10;
 		auto dechanneling_lenght10_err = sqrt( pow(Rc10 * thetad10_err * MICRO_,2) +
 											  pow(thetad10 * MICRO_ * Rc10_err,2) );
+	    */
 
+		auto map5 = *calculate_cystal_params_from_fit(thickness,bending_angle5,bending_angle5_err,slopeDc5,slopeDc5_err);
+		auto map10 = *calculate_cystal_params_from_fit(thickness,bending_angle10,bending_angle10_err,slopeDc10,slopeDc10_err);
 
-		DBG( std::clog << "dechanneling_lenght5: " << dechanneling_lenght5 << std::endl; , ; )
-		DBG( std::clog << "dechanneling_lenght5_err: " << dechanneling_lenght5_err << std::endl; , ; )
-		DBG( std::clog << "dechanneling_lenght10: " << dechanneling_lenght10 << std::endl; , ; )
-		DBG( std::clog << "dechanneling_lenght10_err: " << dechanneling_lenght10_err << std::endl; , ; )
+		DBG( std::clog << "dechanneling_lenght5: " << map5["dechanneling_lenght"] << std::endl; , ; )
+		DBG( std::clog << "dechanneling_lenght5_err: " << map5["dechanneling_lenght_err"] << std::endl; , ; )
+		DBG( std::clog << "dechanneling_lenght10: " << map10["dechanneling_lenght"]  << std::endl; , ; )
+		DBG( std::clog << "dechanneling_lenght10_err: " << map10["dechanneling_lenght_err"]  << std::endl; , ; )
 
 		//Weighted mean for the bending angle
 		//Create key with name nome_cristallo
@@ -375,15 +407,15 @@ void mia_dech(std::string nome_cristallo,
 		crystal_calc_ref[(int) FieldCrystalDataTable510::bending_angle5_err] = bending_angle5;
 		crystal_calc_ref[(int) FieldCrystalDataTable510::bending_angle10] = bending_angle10;
 		crystal_calc_ref[(int) FieldCrystalDataTable510::bending_angle10_err] = bending_angle10;
-		crystal_calc_ref[(int) FieldCrystalDataTable510::raggio_curvatura5] = Rc5;
-		crystal_calc_ref[(int) FieldCrystalDataTable510::raggio_curvatura5_err] = Rc5_err;
-		crystal_calc_ref[(int) FieldCrystalDataTable510::raggio_curvatura10] = Rc10;
-		crystal_calc_ref[(int) FieldCrystalDataTable510::raggio_curvatura10_err] = Rc10_err;
+		crystal_calc_ref[(int) FieldCrystalDataTable510::raggio_curvatura5] = map5["Rc"];
+		crystal_calc_ref[(int) FieldCrystalDataTable510::raggio_curvatura5_err] = map5["Rc_err"];
+		crystal_calc_ref[(int) FieldCrystalDataTable510::raggio_curvatura10] = map10["Rc"];
+		crystal_calc_ref[(int) FieldCrystalDataTable510::raggio_curvatura10_err] = map10["Rc_err"];
 		crystal_calc_ref[(int) FieldCrystalDataTable510::thickness] = thickness;
-		crystal_calc_ref[(int) FieldCrystalDataTable510::dechanneling_lenght5] = dechanneling_lenght5;
-		crystal_calc_ref[(int) FieldCrystalDataTable510::dechanneling_lenght5_err] = dechanneling_lenght5_err;
-		crystal_calc_ref[(int) FieldCrystalDataTable510::dechanneling_lenght10] = dechanneling_lenght10;
-		crystal_calc_ref[(int) FieldCrystalDataTable510::dechanneling_lenght10_err] = dechanneling_lenght10_err;
+		crystal_calc_ref[(int) FieldCrystalDataTable510::dechanneling_lenght5] = map5["dechanneling_lenght"];
+		crystal_calc_ref[(int) FieldCrystalDataTable510::dechanneling_lenght5_err] = map5["dechanneling_lenght_err"];
+		crystal_calc_ref[(int) FieldCrystalDataTable510::dechanneling_lenght10] = map10["dechanneling_lenght"];
+		crystal_calc_ref[(int) FieldCrystalDataTable510::dechanneling_lenght10_err] = map10["dechanneling_lenght_err"];
 
 
 
@@ -393,7 +425,7 @@ void mia_dech(std::string nome_cristallo,
 
 		// Expanded range
 		//TF1* fDech5_2  = new TF1("fDech5_2", "expo(3)", meanAm5, meanCh5);
-		TF1* fTot5 = new TF1("fTot5", "gaus(0) + expo(3)*( x > [5] && x < [6] ) + gaus(7)", meanAm5 - 4*sigmaAm5, meanCh5 + 4*sigmaCh5);
+		TF1* fTot5 = new TF1("fTot5", "gaus(0) + expo(3) * ( x > [5] && x < [6] ) + gaus(7)", meanAm5 - 4*sigmaAm5, meanCh5 + 4*sigmaCh5);
 		const Double_t param5[10] = {
 				//Amorphous peak
 				constAm5,          // 0
@@ -418,10 +450,16 @@ void mia_dech(std::string nome_cristallo,
 
 		histogram5->Fit("fTot5", "ILREM+");
 
+		constexpr int SlopeDc_tot = 4;
+		TF1 *fitResultTot5 = histogram5->GetFunction("fTot5");
+		auto slopeDc_tot5 = fitResultTot5->GetParameter(SlopeDc_tot);
+		auto slopeDc_tot5_err = fitResultTot5->GetParError(SlopeDc_tot);
+
+		DBG( std::clog << "slopeDc_tot5: " << slopeDc_tot5 << " +- " << slopeDc_tot5_err << std::endl; , ; )
 
 
 		//TF1* fDech10_2  = new TF1("fDech10_2", "expo(3)", meanAm10+sigmaAm10, meanCh10-sigmaCh10);
-		TF1* fTot10 = new TF1("fTot10", "gaus(0) + expo(3)*( x > [5] && x < [6] ) + gaus(7)", meanAm10 - 4*sigmaAm10, meanCh10 + 4*sigmaCh10);
+		TF1* fTot10 = new TF1("fTot10", "gaus(0) + expo(3) * ( x > [5] && x < [6] ) + gaus(7)", meanAm10 - 4*sigmaAm10, meanCh10 + 4*sigmaCh10);
 		const Double_t param10[10] = {
 				//Amorphous peak
 				constAm10,          // 0
@@ -445,6 +483,13 @@ void mia_dech(std::string nome_cristallo,
 		fTot10->FixParameter(6,meanCh10-2*sigmaCh10);
 
 		histogram10->Fit("fTot10", "IREM+");
+
+		TF1 *fitResultTot10 = histogram10->GetFunction("fTot10");
+		auto slopeDc_tot10 = fitResultTot10->GetParameter(SlopeDc_tot);
+		auto slopeDc_tot10_err = fitResultTot10->GetParError(SlopeDc_tot);
+
+		DBG( std::clog << "slopeDc_tot10: " << slopeDc_tot10 << " +- " << slopeDc_tot10_err << std::endl; , ; )
+
 
 
 
