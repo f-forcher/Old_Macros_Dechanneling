@@ -400,7 +400,7 @@ void mia_dech(std::string nome_cristallo,
 
 		//Weighted mean for the bending angle
 		//Create key with name nome_cristallo
-		auto crystal_calc_ref = dati_cristalli_calcolati[nome_cristallo];
+		auto& crystal_calc_ref = dati_cristalli_calcolati[nome_cristallo];
 
 
 		crystal_calc_ref[(int) FieldCrystalDataTable510::bending_angle5] = bending_angle5;
