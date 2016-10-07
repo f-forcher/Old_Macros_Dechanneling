@@ -38,7 +38,12 @@ Double_t myfunction(Double_t *x, Double_t *par) {
 
 }
 
-std::unique_ptr<std::map<std::string,Double_t> >
+/*
+ * @brief: calculate the crystal parameters (like the dechanneling_lenght) from the fitted data
+ * @thickness: z [mm], thickness of the crystal
+ * @bending_angle: [microrad]
+ */
+std::unique_ptr< std::map<std::string,Double_t> >
 calculate_cystal_params_from_fit (
 		Double_t thickness,
 		Double_t bending_angle,
@@ -57,11 +62,19 @@ calculate_cystal_params_from_fit (
 	mapc->emplace("bending_angle" , bending_angle);
 	mapc->emplace("bending_angle_err" , bending_angle_err);
 
+	//Errors calculated with error propagation
+	// Rc [m] = z / thetaBend
 	auto Rc = (thickness * MILLI_) / (bending_angle * MICRO_);
+	// Error propagation: sigmaRc = (thickness / bending_angle^2) * sigmaBendingAngle
 	auto Rc_err = (thickness * MILLI_) / pow(bending_angle * MICRO_, 2) * bending_angle_err * MICRO_;
+	// e^(s*theta) = e^(-theta/thetad) --> thetad = -1/s
+	// Angular dechanneling characteristic angle ThetaD [microrad]
 	auto thetad = -1.0 / slopeDc;
+	// Error prop on theta = 1/s
 	auto thetad_err = slopeDc_err / pow(slopeDc, 2);
+	// Ld [m] = thetad * Rc
 	auto dechanneling_lenght = (thetad * MICRO_) * Rc;
+	// Error prop: sqrt( (Rc*sigmaThetaD)^2 + (ThetaD*sigmaRc)^2 )
 	auto dechanneling_lenght_err = sqrt( pow(Rc * thetad_err * MICRO_,2) +
 										  pow(thetad * MICRO_ * Rc_err,2) );
 
