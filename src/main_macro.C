@@ -29,6 +29,9 @@
 #include <TROOT.h>
 #include <TH1.h>
 #include <TFile.h>
+#include <TGraphErrors.h>
+#include <TCanvas.h>
+#include <TF1.h>
 
 #include "mia_dech.h"
 #include "analizza_dechanneling.h"
@@ -62,6 +65,8 @@ int main_macro(int argc, char* argv[]) {
 	using namespace std;
 	using mions::FieldCrystalDataTable;
 	using mions::CrystalDataTable;
+	using mions::FieldCrystalDataTable510;
+	using mions::CrystalDataTable510;
 
 	// Save the directory of the project (remember you are expected to start it from the
 	// top folder of the repo)
@@ -85,8 +90,9 @@ int main_macro(int argc, char* argv[]) {
 	//std::vector<const char*> elenco_cristalli { "QMP32" };
 	clog << "Start main_macro..." << endl;
 
-	DBG(clog << "DEBUG VERSION " << endl; ,
-	    clog << "RELEASE VERSION " << endl;)
+	DBG(clog << "DEBUG VERSION " << endl
+	; ,
+	clog << "RELEASE VERSION " << endl;)
 
 	// Corso root lunardon/garfagnini
 	// carica la macro generica che legge il file di testo
@@ -122,14 +128,10 @@ int main_macro(int argc, char* argv[]) {
 	std::shared_ptr<std::ofstream> outputdechanneling(
 			new std::ofstream("./crystal_calc_table.txt",
 					std::ofstream::out | std::ofstream::trunc));
-	std::ofstream out_dech5(
-			new std::ofstream("./dech5_table.txt",
-					std::ofstream::out | std::ofstream::trunc));
-	std::ofstream out_dech10(
-			new std::ofstream("./dech10_table.txt",
-					std::ofstream::out | std::ofstream::trunc));
-
-
+	std::ofstream out_dech5("./dech5_table.txt",
+					std::ofstream::out | std::ofstream::trunc);
+	std::ofstream out_dech10("./dech10_table.txt",
+					std::ofstream::out | std::ofstream::trunc);
 
 	auto& outdatafile = *outputdechanneling;
 
@@ -139,23 +141,14 @@ int main_macro(int argc, char* argv[]) {
 //	*outputdechanneling
 //			<< "# Crystal | dechanneling L at +-5 microrad [m] | dechanneling L at +-10 microrad [m]"
 //			<< endl;
-	outdatafile
-			<< "#Crystal,"
-			<< "raggio_curvatura5[m],"
-			<< "raggio_curvatura5_err[m],"
-			<< "raggio_curvatura10[m],"
-			<< "raggio_curvatura10_err[m],"
-			<< "bending_angle5[microrad],"
-			<< "bending_angle5_err[microrad],"
-			<< "bending_angle10[microrad],"
-			<< "bending_angle10_err[microrad],"
-			<< "thickness[mm],"
-			<< "dechanneling_lenght5[m],"
-			<< "dechanneling_lenght5_err[m],"
-			<< "dechanneling_lenght10[m],"
-			<< "dechanneling_lenght10_err[m]"
+	outdatafile << "#Crystal," << "raggio_curvatura5[m],"
+			<< "raggio_curvatura5_err[m]," << "raggio_curvatura10[m],"
+			<< "raggio_curvatura10_err[m]," << "bending_angle5[microrad],"
+			<< "bending_angle5_err[microrad]," << "bending_angle10[microrad],"
+			<< "bending_angle10_err[microrad]," << "thickness[mm],"
+			<< "dechanneling_lenght5[m]," << "dechanneling_lenght5_err[m],"
+			<< "dechanneling_lenght10[m]," << "dechanneling_lenght10_err[m]"
 			<< endl;
-
 
 	ROOT_PROJDIR = gDirectory;
 	TDirectory* currentDir = gDirectory;
@@ -164,8 +157,6 @@ int main_macro(int argc, char* argv[]) {
 			+ "/Dechanneling_Histograms.root";
 	auto file_output_root = std::make_shared<TFile>(
 			path_file_output_root.c_str(), "RECREATE");
-
-
 
 	//Read crystal data
 	// File format: Crystal name | Rc [m]
@@ -178,7 +169,6 @@ int main_macro(int argc, char* argv[]) {
 
 		string riga_estratta;
 		stringstream ss;
-
 
 		// Contenuto di una riga del file
 		//Ignora la prima linea con i nomi delle colonne
@@ -202,8 +192,9 @@ int main_macro(int argc, char* argv[]) {
 			ss >> thickness;
 
 			if (cristallo != string("")) {
-				DBG(clog << cristallo << ": Rc " << raggio_curvatura << " Thb " << bending_angle << endl;
-				; , ;)
+				DBG(
+						clog << cristallo << ": Rc " << raggio_curvatura << " Thb " << bending_angle << endl; ;,
+						;)
 				//map_dati_crist[cristallo][(int)FieldCrystalDataTable::raggio_curvatura] = raggio_curvatura;
 				//map_dati_crist[cristallo][(int)FieldCrystalDataTable::bending_angle] = bending_angle;
 
@@ -215,13 +206,10 @@ int main_macro(int argc, char* argv[]) {
 		}
 	}
 
-
 	std::string path_file_output_data = string(PROJECT_DIR)
 			+ "/Calculated_Crystal_Data.txt";
 	//auto file_output_data = std::make_shared<TFile>(
 	//		path_file_output_root.c_str(), "RECREATE");
-
-
 
 	//Here we store the results of the analysis (ie the fit parameters)
 	mions::CrystalDataTable510 map_dati_crist_calc;
@@ -229,12 +217,13 @@ int main_macro(int argc, char* argv[]) {
 	for (const auto& ch : elenco_cristalli_buoni) {
 		cout << endl << endl;
 		//dech(ch, outputdechanneling);
-		cout << "Crystal: " << ch
-				<< " Rc[m]: " << map_dati_crist_orig[ch][(int)FieldCrystalDataTable::raggio_curvatura]
-				<< " Thetab[muRad]: " << map_dati_crist_orig[ch][(int)FieldCrystalDataTable::bending_angle];
+		cout << "Crystal: " << ch << " Rc[m]: "
+				<< map_dati_crist_orig[ch][(int) FieldCrystalDataTable::raggio_curvatura]
+				<< " Thetab[muRad]: "
+				<< map_dati_crist_orig[ch][(int) FieldCrystalDataTable::bending_angle];
 
 		mions::mia_dech(ch, outputdechanneling, file_output_root,
-				map_dati_crist_orig,map_dati_crist_calc);
+				map_dati_crist_orig, map_dati_crist_calc);
 		//currentDir->cd();
 
 		outdatafile << ch << " ";
@@ -247,24 +236,155 @@ int main_macro(int argc, char* argv[]) {
 	}
 	//file_output_root->Close();
 
-
 	// TODO test
 	//dech("STF45", outputdechanneling);
 
 	cout << "Analyzed all crystals in list" << endl;
 
-
-
-
 	/*
-	 * Now make the file with the data for the plot Rc-Ld
+	 * Plot the four TGraphErrors (Rc5 vs LD5, Rc5/LDe vs LD5, Rc10 vs LD10, Rc10/LDe ) * 2 (ie fTot vs fDech)
+	 * LDe = Analytic extimation of the electronic dechanneling lenght (see Biryukov, Chesnokov), using 5/10 cuts data.
+	 * LDe = 256/Pi^2 * p*v/ln(2*m_e*c^2*gamma/I) * a_tf/(Z_i * r_e * m_e * c^2)
+	 * With
+	 *   p: incoming particle momentumcrysdata
+	 *   v: speed of incoming particle
+	 *   m_e: electron mass
+	 *   c: speed of light
+	 *   gamma: relativistic gamma of incoming particle
+	 *   I: Mean Excitation Energy (like in http://pdg.lbl.gov/2016/AtomicNuclearProperties/HTML/silicon_Si.html)
+	 *   a_tf: Thomas-Fermi atomic radius
+	 *   Z_i: electric charge of incoming particle
+	 *   r_e: classical electron radius
 	 */
 
+	vector<Double_t> Rc5;
+	vector<Double_t> Rc10;
+	vector<Double_t> Rc5_err;
+	vector<Double_t> Rc10_err;
+	vector<Double_t> Ld5;
+	vector<Double_t> Ld10;
+	vector<Double_t> Ld5_err;
+	vector<Double_t> Ld10_err;
+
+
+	for (const auto& crys : elenco_cristalli_buoni){
+		const auto& crysdata = map_dati_crist_calc[crys];
+		Rc5.emplace_back(crysdata[(int) FieldCrystalDataTable510::raggio_curvatura5]);
+		Rc5_err.emplace_back(crysdata[(int) FieldCrystalDataTable510::raggio_curvatura5_err]);
+		Ld5.emplace_back(crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght5]);
+		Ld5_err.emplace_back(crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght5_err]);
+
+		Rc10.emplace_back(crysdata[(int) FieldCrystalDataTable510::raggio_curvatura10]);
+		Rc10_err.emplace_back(crysdata[(int) FieldCrystalDataTable510::raggio_curvatura10_err]);
+		Ld10.emplace_back(crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght10]);
+		Ld10_err.emplace_back(crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght10_err]);
+	}
+
+	auto cRcLd = new TCanvas("cRcLd", "Rc vs Ld");
+	// 2 rows, 2 columns
+	cRcLd->Divide(2, 2);
+	{
+		//auto RcLd_5 = new TGraphErrors(n,x,y,ex,ey);
+		// choose upper left pad https://root.cern.ch/canvases-and-pads
+		cRcLd->cd(1);
+		auto len = Rc5.size();
+		auto RcLd_5 = new TGraphErrors(len, Rc5.data(), Ld5.data(),
+				Rc5_err.data(), Ld5_err.data());
+		/*
+		 * Fit Options (https://root.cern.ch/doc/master/classTGraph.html#aa978c8ee0162e661eae795f6f3a35589):
+		 *  "W" 	Set all weights to 1; ignore error bars
+		 *  "U" 	Use a User specified fitting algorithm (via SetFCN)
+		 *	"Q" 	Quiet mode (minimum printing)
+		 *	"V" 	Verbose mode (default is between Q and V)
+		 *	"E" 	Perform better Errors estimation using Minos technique
+		 *	"B" 	User defined parameter settings are used for predefined functions like "gaus", "expo", "poln", "landau". Use this option when you want to fix one or more parameters for these functions.
+		 *	"M" 	More. Improve fit results. It uses the IMPROVE command of TMinuit (see TMinuit::mnimpr). This algorithm attempts to improve the found local minimum by searching for a better one.
+		 *	"R" 	Use the Range specified in the function range
+		 *	"N" 	Do not store the graphics function, do not draw
+		 *	"0" 	Do not plot the result of the fit. By default the fitted function is drawn unless the option "N" above is specified.
+		 *	"+" 	Add this new fitted function to the list of fitted functions (by default, any previous function is deleted)
+		 *	"C" 	In case of linear fitting, do not calculate the chisquare (saves time)
+		 *	"F" 	If fitting a polN, use the minuit fitter
+		 *	"EX0" 	When fitting a TGraphErrors or TGraphAsymErrors do not consider errors in the coordinate
+		 *	"ROB" 	In case of linear fitting, compute the LTS regression coefficients (robust (resistant) regression), using the default fraction of good points "ROB=0.x" - compute the LTS regression coefficients, using 0.x as a fraction of good points
+		 *	"S" 	The result of the fit is returned in the TFitResultPtr (see below Access to the Fit Result)
+		 */
+		/*
+		 *  Graphic options (https://root.cern.ch/doc/master/classTGraphPainter.html):
+		 *  "A" 	Axis are drawn around the graph
+		 *  "I" 	Combine with option 'A' it draws invisible axis
+		 *  "L" 	A simple polyline is drawn
+		 *	"F" 	A fill area is drawn ('CF' draw a smoothed fill area)
+		 *	"C" 	A smooth Curve is drawn
+		 *	"*" 	A Star is plotted at each point
+		 *	"P" 	The current marker is plotted at each point
+		 *	"B" 	A Bar chart is drawn
+		 *	"1" 	When a graph is drawn as a bar chart, this option makes the bars start from the bottom of the pad. By default they start at 0.
+		 *	"X+" 	The X-axis is drawn on the top side of the plot.
+		 *	"Y+" 	The Y-axis is drawn on the right side of the plot.
+		 */
+
+		TF1 *fRcLd_5 = new TF1("fRcLd_5", "pol1");
+		TFitResultPtr fit_RcLd_5 = RcLd_5->Fit(fRcLd_5, "S");
+		RcLd_5->SetTitle("Rc vs Ld (cuts at 5)");
+		RcLd_5->GetXaxis()->SetTitle("Rc [m]");
+		RcLd_5->GetYaxis()->SetTitle("Ld [m]");
+		RcLd_5->Draw("AP");
+	}
+
+	// Plots at 10 cuts
+	{
+		// choose upper right pad https://root.cern.ch/canvases-and-pads
+		cRcLd->cd(2);
+		auto len = Rc10.size();
+		auto RcLd_10 = new TGraphErrors(len, Rc10.data(), Ld10.data(),
+				Rc10_err.data(), Ld10_err.data());
+		/*
+		 * Fit Options (https://root.cern.ch/doc/master/classTGraph.html#aa978c8ee0162e661eae795f6f3a35589):
+		 *  "W" 	Set all weights to 1; ignore error bars
+		 *  "U" 	Use a User specified fitting algorithm (via SetFCN)
+		 *	"Q" 	Quiet mode (minimum printing)
+		 *	"V" 	Verbose mode (default is between Q and V)
+		 *	"E" 	Perform better Errors estimation using Minos technique
+		 *	"B" 	User defined parameter settings are used for predefined functions like "gaus", "expo", "poln", "landau". Use this option when you want to fix one or more parameters for these functions.
+		 *	"M" 	More. Improve fit results. It uses the IMPROVE command of TMinuit (see TMinuit::mnimpr). This algorithm attempts to improve the found local minimum by searching for a better one.
+		 *	"R" 	Use the Range specified in the function range
+		 *	"N" 	Do not store the graphics function, do not draw
+		 *	"0" 	Do not plot the result of the fit. By default the fitted function is drawn unless the option "N" above is specified.
+		 *	"+" 	Add this new fitted function to the list of fitted functions (by default, any previous function is deleted)
+		 *	"C" 	In case of linear fitting, do not calculate the chisquare (saves time)
+		 *	"F" 	If fitting a polN, use the minuit fitter
+		 *	"EX0" 	When fitting a TGraphErrors or TGraphAsymErrors do not consider errors in the coordinate
+		 *	"ROB" 	In case of linear fitting, compute the LTS regression coefficients (robust (resistant) regression), using the default fraction of good points "ROB=0.x" - compute the LTS regression coefficients, using 0.x as a fraction of good points
+		 *	"S" 	The result of the fit is returned in the TFitResultPtr (see below Access to the Fit Result)
+		 */
+		/*
+		 *  Graphic options (https://root.cern.ch/doc/master/classTGraphPainter.html):
+		 *  "A" 	Axis are drawn around the graph
+		 *  "I" 	Combine with option 'A' it draws invisible axis
+		 *  "L" 	A simple polyline is drawn
+		 *	"F" 	A fill area is drawn ('CF' draw a smoothed fill area)
+		 *	"C" 	A smooth Curve is drawn
+		 *	"*" 	A Star is plotted at each point
+		 *	"P" 	The current marker is plotted at each point
+		 *	"B" 	A Bar chart is drawn
+		 *	"1" 	When a graph is drawn as a bar chart, this option makes the bars start from the bottom of the pad. By default they start at 0.
+		 *	"X+" 	The X-axis is drawn on the top side of the plot.
+		 *	"Y+" 	The Y-axis is drawn on the right side of the plot.
+		 */
+
+		TF1 *fRcLd_10 = new TF1("fRcLd_10", "pol1");
+		TFitResultPtr fit_RcLd_10 = RcLd_10->Fit(fRcLd_10, "S");
+		RcLd_10->SetTitle("Rc vs Ld (cuts at 10)");
+		RcLd_10->GetXaxis()->SetTitle("Rc [m]");
+		RcLd_10->GetYaxis()->SetTitle("Ld [m]");
+		RcLd_10->Draw("AP");
+	}
 
 
 
 	currentDir->cd();
-	//mia_dech();
+	//mia_dech(); TCanvas
 
 	//char t = 'a';
 	//while (cin >> t)
