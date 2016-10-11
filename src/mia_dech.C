@@ -95,10 +95,11 @@ calculate_cystal_params_from_fit (
  *               Crystal | dechanneling L at +-5 microrad [m] | dechanneling L at +-10 microrad [m]
  */
 void mia_dech(std::string nome_cristallo,
-			std::shared_ptr<std::ofstream> output_analisi_dech,
-			std::shared_ptr<TFile> root_output,
-			const mions::CrystalDataTable& dati_cristalli_orig,
-			mions::CrystalDataTable510& dati_cristalli_calcolati) {
+		std::shared_ptr<std::ofstream> output_analisi_dech,
+		std::shared_ptr<TFile> root_output,
+		const mions::CrystalDataTable& dati_cristalli_orig,
+		mions::CrystalDataTable510& dati_cristalli_calcolati,
+		mions::CrystalDataTable510& dati_cristalli_calcolati_ftot) {
 
 	//PROJDIR->cd();
 	// Go to the project's "home" folder
@@ -417,9 +418,9 @@ void mia_dech(std::string nome_cristallo,
 
 
 		crystal_calc_ref[(int) FieldCrystalDataTable510::bending_angle5] = bending_angle5;
-		crystal_calc_ref[(int) FieldCrystalDataTable510::bending_angle5_err] = bending_angle5;
+		crystal_calc_ref[(int) FieldCrystalDataTable510::bending_angle5_err] = bending_angle5_err;
 		crystal_calc_ref[(int) FieldCrystalDataTable510::bending_angle10] = bending_angle10;
-		crystal_calc_ref[(int) FieldCrystalDataTable510::bending_angle10_err] = bending_angle10;
+		crystal_calc_ref[(int) FieldCrystalDataTable510::bending_angle10_err] = bending_angle10_err;
 		crystal_calc_ref[(int) FieldCrystalDataTable510::raggio_curvatura5] = map5["Rc"];
 		crystal_calc_ref[(int) FieldCrystalDataTable510::raggio_curvatura5_err] = map5["Rc_err"];
 		crystal_calc_ref[(int) FieldCrystalDataTable510::raggio_curvatura10] = map10["Rc"];
@@ -432,10 +433,13 @@ void mia_dech(std::string nome_cristallo,
 
 
 
+
+
+
 		/*
 		 * TODO Test con somma
 		 */
-
+		cout << endl << endl << "Prova fit totale con fTot" << endl;
 		// Expanded range
 		//TF1* fDech5_2  = new TF1("fDech5_2", "expo(3)", meanAm5, meanCh5);
 		TF1* fTot5 = new TF1("fTot5", "gaus(0) + expo(3) * ( x > [5] && x < [6] ) + gaus(7)", meanAm5 - 4*sigmaAm5, meanCh5 + 4*sigmaCh5);
@@ -503,6 +507,42 @@ void mia_dech(std::string nome_cristallo,
 
 		DBG( std::clog << "slopeDc_tot10: " << slopeDc_tot10 << " +- " << slopeDc_tot10_err << std::endl; , ; )
 
+
+
+
+
+		auto bending_angle5_tot = fitResultTot5->GetParameter(8);;
+		auto bending_angle5_tot_err = fitResultTot5->GetParError(8);;
+		auto bending_angle10_tot = fitResultTot10->GetParameter(8);
+		auto bending_angle10_tot_err = fitResultTot10->GetParError(8);
+
+
+		auto map5_tot = *calculate_cystal_params_from_fit(thickness,bending_angle5_tot,bending_angle5_tot_err,slopeDc_tot5,slopeDc_tot5_err);
+		auto map10_tot = *calculate_cystal_params_from_fit(thickness,bending_angle10_tot,bending_angle10_tot_err,slopeDc_tot10,slopeDc_tot10_err);
+
+		DBG( std::clog << "dechanneling_lenght5 tot: " << map5_tot["dechanneling_lenght"] << std::endl; , ; )
+		DBG( std::clog << "dechanneling_lenght5_err tot: " << map5_tot["dechanneling_lenght_err"] << std::endl; , ; )
+		DBG( std::clog << "dechanneling_lenght10 tot: " << map10_tot["dechanneling_lenght"]  << std::endl; , ; )
+		DBG( std::clog << "dechanneling_lenght10_err tot: " << map10_tot["dechanneling_lenght_err"]  << std::endl; , ; )
+
+		//Weighted mean for the bending angle
+		//Create key with name nome_cristallo
+		auto& crystal_calctot_ref = dati_cristalli_calcolati_ftot[nome_cristallo];
+
+
+		crystal_calctot_ref[(int) FieldCrystalDataTable510::bending_angle5] = bending_angle5_tot;
+		crystal_calctot_ref[(int) FieldCrystalDataTable510::bending_angle5_err] = bending_angle5_tot_err;
+		crystal_calctot_ref[(int) FieldCrystalDataTable510::bending_angle10] = bending_angle10_tot;
+		crystal_calctot_ref[(int) FieldCrystalDataTable510::bending_angle10_err] = bending_angle10_tot_err;
+		crystal_calctot_ref[(int) FieldCrystalDataTable510::raggio_curvatura5] = map5_tot["Rc"];
+		crystal_calctot_ref[(int) FieldCrystalDataTable510::raggio_curvatura5_err] = map5_tot["Rc_err"];
+		crystal_calctot_ref[(int) FieldCrystalDataTable510::raggio_curvatura10] = map10_tot["Rc"];
+		crystal_calctot_ref[(int) FieldCrystalDataTable510::raggio_curvatura10_err] = map10_tot["Rc_err"];
+		crystal_calctot_ref[(int) FieldCrystalDataTable510::thickness] = thickness;
+		crystal_calctot_ref[(int) FieldCrystalDataTable510::dechanneling_lenght5] = map5_tot["dechanneling_lenght"];
+		crystal_calctot_ref[(int) FieldCrystalDataTable510::dechanneling_lenght5_err] = map5_tot["dechanneling_lenght_err"];
+		crystal_calctot_ref[(int) FieldCrystalDataTable510::dechanneling_lenght10] = map10_tot["dechanneling_lenght"];
+		crystal_calctot_ref[(int) FieldCrystalDataTable510::dechanneling_lenght10_err] = map10_tot["dechanneling_lenght_err"];
 
 
 

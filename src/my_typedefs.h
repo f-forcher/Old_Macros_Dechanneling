@@ -12,6 +12,7 @@
 #include <map>
 #include <array>
 #include <string>
+#include <cmath>
 
 namespace mions {
 
@@ -72,10 +73,11 @@ constexpr Double_t CENTI_ = 1e-2;
 constexpr Double_t MILLI_ = 1e-3;
 constexpr Double_t MICRO_ = 1e-6;
 constexpr Double_t NANO_ = 1e-9;
+constexpr Double_t PI_  = 3.141592653589793238463;
 
 // Conversioni
 constexpr Double_t ELECTRONVOLT_ = 1.60217656535e-19; // ElectronVolt in Joule (1 eV = 1.602176565(35)*10−19 J)
-constexpr Double_t ANGSTROM_ = 1e-9; // Angstrom in metri (1 Ang = 1e-9 m)
+constexpr Double_t ANGSTROM_ = 1e-10; // Angstrom in metri (1 Ang = 1e-9 m)
 
 /* electronic dechanneling lenght, analytic expression
  * LDe = 256/Pi^2 * p*v/ln(2*m_e*c^2*gamma/I) * a_tf * d_p / (Z_i * r_e * m_e * c^2)
@@ -93,23 +95,38 @@ constexpr Double_t ANGSTROM_ = 1e-9; // Angstrom in metri (1 Ang = 1e-9 m)
  *
  *   @E: incoming particle energy [eV]
  */
-constexpr Double_t electronic_dechanneling(UShort_t Z, Double_t E_eV) {
+
+constexpr Double_t electronic_dechanneling(UShort_t Z, Double_t E_GeV) {
+	using std::pow;
+	using std::log;
+	using std::clog;
+	using std::endl;
 	//Constants from NIST
-	Double_t c = 299792458;
+	Double_t c = 299792458; //Speed of light [m/s]
+	Double_t r_e = 2.8179403227e-15; //Classical electron radius [m]
+	Double_t c_p = 1.60217733e-19; // Carica protone [Coul]
 	Double_t m_e = 9.10938356e-31; // Electron mass [kg]
+	Double_t m_e_ev = m_e/(1/(c*c)*ELECTRONVOLT_); //Electron mass [eV] ~ 511000 ev
+	Double_t m_p = 1.672621898e-27; //Proton mass [Kg]
+	Double_t m_p_ev = m_p/(1/(c*c)*ELECTRONVOLT_); //Proton mass [eV] ~ 938272 ev
+	//DBG( std::clog << "m_e: " << m_e << std::endl; , ; );
 	Double_t I  = 173.0 * ELECTRONVOLT_; // I: Mean Excitation Energy [Joule]
-	//Constants from D. Mirarchi, "Crystal Collimation for LHC"
 
+	//Constants from D. Mirarchi, "Crystal Collimation for LHC", and R. Rossi Master Thesis
 	Double_t d_p = 1.92*ANGSTROM_; //d_p: interatomic distance [m]
-	//Doublet_t Z
+	Double_t Z_Si= 14; // Integer Electric charge of the incoming particle
+	Double_t E = E_GeV * GIGA_*ELECTRONVOLT_; // Energy in [Joule]
+	Double_t a_tf = 0.8853*(0.529*ANGSTROM_)*pow(Z+Z_Si,-1.0/3.0); // Thomas-Fermi Radius [m?]: (0.529*ANGSTROM_) bohr radius
 
-	Double_t E = E_eV * GIGA_*ELECTRONVOLT_; // Energy in [Joule]
+	//Double_t pv = 400*GIGA_*ELECTRONVOLT_; //Energy in GeV
+	Double_t gamma = E/(m_p*c*c);
+	//clog << gamma << endl;
+	Double_t LDe = 256.0/(9*PI_*PI_)*E/log(2*m_e*c*c*gamma*pow(I,-1.0))*(a_tf*d_p)/(Z*r_e*m_e*c*c);
 
-
-	return 0;
+	return LDe;
 }
 
 
-}
+} // mions
 
 #endif /* MY_TYPEDEFS_H_ */

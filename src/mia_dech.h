@@ -22,12 +22,16 @@ class TFile;
 	 * @nome_cristallo: Name of the folder with the crystal data
 	 * @output_dech: file in which to append the "Ldech"s, in the format
 	 *               Crystal | dechanneling L at +-5 microrad [m] | dechanneling L at +-10 microrad [m]
+	 * @dati_cristalli_orig: declared data of the crystal
+	 * @dati_cristalli_calcolati: data calculated using three separated functions
+	 * dati_cristalli_calcolati_ftot: data calculated using a total fit
 	 */
 	void mia_dech(std::string nome_cristallo,
 			std::shared_ptr<std::ofstream> output_analisi_dech,
 			std::shared_ptr<TFile> root_output,
 			const mions::CrystalDataTable& dati_cristalli_orig,
-			mions::CrystalDataTable510& dati_cristalli_calcolati);
+			mions::CrystalDataTable510& dati_cristalli_calcolati,
+			mions::CrystalDataTable510& dati_cristalli_calcolati_ftot);
 	}
 
 #else
