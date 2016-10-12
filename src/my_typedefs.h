@@ -121,7 +121,7 @@ constexpr Double_t electronic_dechanneling(UShort_t Z, Double_t E_GeV) {
 	//Double_t pv = 400*GIGA_*ELECTRONVOLT_; //Energy in GeV
 	Double_t gamma = E/(m_p*c*c);
 	//clog << gamma << endl;
-	Double_t LDe = 256.0/(9*PI_*PI_)*E/log(2*m_e*c*c*gamma*pow(I,-1.0))*(a_tf*d_p)/(Z*r_e*m_e*c*c);
+	Double_t LDe = 256.0/(9*PI_*PI_)*E/(log(2*m_e*c*c*gamma*pow(I,-1.0))-1)*(a_tf*d_p)/(Z*r_e*m_e*c*c);
 
 	return LDe;
 }

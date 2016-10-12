@@ -95,7 +95,7 @@ int main_macro(int argc, char* argv[]) {
 	std::vector<const char*> elenco_cristalli { "STF38", "STF45", "STF47",
 			"STF49", "STF51", "QMP27", "QMP29", "QMP32" };
 
-	std::vector<const char*> elenco_cristalli_buoni { "STF45", "STF49", "QMP27",
+	std::vector<const char*> elenco_cristalli_buoni { "STF45", "STF38", "STF49", "QMP27",
 			"QMP32" };
 
 	//std::vector<const char*> elenco_cristalli { "QMP32" };
@@ -290,17 +290,16 @@ int main_macro(int argc, char* argv[]) {
 	vector<Double_t> Ld5_tot_err;
 	vector<Double_t> Ld10_tot_err;
 
+	auto LDe = electronic_dechanneling(1,400);
 
 	for (const auto& crys : elenco_cristalli_buoni) {
 		const auto& crysdata = map_dati_crist_calc[crys];
 		const auto& crysdata_tot = map_dati_crist_calc_tot[crys];
 
-		auto LDe=electronic_dechanneling(1,400);
-
 		Rc5.emplace_back(crysdata[(int) FieldCrystalDataTable510::raggio_curvatura5]);
 		Rc5_err.emplace_back(crysdata[(int) FieldCrystalDataTable510::raggio_curvatura5_err]);
-		Ld5.emplace_back(crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght5]/LDe);
-		Ld5_err.emplace_back(crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght5_err]/LDe);
+		Ld5.emplace_back(crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght5]);
+		Ld5_err.emplace_back(crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght5_err]);
 
 		Rc10.emplace_back(crysdata[(int) FieldCrystalDataTable510::raggio_curvatura10]);
 		Rc10_err.emplace_back(crysdata[(int) FieldCrystalDataTable510::raggio_curvatura10_err]);

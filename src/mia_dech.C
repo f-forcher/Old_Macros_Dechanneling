@@ -441,8 +441,23 @@ void mia_dech(std::string nome_cristallo,
 		 */
 		cout << endl << endl << "Prova fit totale con fTot" << endl;
 		// Expanded range
+
 		//TF1* fDech5_2  = new TF1("fDech5_2", "expo(3)", meanAm5, meanCh5);
-		TF1* fTot5 = new TF1("fTot5", "gaus(0) + expo(3) * ( x > [5] && x < [6] ) + gaus(7)", meanAm5 - 4*sigmaAm5, meanCh5 + 4*sigmaCh5);
+		/*
+		 * Gaussian blurred exponential
+		 * (E^(d + (c^2 sigma^2)/4 + c y) (Erf[(-2 a + c sigma^2 + 2 y)/(2 sigma)] +
+            Erf[b/sigma - (c sigma)/2 - y/sigma]))/(2 Sqrt[2])
+		 */
+		TF1* fTot5 = new TF1("fTot5", "gaus(0) + "
+							 "expo(3) * ( x > [5] && x < [6] ) "
+							 "+ gaus(7)", meanAm5 - 4*sigmaAm5, meanCh5 + 4*sigmaCh5);
+
+//		TF1* fTot5_2 = new TF1("fTot5", "gaus(0) + "
+//									 "(exp(d + (c*c * sigma*sigma)/4.0 + c*x)*(TMath::Erf((-2*a + c*sigma*sigma + 2*x)/(2*sigma)) +
+//									 " TMath::ErfErf[b/sigma - (c sigma)/2 - y/sigma]))/(2 Sqrt[2])"
+//									 "+ gaus(7)", meanAm5 - 4*sigmaAm5, meanCh5 + 4*sigmaCh5);
+
+
 		const Double_t param5[10] = {
 				//Amorphous peak
 				constAm5,          // 0
@@ -564,7 +579,7 @@ void mia_dech(std::string nome_cristallo,
 
 		//ROOT_PROJDIR->cd();
 		//Todo rimetterla;
-		//dech(nome_cristallo,output_dech);
+		dech(nome_cristallo,output_analisi_dech,dati_cristalli_orig,dati_cristalli_calcolati,dati_cristalli_calcolati_ftot);
 	}
 
 }
