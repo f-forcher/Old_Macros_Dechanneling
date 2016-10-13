@@ -21,4 +21,11 @@ Old ROOT macros for dechanneling, wich I`m modifying to analyze (old and new) cr
 * Alternatively you can load and execute the macro main_macro() (the equivalent of main) from root, with for example
 
 #Usage
-The file .dat to analyze (not in github as they are too big to use) are
+The files .dat to analyze (not in github as they are too big to use) are called `recoDataSimple_<nome_cryst>.torsion.correction.histo.dat` and have to be placed in the relative crystal's folder `<PROJ_DIR>/ForFrancesco/<nome_cryst>_exp/`
+
+1. Load ROOT 6 with thisroot.sh or equivalent.
+2. `cd` to the project folder `PROJ_DIR` (for example, `~/git/Old_Macros_Dechanneling`)
+3. Choose a configuration, for example `Release`, and `cd` into it.
+4. Run `make`
+5. `cd` to `PROJ_DIR` again.
+6. Run the analysis with `./Debug/Old_Macros_Dechanneling`

@@ -579,7 +579,7 @@ void mia_dech(std::string nome_cristallo,
 
 		//ROOT_PROJDIR->cd();
 		//Todo rimetterla;
-		dech(nome_cristallo,output_analisi_dech,dati_cristalli_orig,dati_cristalli_calcolati,dati_cristalli_calcolati_ftot);
+		//dech(nome_cristallo,output_analisi_dech,dati_cristalli_orig,dati_cristalli_calcolati,dati_cristalli_calcolati_ftot);
 	}
 
 }
