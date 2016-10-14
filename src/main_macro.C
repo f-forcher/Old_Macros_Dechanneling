@@ -59,6 +59,7 @@ TDirectory* ROOT_PROJDIR = nullptr;
 char PROJECT_DIR[FILENAME_MAX] = "[NOT SET]";
 std::vector<TH1*> vHistograms;
 std::vector<TCanvas*> vCanvases;
+bool PREFER_DAT_FILES = true; // If true
 
 
 
@@ -67,8 +68,9 @@ std::vector<TCanvas*> vCanvases;
 
 
 
-
-
+/*
+ * First argument from command line
+ */
 int main_macro(int argc, char* argv[]) {
 
 	using namespace std;
@@ -78,6 +80,21 @@ int main_macro(int argc, char* argv[]) {
 	using mions::CrystalDataTable510;
 	using mions::electronic_dechanneling;
 
+	// No arguments:  argc=1, argv[0]=nome_comando
+	if(argc >= 2 && string(argv[1]) == string("-dat")){
+		cout << "[SETTING]: Prefers to use .dat file if exist, else try with .root" << endl;
+		PREFER_DAT_FILES = true;
+	} else if(argc >= 2 && string(argv[1]) == string("-root")) {
+		cout << "[SETTING]: Prefers to use .root file if exist, else try with .dat" << endl;
+		PREFER_DAT_FILES = false;
+	} else if (argc < 2) {
+		cout << "[WARNING][SETTING]: No file preference indicated. Prefers to use .dat file if exist, else try with .root" << endl;
+		cout << "[WARNING]: use option \"-dat\" or \"-root\" (but without ticks) to select a preferred file type." << endl;
+		PREFER_DAT_FILES = true;
+	} else {
+		cout << "[ERROR]: first option should be either \"-dat\" or \"-root\", to select preferred file type" << endl;
+		return -1;
+	}
 
 	// Save the directory of the project (remember you are expected to start it from the
 	// top folder of the repo)

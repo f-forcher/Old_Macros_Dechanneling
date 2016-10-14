@@ -24,6 +24,7 @@
 //extern 	std::vector<TH1*> vHistograms10;
 //extern std::vector<TCanvas*> vCanvases;
 extern char PROJECT_DIR[FILENAME_MAX];
+extern bool PREFER_DAT_FILES;
 
 namespace mions {
 
@@ -156,7 +157,7 @@ void mia_dech(std::string nome_cristallo,
 
 	//vHistograms.front()->SetNameTitle(nomehisto5.c_str(),nome_cristallo.c_str());
 
-	if (file_dat) {
+	if (file_dat && PREFER_DAT_FILES) {
 		// Il codice per la mia analisi qua
 
 		//gStyle->SetPalette(1);
