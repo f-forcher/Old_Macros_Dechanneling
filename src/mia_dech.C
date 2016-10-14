@@ -82,6 +82,9 @@ calculate_cystal_params_from_fit (
 	mapc->emplace("Rc_err", Rc_err);
 	mapc->emplace("ThetaD", thetad);
 	mapc->emplace("ThetaD_err", thetad_err);
+	mapc->emplace("slopeDc", slopeDc);
+	mapc->emplace("slopeDc_err", slopeDc_err);
+
 	mapc->emplace("dechanneling_lenght", dechanneling_lenght);
 	mapc->emplace("dechanneling_lenght_err", dechanneling_lenght_err);
 
@@ -173,7 +176,7 @@ void mia_dech(std::string nome_cristallo,
 
 		//dati.print(datisize);
 
-		//Read events and select those with entry angle between -+5 microrad
+		//Read events and select those with entry angle between -+5 and +-10 microrad
 		for (ULong64_t i = 0; i < datisize; ++i) {
 
 			ev = dati.getEvent(i);
@@ -426,6 +429,10 @@ void mia_dech(std::string nome_cristallo,
 		crystal_calc_ref[(int) FieldCrystalDataTable510::raggio_curvatura10] = map10["Rc"];
 		crystal_calc_ref[(int) FieldCrystalDataTable510::raggio_curvatura10_err] = map10["Rc_err"];
 		crystal_calc_ref[(int) FieldCrystalDataTable510::thickness] = thickness;
+		crystal_calc_ref[(int) FieldCrystalDataTable510::slopeDc5] = map5["slopeDc"];
+		crystal_calc_ref[(int) FieldCrystalDataTable510::slopeDc5_err] = map5["slopeDc_err"];
+		crystal_calc_ref[(int) FieldCrystalDataTable510::slopeDc10] = map10["slopeDc"];
+		crystal_calc_ref[(int) FieldCrystalDataTable510::slopeDc10_err] = map10["slopeDc_err"];
 		crystal_calc_ref[(int) FieldCrystalDataTable510::dechanneling_lenght5] = map5["dechanneling_lenght"];
 		crystal_calc_ref[(int) FieldCrystalDataTable510::dechanneling_lenght5_err] = map5["dechanneling_lenght_err"];
 		crystal_calc_ref[(int) FieldCrystalDataTable510::dechanneling_lenght10] = map10["dechanneling_lenght"];
@@ -554,6 +561,10 @@ void mia_dech(std::string nome_cristallo,
 		crystal_calctot_ref[(int) FieldCrystalDataTable510::raggio_curvatura10] = map10_tot["Rc"];
 		crystal_calctot_ref[(int) FieldCrystalDataTable510::raggio_curvatura10_err] = map10_tot["Rc_err"];
 		crystal_calctot_ref[(int) FieldCrystalDataTable510::thickness] = thickness;
+		crystal_calctot_ref[(int) FieldCrystalDataTable510::slopeDc5] = map5_tot["slopeDc"];
+		crystal_calctot_ref[(int) FieldCrystalDataTable510::slopeDc5_err] = map5_tot["slopeDc_err"];
+		crystal_calctot_ref[(int) FieldCrystalDataTable510::slopeDc10] = map10_tot["slopeDc"];
+		crystal_calctot_ref[(int) FieldCrystalDataTable510::slopeDc10_err] = map10_tot["slopeDc_err"];
 		crystal_calctot_ref[(int) FieldCrystalDataTable510::dechanneling_lenght5] = map5_tot["dechanneling_lenght"];
 		crystal_calctot_ref[(int) FieldCrystalDataTable510::dechanneling_lenght5_err] = map5_tot["dechanneling_lenght_err"];
 		crystal_calctot_ref[(int) FieldCrystalDataTable510::dechanneling_lenght10] = map10_tot["dechanneling_lenght"];

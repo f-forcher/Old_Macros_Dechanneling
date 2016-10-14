@@ -12,20 +12,27 @@ Old ROOT macros for dechanneling, wich I`m modifying to analyze (old and new) cr
    
 3. Put the aliases for the shell (bash, zsh, etc) in the corresponding file and source them.
 3. Put Eclipse (or modify the scripts, obviously...) in `~/bin/eclipse`
-4. Put the scripts to run eclipse (eg `~/SCRIPT_ROOT_ECLIPSE/eclipse_root534.sh`) for example on the Desktop
+4. You can put the scripts to run eclipse (eg `~/SCRIPT_ROOT_ECLIPSE/eclipse_root534.sh`) for example on the Desktop
 
-###Compile/run
+###Compile/run from Eclipse
 1. Open a terminal and select the root to use with the aliases (eg `root_534_select`) or soucing the scripts in `~/Documents/root_varie`
 2. Open eclipse using the script corresponding the selected ROOT
 * From terminal you can compile (assuming as usual you are in the folder) for example with Debug congfig with `cd ./Debug; make` and then you go back up `cd ..` and execute `./Debug/Old_Macros_Dechanelling`
 * Alternatively you can load and execute the macro main_macro() (the equivalent of main) from root, with for example
 
+#Configurations
+On the scale Debugging vs Optimization the configurations are arranged as follows
+1. `Debug_Super` (uses fsanitize, -Weffc++)
+2. `Debug` (usual Eclipse config, with -ggdb, (un)define macro (N)DEBUG)
+3. `Release` (usual Eclipse, define macro NDEBUG and undefine DEBUG)
+4. `Optimized_Super` (maximal "standard" optimization, uses -flto)
+5. `Fastmath_Optimized_Super` ("non-standard" optimizations, like -ffast-math)
+
 #Usage
 The files .dat to analyze (not in github as they are too big to use) are called `recoDataSimple_<nome_cryst>.torsion.correction.histo.dat` and have to be placed in the relative crystal's folder `<PROJ_DIR>/ForFrancesco/<nome_cryst>_exp/`
-
 1. Load ROOT 6 with thisroot.sh or equivalent.
-2. `cd` to the project folder `PROJ_DIR` (for example, `~/git/Old_Macros_Dechanneling`)
+2. `cd` to the project folder `<PROJ_DIR>` (for example, `cd ~/git/Old_Macros_Dechanneling/`)
 3. Choose a configuration, for example `Release`, and `cd` into it.
-4. Run `make`
-5. `cd` to `PROJ_DIR` again.
-6. Run the analysis with `./Debug/Old_Macros_Dechanneling`
+4. Run `make clean` if needed and then `make`
+5. `cd ..` to `<PROJ_DIR>` again.
+6. Run the analysis with `./Release/Old_Macros_Dechanneling`

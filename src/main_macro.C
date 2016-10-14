@@ -367,7 +367,7 @@ int main_macro(int argc, char* argv[]) {
 		RcLd_5->SetTitle("Rc vs Ld (cuts at 5)");
 		RcLd_5->GetXaxis()->SetTitle("Rc [m]");
 		RcLd_5->GetYaxis()->SetTitle("Ld [m]");
-		RcLd_5->Draw("AP");
+		RcLd_5->Draw("AP*");
 		RcLd_5->Write();
 	}
 
@@ -385,7 +385,7 @@ int main_macro(int argc, char* argv[]) {
 		RcLd_10->SetTitle("Rc vs Ld (cuts at 10)");
 		RcLd_10->GetXaxis()->SetTitle("Rc [m]");
 		RcLd_10->GetYaxis()->SetTitle("Ld [m]");
-		RcLd_10->Draw("AP");
+		RcLd_10->Draw("AP*");
 		RcLd_10->Write();
 	}
 
@@ -402,7 +402,7 @@ int main_macro(int argc, char* argv[]) {
 		RcLd_5_tot->SetTitle("Rc vs Ld (cuts at 5), total sum fit");
 		RcLd_5_tot->GetXaxis()->SetTitle("Rc [m]");
 		RcLd_5_tot->GetYaxis()->SetTitle("Ld [m]");
-		RcLd_5_tot->Draw("AP");
+		RcLd_5_tot->Draw("AP*");
 		RcLd_5_tot->Write();
 	}
 
@@ -419,7 +419,7 @@ int main_macro(int argc, char* argv[]) {
 		RcLd_10_tot->SetTitle("Rc vs Ld (cuts at 10), total sum fit");
 		RcLd_10_tot->GetXaxis()->SetTitle("Rc [m]");
 		RcLd_10_tot->GetYaxis()->SetTitle("Ld [m]");
-		RcLd_10_tot->Draw("AP");
+		RcLd_10_tot->Draw("AP*");
 		RcLd_10_tot->Write();
 	}
 
