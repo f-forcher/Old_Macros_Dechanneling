@@ -12,6 +12,7 @@
 #include <cmath>
 #include <map>
 #include <string>
+#include <memory>
 
 #include "dbg_macro.h"
 #include "func_sim.h"
@@ -121,14 +122,21 @@ void mia_dech(std::string nome_cristallo,
 
 	string cartella_cristallo = "ForFrancesco/" + nome_cristallo + "_exp/";
 	gSystem->ChangeDirectory(cartella_cristallo.c_str());
-	string pathfiledati = //cartella_cristallo +
+	string pathfiledati_dat = //cartella_cristallo +
 			"recoDataSimple_" + nome_cristallo
 					+ ".torsion.correction.histo.dat";
 
-	string nomefiledati = "recoDataSimple_" + nome_cristallo
+	string nomefiledati_dat = "recoDataSimple_" + nome_cristallo
 			+ ".torsion.correction.histo.dat";
 
-	ifstream file_dat(pathfiledati);
+	std::string pathfiledati_root = cartella_cristallo
+			+ "recoDataSimple_renamed.torsion.correction.histo.root";
+
+	// TODO Generalizzare il nome del file
+	std::string filedati_root =
+			"recoDataSimple_renamed.torsion.correction.histo.root";
+
+	ifstream file_dat(pathfiledati_dat);
 
 	//600 bin ,da -200 a 400
 	// Scelti guardando i grafici fatti da dech.C
@@ -145,19 +153,29 @@ void mia_dech(std::string nome_cristallo,
 	// /* title */nome_cristallo.c_str(),
 	// /* X-dimension */600, -200, 400));
 
-	auto histogram5 = std::make_unique < TH1D > (
-	/* name */nomehisto5.c_str(),
-	/* title */titlehisto5.c_str(),
-	/* X-dimension */600/4, -200, 400);
+	//	auto histogram5_dat = std::make_unique < TH1D > (
+	//	/* name */nomehisto5.c_str(),
+	//	/* title */titlehisto5.c_str(),
+	//	/* X-dimension */600/4, -200, 400);
 
-	auto histogram10 = std::make_unique < TH1D > (
-	/* name */nomehisto10.c_str(),
-	/* title */titlehisto10.c_str(),
-	/* X-dimension */600/4, -200, 400);
+
+	TH1D* histogram5;
+	TH1D* histogram10;
+
 
 	//vHistograms.front()->SetNameTitle(nomehisto5.c_str(),nome_cristallo.c_str());
 
-	if (file_dat && PREFER_DAT_FILES) {
+
+
+
+	/*
+	 * Assumption: .root exist for all files
+	 * If .dat exist and is preferred, use it
+	 * if .dat does not exist and is preferred, use .root and warn about it
+	 * if .dat exist but is not preferred, use .root
+	 * if .dat does not exist and is not prefferred... all's right with the world, use .root
+	 */
+	if (bool(file_dat) and PREFER_DAT_FILES) {
 		// Il codice per la mia analisi qua
 
 		//gStyle->SetPalette(1);
@@ -168,12 +186,25 @@ void mia_dech(std::string nome_cristallo,
 		DBG(
 				clog << "[LOG]: " << "Crystal " << nome_cristallo << endl; clog << "[LOG]: File "<< pathfiledati << endl << endl;,
 				;)
+		clog << "[LOG]: Using .dat file";
+
+		//ifstream file_dat(pathfiledati);
 
 		//Riempi gli istogrammi
-		DatiChanneling dati(nomefiledati);
+		DatiChanneling dati(nomefiledati_dat);
 
 		EventoDechanneling ev;
 		auto datisize = dati.getSize();
+
+		auto histogram5_dat = new TH1D(
+				/* name */nomehisto5.c_str(),
+				/* title */titlehisto5.c_str(),
+				/* X-dimension */600/4, -200, 400);
+
+		auto histogram10_dat = new TH1D(
+				/* name */nomehisto10.c_str(),
+				/* title */titlehisto10.c_str(),
+				/* X-dimension */600/4, -200, 400);
 
 		//dati.print(datisize);
 
@@ -186,14 +217,52 @@ void mia_dech(std::string nome_cristallo,
 
 			if (x_entrata > -5 and x_entrata < 5) {
 				//vHistograms.front()->Fill(x_uscita-x_entrata);
-				histogram5->Fill(x_uscita - x_entrata);
+				histogram5_dat->Fill(x_uscita - x_entrata);
 			}
 
 			if (x_entrata > -10 and x_entrata < 10) {
 				//vHistograms.front()->Fill(x_uscita-x_entrata);
-				histogram10->Fill(x_uscita - x_entrata);
+				histogram10_dat->Fill(x_uscita - x_entrata);
 			}
 		}
+		histogram5 = histogram5_dat;
+		histogram10 = histogram10_dat;
+		// Technically not necessary now, but maybe I'll add more conditions
+	} else if (not bool(file_dat) or not PREFER_DAT_FILES) {
+		auto in_file_root = new TFile(filedati_root.c_str());
+
+		// Check if .root exist
+		if(!in_file_root) {
+			cerr << "[ERROR] Crystal " << nome_cristallo << endl;
+			cerr << "[ERROR]: File .root not found!" << endl;
+			return;
+		}
+
+		auto h2D = (TH2D*) in_file_root->Get("dTheta_x_vs_Impact_x_cor");
+		//auto h1D = h2D->ProjectionY();
+
+		auto axis = h2D->GetXaxis();
+
+		auto min5 = axis->FindBin(-5.);
+		auto max5 = axis->FindBin(5.);
+
+		auto min10 = axis->FindBin(-10.);
+		auto max10 = axis->FindBin(10.);
+
+		cout << "bin cut" << endl;
+		cout << "  -5 -> " << min5 << "   5 -> " << max5 << endl;
+		cout << " -10 -> " << min10 << "  10 -> " << max10 << endl;
+
+		auto h5 = (TH1D*) (h2D->ProjectionY("cut +/- 5 urad", min5, max5));
+		h5->GetXaxis()->SetTitle("#Delta#theta_{x} [#murad]");
+		h5->Rebin(4);
+		auto h10 = (TH1D*) (h2D->ProjectionY("cut +/- 10 urad", min10, max10));
+		h10->GetXaxis()->SetTitle("#Delta#theta_{x} [#murad]");
+		h10->Rebin(4);
+
+		histogram5 = h5;
+		histogram10 = h10;
+	}
 
 		//TODO FITTING
 		//Alla fine dovro' scrivere sul file dechanneling_table.txt
@@ -580,7 +649,7 @@ void mia_dech(std::string nome_cristallo,
 		//histogram5->Draw();
 		root_output->Write();
 
-	} else {
+/*	} else {
 		DBG(
 				clog << nome_cristallo << ": File .dat not found" << endl; clog << "Nome cercato: " << pathfiledati << endl; clog << "Current Dir: " << system("pwd") << endl;
 				, ; )
@@ -592,7 +661,7 @@ void mia_dech(std::string nome_cristallo,
 		//ROOT_PROJDIR->cd();
 		//Todo rimetterla;
 		//dech(nome_cristallo,output_analisi_dech,dati_cristalli_orig,dati_cristalli_calcolati,dati_cristalli_calcolati_ftot);
-	}
+	}*/
 
 }
 
