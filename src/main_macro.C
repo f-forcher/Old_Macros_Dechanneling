@@ -112,8 +112,23 @@ int main_macro(int argc, char* argv[]) {
 	std::vector<const char*> elenco_cristalli { "STF38", "STF45", "STF47",
 			"STF49", "STF51", "QMP27", "QMP29", "QMP32" };
 
-	std::vector<const char*> elenco_cristalli_buoni { "STF45", "STF38", "STF49", "QMP27",
+	std::vector<const char*> elenco_cristalli_buoni_orig { "STF45", "STF38", "STF49", "QMP27",
 			"QMP32" };
+	std::vector<const char*> elenco_cristalli_buoni {
+		"QMP25",
+		"QMP27",
+	//	"QMP29",
+		"QMP32",
+	//TODO	"QMP36",
+		"QMP38",
+		"STF38",
+		"STF45",
+	//	"STF47",
+		"STF49",
+		"STF51",
+		"STF9",
+		"STF99"
+ };
 
 	//std::vector<const char*> elenco_cristalli { "QMP32" };
 	clog << "Start main_macro..." << endl;

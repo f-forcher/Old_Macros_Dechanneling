@@ -253,15 +253,30 @@ void mia_dech(std::string nome_cristallo,
 		cout << "  -5 -> " << min5 << "   5 -> " << max5 << endl;
 		cout << " -10 -> " << min10 << "  10 -> " << max10 << endl;
 
-		auto h5 = (TH1D*) (h2D->ProjectionY("cut +/- 5 urad", min5, max5));
+		auto h5 = (TH1D*) (h2D->ProjectionY(titlehisto5.c_str(), min5, max5));
 		h5->GetXaxis()->SetTitle("#Delta#theta_{x} [#murad]");
 		h5->Rebin(4);
-		auto h10 = (TH1D*) (h2D->ProjectionY("cut +/- 10 urad", min10, max10));
+		auto h10 = (TH1D*) (h2D->ProjectionY(titlehisto10.c_str(), min10, max10));
 		h10->GetXaxis()->SetTitle("#Delta#theta_{x} [#murad]");
 		h10->Rebin(4);
 
-		histogram5 = h5;
-		histogram10 = h10;
+		//Crystal qmp36 has been mounted reversed, so we must flip the graph along x axis
+		if (nome_cristallo == string("QMP36")) {
+			clog << "QMP36, flipping the histogram orizontally" << endl;
+			auto h5_qmp36 = new TH1D(
+							/* name */nomehisto5.c_str(),
+							/* title */titlehisto5.c_str(),
+							/* X-dimension */600/4, -200, 400);
+
+			h5_qmp36
+
+		} else {
+			histogram5 = h5;
+			histogram10 = h10;
+
+			h5->SetTitle(nomehisto5.c_str());
+			h10->SetTitle(nomehisto10.c_str());
+		}
 	}
 
 		//TODO FITTING
@@ -647,7 +662,10 @@ void mia_dech(std::string nome_cristallo,
 		//vCanvases.push_back(new TCanvas(nome_cristallo.c_str()));
 		//vHistograms.front()->Draw();
 		//histogram5->Draw();
-		root_output->Write();
+		root_output->cd();
+		//root_output->Write();
+		histogram5->Write();
+		histogram10->Write();
 
 /*	} else {
 		DBG(

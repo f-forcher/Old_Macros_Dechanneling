@@ -47,8 +47,39 @@ src/main_macro.o: ../src/main_macro.C \
  /home/fforcher/ROOT/v6-06-08/include/TDirectoryFile.h \
  /home/fforcher/ROOT/v6-06-08/include/TMap.h \
  /home/fforcher/ROOT/v6-06-08/include/THashTable.h \
- /home/fforcher/ROOT/v6-06-08/include/TUrl.h ../src/mia_dech.h \
- ../src/dbg_macro.h ../src/DatiChanneling.h
+ /home/fforcher/ROOT/v6-06-08/include/TUrl.h \
+ /home/fforcher/ROOT/v6-06-08/include/TGraphErrors.h \
+ /home/fforcher/ROOT/v6-06-08/include/TGraph.h \
+ /home/fforcher/ROOT/v6-06-08/include/TCanvas.h \
+ /home/fforcher/ROOT/v6-06-08/include/TPad.h \
+ /home/fforcher/ROOT/v6-06-08/include/TVirtualPad.h \
+ /home/fforcher/ROOT/v6-06-08/include/TAttPad.h \
+ /home/fforcher/ROOT/v6-06-08/include/TVirtualX.h \
+ /home/fforcher/ROOT/v6-06-08/include/TAttText.h \
+ /home/fforcher/ROOT/v6-06-08/include/GuiTypes.h \
+ /home/fforcher/ROOT/v6-06-08/include/Buttons.h \
+ /home/fforcher/ROOT/v6-06-08/include/TQObject.h \
+ /home/fforcher/ROOT/v6-06-08/include/TQObjectEmitVA.h \
+ /home/fforcher/ROOT/v6-06-08/include/TQConnection.h \
+ /home/fforcher/ROOT/v6-06-08/include/Varargs.h \
+ /home/fforcher/ROOT/v6-06-08/include/TInterpreter.h \
+ /home/fforcher/ROOT/v6-06-08/include/TDictionary.h \
+ /home/fforcher/ROOT/v6-06-08/include/ESTLType.h \
+ /home/fforcher/ROOT/v6-06-08/include/TVirtualMutex.h \
+ /home/fforcher/ROOT/v6-06-08/include/TAttBBox2D.h \
+ /home/fforcher/ROOT/v6-06-08/include/TPoint.h \
+ /home/fforcher/ROOT/v6-06-08/include/TAttCanvas.h \
+ /home/fforcher/ROOT/v6-06-08/include/TCanvasImp.h \
+ /home/fforcher/ROOT/v6-06-08/include/TF1.h \
+ /home/fforcher/ROOT/v6-06-08/include/TFormula.h \
+ /home/fforcher/ROOT/v6-06-08/include/TBits.h \
+ /home/fforcher/ROOT/v6-06-08/include/TObjArray.h \
+ /home/fforcher/ROOT/v6-06-08/include/TMethodCall.h \
+ /home/fforcher/ROOT/v6-06-08/include/Math/ParamFunctor.h \
+ ../src/mia_dech.h ../src/my_typedefs.h \
+ /home/fforcher/ROOT/v6-06-08/include/Rtypes.h \
+ ../src/analizza_dechanneling.h ../src/dbg_macro.h ../src/dech.h \
+ ../src/DatiChanneling.h
 
 /home/fforcher/ROOT/v6-06-08/include/TROOT.h:
 
@@ -148,8 +179,72 @@ src/main_macro.o: ../src/main_macro.C \
 
 /home/fforcher/ROOT/v6-06-08/include/TUrl.h:
 
+/home/fforcher/ROOT/v6-06-08/include/TGraphErrors.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TGraph.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TCanvas.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TPad.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TVirtualPad.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TAttPad.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TVirtualX.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TAttText.h:
+
+/home/fforcher/ROOT/v6-06-08/include/GuiTypes.h:
+
+/home/fforcher/ROOT/v6-06-08/include/Buttons.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TQObject.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TQObjectEmitVA.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TQConnection.h:
+
+/home/fforcher/ROOT/v6-06-08/include/Varargs.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TInterpreter.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TDictionary.h:
+
+/home/fforcher/ROOT/v6-06-08/include/ESTLType.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TVirtualMutex.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TAttBBox2D.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TPoint.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TAttCanvas.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TCanvasImp.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TF1.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TFormula.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TBits.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TObjArray.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TMethodCall.h:
+
+/home/fforcher/ROOT/v6-06-08/include/Math/ParamFunctor.h:
+
 ../src/mia_dech.h:
 
+../src/my_typedefs.h:
+
+/home/fforcher/ROOT/v6-06-08/include/Rtypes.h:
+
+../src/analizza_dechanneling.h:
+
 ../src/dbg_macro.h:
+
+../src/dech.h:
 
 ../src/DatiChanneling.h:
