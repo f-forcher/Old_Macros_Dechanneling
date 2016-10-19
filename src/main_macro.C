@@ -60,7 +60,7 @@ char PROJECT_DIR[FILENAME_MAX] = "[NOT SET]";
 std::vector<TH1*> vHistograms;
 std::vector<TCanvas*> vCanvases;
 bool PREFER_DAT_FILES = true; // If true
-
+std::vector<std::string> lista_crist_sia_root_sia_dat(5);
 
 
 
@@ -119,13 +119,13 @@ int main_macro(int argc, char* argv[]) {
 		"QMP27",
 	//	"QMP29",
 		"QMP32",
-	//TODO	"QMP36",
-		"QMP38",
+		"QMP36",
+	//	"QMP38", // Low Efficiency
 		"STF38",
 		"STF45",
-	//	"STF47",
+	//	"STF47",  //45 ThetaB, Troppo poco piegato
 		"STF49",
-		"STF51",
+	//  "STF51",  //30 ThetaB Troppo poco piegato
 		"STF9",
 		"STF99"
  };
@@ -158,7 +158,7 @@ int main_macro(int argc, char* argv[]) {
 	 * 1. Ottenere i file recoDataSimple_546_31-59.torsion.correction.histo.root
 	 *
 	 * 2. Scoprire dove sono le variabili
-	 * 	//xtal length and curvature TODO Controllare!
+	 * 	//xtal length and curvature
 	 Double_t z = 2e-3;
 	 Double_t R;
 	 * per gli altri cristalli (tabella in tesi di roberto?)
@@ -230,8 +230,6 @@ int main_macro(int argc, char* argv[]) {
 			//cout << riga_estratta << endl;
 			ss << riga_estratta;
 
-			//TODO finire!
-			// TODO Perche' i raggi di pag 88 e di pag 66 non coincidono? Che fare?
 			ss >> cristallo;
 			ss >> raggio_curvatura;
 			ss >> bending_angle;
@@ -283,7 +281,6 @@ int main_macro(int argc, char* argv[]) {
 	}
 	//file_output_root->Close();
 
-	// TODO test
 	//dech("STF45", outputdechanneling);
 
 	cout << "Analyzed all crystals in list" << endl;

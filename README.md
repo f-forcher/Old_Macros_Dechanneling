@@ -3,7 +3,7 @@ Old ROOT macros for dechanneling, wich I`m modifying to analyze (old and new) cr
 
 # How to use
 ###Installation/Preliminary operations
-1. Install/compile the various versions of ROOT and put them in ~/ROOT/vXX-XX-XX (eg "~/ROOT/v5-34-36").
+1. Install/compile the various versions of ROOT and put them in `~/ROOT/vXX-XX-XX` (eg `~/ROOT/v5-34-36`).
 2. Put the   `SCRIPT_ROOT_ECLIPSE/Documents/root_varie` in `~/Documents` (or modify the scripts).
    
    The reason here is that at the moment, ROOT 5 and ROOT 6 are not compatible. Even worse, gcc 4 and 5's ABis are not
