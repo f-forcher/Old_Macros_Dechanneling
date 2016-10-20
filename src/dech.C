@@ -15,7 +15,7 @@ Double_t myfunction(Double_t *x, Double_t *par) {
 	// Float_t xx = x[0];
 
 	Float_t xx = x[0];
-	Double_t f = par[0] * exp(-xx / par[1]);
+	Double_t f = par[0] * exp( -xx / par[1] );
 	return f;
 }
 
@@ -28,25 +28,22 @@ Double_t myfunction(Double_t *x, Double_t *par) {
  */
 void dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_dech) {
 
-	gStyle->SetPalette(1);
-	gStyle->SetOptStat(0);
-	gStyle->SetOptTitle(0);
-	TGaxis::SetMaxDigits(3);
+	gStyle->SetPalette( 1 );
+	gStyle->SetOptStat( 0 );
+	gStyle->SetOptTitle( 0 );
+	TGaxis::SetMaxDigits( 3 );
 
 	// TODO Togliere i nomi specifici e usare quelli _renamed
-	std::string cartella_cristallo = "ForFrancesco/" + nome_cristallo
-			+ "_exp/";
-	gSystem->ChangeDirectory(cartella_cristallo.c_str());
-	std::string pathfiledati = cartella_cristallo
-			+ "recoDataSimple_renamed.torsion.correction.histo.root";
+	std::string cartella_cristallo = "ForFrancesco/" + nome_cristallo + "_exp/";
+	gSystem->ChangeDirectory( cartella_cristallo.c_str() );
+	std::string pathfiledati = cartella_cristallo + "recoDataSimple_renamed.torsion.correction.histo.root";
 
 	// TODO Generalizzare il nome del file
-	std::string filedati =
-			"recoDataSimple_renamed.torsion.correction.histo.root";
+	std::string filedati = "recoDataSimple_renamed.torsion.correction.histo.root";
 
 	//Apre file dati
 	// TFile * in_file = new TFile("./ForFrancesco/STF45_exp/Analysis/recoDataSimple_415_1-37.torsion.correction.histo.root");
-	TFile * in_file = new TFile(filedati.c_str());
+	TFile * in_file = new TFile( filedati.c_str() );
 	//TString outputfile = "recoDataSimple_415.dechanneling.root";
 
 	//TFile * in_file = new TFile("STF45Rob.root");
@@ -61,14 +58,14 @@ void dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_dech
 
 	//Selezione histogramma
 
-	TH2D * h = (TH2D*) in_file->Get("dTheta_x_vs_Impact_x_cor");
+	TH2D * h = (TH2D*) in_file->Get( "dTheta_x_vs_Impact_x_cor" );
 	//TH1D * h1 = (TH1D*) in_file->Get("dTheta_x_5");
 
 	//TH2F * h = (TH2F*) in_file->Get("hH8");
 	TH1D *h1 = h->ProjectionY();
 
 	TCanvas *c = new TCanvas();
-	h->Draw("colz");
+	h->Draw( "colz" );
 
 	TCanvas *c1 = new TCanvas();
 	h1->Draw();
@@ -77,10 +74,10 @@ void dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_dech
 
 	// TODO chiedere dei nomi, dei numeri, etc
 	Double_t par_ch[3] = { 0 };
-	TF1 *g = new TF1("g", "gaus", 110, 180);
-	g->SetLineColor(kRed);
-	h1->Fit(g, "R");
-	g->GetParameters(&par_ch[0]);
+	TF1 *g = new TF1( "g", "gaus", 110, 180 );
+	g->SetLineColor( kRed );
+	h1->Fit( g, "R" );
+	g->GetParameters( &par_ch[0] );
 	R = (z / (par_ch[1] * 1e-6));
 	cout << R << endl;
 
@@ -88,15 +85,15 @@ void dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_dech
 	Double_t max_ch = par_ch[1] + (par_ch[2] * 3.);
 
 	Double_t par_de[3] = { 0 };
-	TF1 *de = new TF1("de", "expo", 20, 110);
-	de->SetLineColor(kGreen + 2);
+	TF1 *de = new TF1( "de", "expo", 20, 110 );
+	de->SetLineColor( kGreen + 2 );
 	//de->SetParameters(1,1);
-	h1->Fit(de, "R+");
-	de->GetParameters(&par_de[0]);
+	h1->Fit( de, "R+" );
+	de->GetParameters( &par_de[0] );
 
 	cout << par_de[0] << " " << par_de[1] << endl;
 
-	Double_t zero = exp(par_de[0]);
+	Double_t zero = exp( par_de[0] );
 	Double_t uno = -(1 / par_de[1]);
 
 	cout << zero << " " << uno << endl;
@@ -104,47 +101,47 @@ void dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_dech
 	// tagli angolari
 	TAxis *axis = h->GetXaxis();
 
-	int min5 = axis->FindBin(-5.);
-	int max5 = axis->FindBin(5.);
+	int min5 = axis->FindBin( -5. );
+	int max5 = axis->FindBin( 5. );
 
-	int min10 = axis->FindBin(-10.);
-	int max10 = axis->FindBin(10.);
+	int min10 = axis->FindBin( -10. );
+	int max10 = axis->FindBin( 10. );
 
 	cout << "bin cut" << endl;
 	cout << "  -5 -> " << min5 << "   5 -> " << max5 << endl;
 	cout << " -10 -> " << min10 << "  10 -> " << max10 << endl;
 
-	TH1D *h5 = h->ProjectionY("cut +/- 5 urad", min5, max5);
-	h5->GetXaxis()->SetTitle("#Delta#theta_{x} [#murad]");
-	h5->Rebin(4);
-	TH1D *h10 = h->ProjectionY("cut +/- 10 urad", min10, max10);
-	h10->GetXaxis()->SetTitle("#Delta#theta_{x} [#murad]");
-	h10->Rebin(4);
+	TH1D *h5 = h->ProjectionY( "cut +/- 5 urad", min5, max5 );
+	h5->GetXaxis()->SetTitle( "#Delta#theta_{x} [#murad]" );
+	h5->Rebin( 4 );
+	TH1D *h10 = h->ProjectionY( "cut +/- 10 urad", min10, max10 );
+	h10->GetXaxis()->SetTitle( "#Delta#theta_{x} [#murad]" );
+	h10->Rebin( 4 );
 
 	//plot e fit
-	TCanvas *c10 = new TCanvas("c10", "c10", 1100, 1100);
-	c10->SetFillColor(10);
-	c10->SetLogy(1);
-	h10->GetYaxis()->SetLabelFont(132);
-	h10->GetYaxis()->SetTitleFont(132);
-	h10->GetXaxis()->SetLabelFont(132);
-	h10->GetXaxis()->SetTitleFont(132);
-	h10->GetYaxis()->SetTitle("N");
+	TCanvas *c10 = new TCanvas( "c10", "c10", 1100, 1100 );
+	c10->SetFillColor( 10 );
+	c10->SetLogy( 1 );
+	h10->GetYaxis()->SetLabelFont( 132 );
+	h10->GetYaxis()->SetTitleFont( 132 );
+	h10->GetXaxis()->SetLabelFont( 132 );
+	h10->GetXaxis()->SetTitleFont( 132 );
+	h10->GetYaxis()->SetTitle( "N" );
 	h10->Draw();
 
 	Double_t par_10[8];
 	Double_t par_am10[3] = { 0 };
 	Double_t par_ch10[3] = { 0 };
-	TF1 *g10 = new TF1("g10", "gaus", 120, 180);
-	TF1 *g10am = new TF1("g10am", "gaus", -50, 10);
-	g10->SetLineColor(kRed);
-	h10->Fit(g10, "R+");
-	g10->GetParameters(&par_ch10[0]);
-	g10am->SetLineColor(kYellow);
-	h10->Fit(g10am, "R+");
-	g10am->GetParameters(&par_am10[0]);
-	g10am->GetParameters(&par_10[0]);
-	g10->GetParameters(&par_10[5]);
+	TF1 *g10 = new TF1( "g10", "gaus", 120, 180 );
+	TF1 *g10am = new TF1( "g10am", "gaus", -50, 10 );
+	g10->SetLineColor( kRed );
+	h10->Fit( g10, "R+" );
+	g10->GetParameters( &par_ch10[0] );
+	g10am->SetLineColor( kYellow );
+	h10->Fit( g10am, "R+" );
+	g10am->GetParameters( &par_am10[0] );
+	g10am->GetParameters( &par_10[0] );
+	g10->GetParameters( &par_10[5] );
 
 	cout << "paramteri fit" << endl;
 	cout << par_ch10[2] << endl;
@@ -186,22 +183,22 @@ void dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_dech
 
 	//fit dechanneling  uso sempre R10
 	Double_t par_de10[3] = { 0 };
-	TF1 *de10 = new TF1("de10", myfunction, am_max101, ch_min102, 2);
-	de10->SetLineColor(kGreen);
-	de10->SetParameters(zero, uno);
-	h10->Fit(de10, "R");
-	gStyle->SetOptFit(1111);
-	h10->Fit(g10, "R+");
-	h10->Fit(g10am, "R+");
+	TF1 *de10 = new TF1( "de10", myfunction, am_max101, ch_min102, 2 );
+	de10->SetLineColor( kGreen );
+	de10->SetParameters( zero, uno );
+	h10->Fit( de10, "R" );
+	gStyle->SetOptFit( 1111 );
+	h10->Fit( g10, "R+" );
+	h10->Fit( g10am, "R+" );
 
 	c10->Update();
-	de10->GetParameters(&par_de10[0]);
+	de10->GetParameters( &par_de10[0] );
 
 	cout << "min = " << am_max10 << "max = " << ch_min10 << endl << endl;
 
 	//TODO salvare su un file
 	Double_t dechanneling10 = R10 * (par_de10[1] * 1e-6);
-	cout << nome_cristallo <<"_lunghezza_di_dechanneling_10:" << dechanneling10 << endl << endl;
+	cout << nome_cristallo << "_lunghezza_di_dechanneling_10:" << dechanneling10 << endl << endl;
 
 	/* TEST VARIE DIMENSIONI FIT
 	 Double_t par_de10n[3]=0;
@@ -272,36 +269,34 @@ void dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_dech
 	 leg10->Draw();
 	 */
 
-	auto leg10 = new TLegend(0.35, 0.25, 0.7, 0.4);
-	leg10->SetHeader(
-			"Dechanneling length for - #theta_{c} < #theta_{in} < #theta_{c}");
-	leg10->AddEntry(de10, Form("L_{D} = %.2f mm", R10 * (par_de10[1] * 1e-3)),
-			"l");
-	leg10->SetFillColor(10);
-	leg10->SetTextFont(132);
-	leg10->SetTextSize(0.035);
+	auto leg10 = new TLegend( 0.35, 0.25, 0.7, 0.4 );
+	leg10->SetHeader( "Dechanneling length for - #theta_{c} < #theta_{in} < #theta_{c}" );
+	leg10->AddEntry( de10, Form( "L_{D} = %.2f mm", R10 * (par_de10[1] * 1e-3) ), "l" );
+	leg10->SetFillColor( 10 );
+	leg10->SetTextFont( 132 );
+	leg10->SetTextSize( 0.035 );
 	leg10->Draw();
 
-	TCanvas *c5 = new TCanvas("c5", "c5", 1100, 1100);
-	c5->SetFillColor(10);
-	c5->SetLogy(1);
-	h5->GetYaxis()->SetLabelFont(132);
-	h5->GetYaxis()->SetTitleFont(132);
-	h5->GetYaxis()->SetTitle("Entries");
+	TCanvas *c5 = new TCanvas( "c5", "c5", 1100, 1100 );
+	c5->SetFillColor( 10 );
+	c5->SetLogy( 1 );
+	h5->GetYaxis()->SetLabelFont( 132 );
+	h5->GetYaxis()->SetTitleFont( 132 );
+	h5->GetYaxis()->SetTitle( "Entries" );
 	h5->Draw();
 
 	Double_t par_am5[3] = { 0 };
 	Double_t par_ch5[3] = { 0 };
-	TF1 *g5 = new TF1("g5", "gaus", min_ch, max_ch);
-	TF1 *g5am = new TF1("g5am", "gaus", -50, 50);
+	TF1 *g5 = new TF1( "g5", "gaus", min_ch, max_ch );
+	TF1 *g5am = new TF1( "g5am", "gaus", -50, 50 );
 
-	g5->SetLineColor(kRed);
-	g5am->SetLineColor(kYellow);
-	h5->Fit(g5, "R+");
-	h5->Fit(g5am, "R+");
+	g5->SetLineColor( kRed );
+	g5am->SetLineColor( kYellow );
+	h5->Fit( g5, "R+" );
+	h5->Fit( g5am, "R+" );
 
-	g5->GetParameters(&par_ch5[0]);
-	g5am->GetParameters(&par_am5[0]);
+	g5->GetParameters( &par_ch5[0] );
+	g5am->GetParameters( &par_am5[0] );
 
 	cout << "paramteri fit picco channeling" << endl;
 	cout << par_ch5[2] << endl;
@@ -326,21 +321,21 @@ void dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_dech
 
 	//fit dechanneling uso sempre R10
 	Double_t par_de5[3] = { 0 };
-	gStyle->SetOptFit(1111);
-	TF1 *de5 = new TF1("de5", myfunction, am_max5, ch_min51, 2);
-	de5->SetLineColor(kGreen);
-	de5->SetParameters(zero, uno);
-	h5->Fit(de5, "R");
-	h5->Fit(g5, "R+");
-	h5->Fit(g5am, "R+");
+	gStyle->SetOptFit( 1111 );
+	TF1 *de5 = new TF1( "de5", myfunction, am_max5, ch_min51, 2 );
+	de5->SetLineColor( kGreen );
+	de5->SetParameters( zero, uno );
+	h5->Fit( de5, "R" );
+	h5->Fit( g5, "R+" );
+	h5->Fit( g5am, "R+" );
 
 	c5->Update();
 
-	de5->GetParameters(&par_de5[0]);
+	de5->GetParameters( &par_de5[0] );
 	//cout << "lunghezza di dechanneling " << R10 * (par_de5[1] * 1e-6) << endl;
 	//TODO salvare su un file
 	Double_t dechanneling5 = R10 * (par_de5[1] * 1e-6);
-	cout << nome_cristallo <<"_lunghezza_di_dechanneling_5:" << dechanneling5 << endl << endl;
+	cout << nome_cristallo << "_lunghezza_di_dechanneling_5:" << dechanneling5 << endl << endl;
 
 	/*TEST VARIE DIMENSIONI FIT
 	 Double_t par_de51[3]=0;
@@ -362,14 +357,12 @@ void dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_dech
 	 cout << "lunghezza di dechanneling " << R5*(par_de52[1]*1e-6) << endl;
 	 */
 
-	auto leg5 = new TLegend(0.35, 0.25, 0.7, 0.4);
-	leg5->SetHeader(
-			"Dechanneling length for - #frac{#theta_{c}}{2} < #theta_{in} < #frac{#theta_{c}}{2}");
-	leg5->AddEntry(de5, Form("L_{D} = %.2f mm", R10 * (par_de5[1] * 1e-3)),
-			"l");
-	leg5->SetFillColor(10);
-	leg5->SetTextFont(132);
-	leg5->SetTextSize(0.035);
+	auto leg5 = new TLegend( 0.35, 0.25, 0.7, 0.4 );
+	leg5->SetHeader( "Dechanneling length for - #frac{#theta_{c}}{2} < #theta_{in} < #frac{#theta_{c}}{2}" );
+	leg5->AddEntry( de5, Form( "L_{D} = %.2f mm", R10 * (par_de5[1] * 1e-3) ), "l" );
+	leg5->SetFillColor( 10 );
+	leg5->SetTextFont( 132 );
+	leg5->SetTextSize( 0.035 );
 	leg5->Draw();
 
 	/*
@@ -397,7 +390,6 @@ void dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_dech
 	 */
 	//TCanvas *c66 = new TCanvas();
 	//h10->Draw();
-
 	cout << "R = " << R << endl;
 
 	cout << "R5 = " << R5 << endl;
@@ -411,12 +403,11 @@ void dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_dech
 
 	//outputdechanneling << "# File generated by the macro mia_dech() for the dechanneling lenghts." << endl;
 	//outputdechanneling << "# Crystal | dechanneling L at +-5 microrad [m] | dechanneling L at +-10 microrad [m]" << endl;
-	*output_dech << nome_cristallo << "  " << double(dechanneling5) << "  " << double(dechanneling10) << endl;
+	*output_dech << nome_cristallo << "  " << double( dechanneling5 ) << "  " << double( dechanneling10 ) << endl;
 
-
-	TFile *outfile = new TFile(outputfile, "RECREATE");
-	c5->Write("dech_5");
-	c10->Write("dech_10");
+	TFile *outfile = new TFile( outputfile, "RECREATE" );
+	c5->Write( "dech_5" );
+	c10->Write( "dech_10" );
 
 	/*
 	 TF1 *den   = new TF1("den","expo",20,110);

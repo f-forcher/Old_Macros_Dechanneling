@@ -45,16 +45,12 @@
 
 using namespace std;
 
-Float_t *normalization(TTree *tr, Long64_t n, Int_t *sci, Int_t tmin,
-		Int_t tmax);
-Float_t *normalization_f(TTree *tr, Long64_t n, Float_t *sci, Int_t tmin,
-		Int_t tmax);
+Float_t *normalization(TTree *tr, Long64_t n, Int_t *sci, Int_t tmin, Int_t tmax);
+Float_t *normalization_f(TTree *tr, Long64_t n, Float_t *sci, Int_t tmin, Int_t tmax);
 
 Int_t count_line(char *filename);
-void extr_var_float(char *filename, Int_t dim, Float_t *var, Int_t col,
-		Int_t nh);
-void extr_var_double(char *filename, Int_t dim, double *var, Int_t col,
-		Int_t nh);
+void extr_var_float(char *filename, Int_t dim, Float_t *var, Int_t col, Int_t nh);
+void extr_var_double(char *filename, Int_t dim, double *var, Int_t col, Int_t nh);
 void extr_var_int(char *filename, Int_t dim, Int_t *var, Int_t col, Int_t nh);
 void extr_names(char *filename, Int_t dim, char **var, Int_t col, Int_t nh);
 //void plot_coll_summary(void);

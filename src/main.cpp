@@ -13,7 +13,6 @@
 #include <TApplication.h>
 using namespace std;
 
-
 int main_macro(int argc, char* argv[]);
 
 int main(int argc, char* argv[]) {
@@ -27,9 +26,9 @@ int main(int argc, char* argv[]) {
 	//cout << "Test main";
 
 	//TApplication Necessary for the graphics
-	TApplication theApp("App",&argc, argv);
+	TApplication theApp( "App", &argc, argv );
 
-	int return_macro = main_macro(argc, argv);
+	int return_macro = main_macro( argc, argv );
 
 	theApp.Run();
 	//mia_dech();

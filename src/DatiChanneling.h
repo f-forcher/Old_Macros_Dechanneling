@@ -38,7 +38,10 @@ public:
 	/*
 	 * @brief: print the events with index from 0 to "to"
 	 */
-	void print(ULong64_t to) const {print(0,to);};
+	void print(ULong64_t to) const {
+		print( 0, to );
+	}
+	;
 
 	/*
 	 * @brief: get the four data of a single event ("orizontal" slice)
@@ -48,7 +51,9 @@ public:
 	/*
 	 * @brief: get number of events
 	 */
-	auto getSize() const {return x_entrata.size();}
+	auto getSize() const {
+		return x_entrata.size();
+	}
 
 	//TODO getters setters
 private:
@@ -60,8 +65,5 @@ private:
 };
 
 } /* namespace mions */
-
-
-
 
 #endif /* DATICHANNELING_H_ */
