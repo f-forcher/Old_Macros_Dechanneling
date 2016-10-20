@@ -544,8 +544,8 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 	 */
 	TF1* fTot5_2 = new TF1("fTot5_smooth", "gaus(0) + "
 								 "(exp([3] + ([4]*[4] * [7]*[7])/4.0 + [4]*x)*(TMath::Erf((-2*[5] + [4]*[7]*[7] + 2*x)/(2*[7])) +"
-								 " TMath::Erf([6]/[7] - ([4]*[7])/2.0 - x/[7])))/(2 Sqrt[2])"
-								 "+ gaus(7)", meanAm5 - 4*sigmaAm5, meanCh5 + 4*sigmaCh5);
+								 " TMath::Erf([6]/[7] - ([4]*[7])/2.0 - x/[7])))/(2 * sqrt(2))"
+								 "+ gaus(8)", meanAm5 - 4*sigmaAm5, meanCh5 + 4*sigmaCh5);
 
 	const Double_t param5[10] = {
 	//Amorphous peak
@@ -555,8 +555,8 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 			//Dechanneling
 			constDc5,          // 3
 			slopeDc5,          // 4
-			meanAm5 + sigmaAm5,  // 5
-			meanCh5 - sigmaCh5,  // 6
+			meanAm5 + 3*sigmaAm5,  // 5
+			meanCh5 - 3*sigmaCh5,  // 6
 			//Channeling peak
 			constCh5,          // 7
 			meanCh5,           // 8
@@ -571,8 +571,8 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 			//Dechanneling
 			constDc5,          // 3
 			slopeDc5,          // 4
-			meanAm5 + sigmaAm5,  // 5
-			meanCh5 - sigmaCh5,  // 6
+			meanAm5 + 3*sigmaAm5,  // 5
+			meanCh5 - 3*sigmaCh5,  // 6
 			sigmaAm5 / 3.0,		// 7
 			//Channeling peak
 			constCh5,          // 8
@@ -587,13 +587,14 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 	fTot5->FixParameter( 6, meanCh5 - 2 * sigmaCh5 );
 	fTot5_2->FixParameter( 5, meanAm5 + 2 * sigmaAm5 );
 	fTot5_2->FixParameter( 6, meanCh5 - 2 * sigmaCh5 );
-	//fTot5_2->FixParameter( 7, sigmaAm5 / 3.0 );
+	//fTot5_2->FixParameter( 7, sigmaAm5 );
+	fTot5_2->SetParLimits(7,0.05*sigmaAm5,0.5*sigmaAm5);
 
-
-	histogram5->Fit( "fTot5", "ILREM+" );
+	auto f5_to_fit = SMOOTHED_EXPO ? "fTot5_smooth" : "fTot5";
+	histogram5->Fit( f5_to_fit, "ILREM+" );
 
 	constexpr int SlopeDc_tot = 4;
-	TF1 *fitResultTot5 = histogram5->GetFunction( "fTot5" );
+	TF1 *fitResultTot5 = histogram5->GetFunction( f5_to_fit );
 	auto slopeDc_tot5 = fitResultTot5->GetParameter( SlopeDc_tot );
 	auto slopeDc_tot5_err = fitResultTot5->GetParError( SlopeDc_tot );
 
@@ -605,8 +606,8 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 			meanCh10 + 4 * sigmaCh10 );
 	TF1* fTot10_2 = new TF1("fTot10_smooth", "gaus(0) + "
 								 "(exp([3] + ([4]*[4] * [7]*[7])/4.0 + [4]*x)*(TMath::Erf((-2*[5] + [4]*[7]*[7] + 2*x)/(2*[7])) +"
-								 " TMath::Erf([6]/[7] - ([4]*[7])/2.0 - x/[7])))/(2 Sqrt[2])"
-								 "+ gaus(7)", meanAm10 - 4 * sigmaAm10, meanCh10 + 4 * sigmaCh10);
+								 " TMath::Erf([6]/[7] - ([4]*[7])/2.0 - x/[7])))/(2 * sqrt(2))"
+								 "+ gaus(8)", meanAm10 - 4 * sigmaAm10, meanCh10 + 4 * sigmaCh10);
 
 	const Double_t param10[10] = {
 			//Amorphous peak
@@ -616,14 +617,14 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 			//Dechanneling
 			constDc10,          // 3
 			slopeDc10,          // 4
-			meanAm10 + sigmaAm10, // 5
-			meanCh10 - sigmaCh10, // 6
+			meanAm10 + 3*sigmaAm10, // 5
+			meanCh10 - 3*sigmaCh10, // 6
 			//Channeling peak
 			constCh10,          // 7
 			meanCh10,           // 8
 			sigmaCh10           // 9
 			};
-	const Double_t param10_smooth[10] = {
+	const Double_t param10_smooth[11] = {
 			//Amorphous peak
 			constAm10,          // 0
 			meanAm10,           // 1
@@ -631,8 +632,8 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 			//Dechanneling
 			constDc10,          // 3
 			slopeDc10,          // 4
-			meanAm10 + sigmaAm10, // 5
-			meanCh10 - sigmaCh10, // 6
+			meanAm10 + 3*sigmaAm10, // 5
+			meanCh10 - 3*sigmaCh10, // 6
 			sigmaAm10 / 3.0,		// 7
 			//Channeling peak
 			constCh10,          // 8
@@ -647,24 +648,24 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 	fTot10->FixParameter( 6, meanCh10 - 2 * sigmaCh10 );
 	fTot10_2->FixParameter( 5, meanAm10 + 2 * sigmaAm10 );
 	fTot10_2->FixParameter( 6, meanCh10 - 2 * sigmaCh10 );
-	//fTot10_2->FixParameter( 7, sigmaAm10 / 3.0 );
+//	fTot10_2->FixParameter( 7, sigmaAm10 / 3.0 );
+	fTot10_2->SetParLimits(7,0.05*sigmaAm10,0.5*sigmaAm10);
 
+	auto f10_to_fit = SMOOTHED_EXPO ? "fTot10_smooth" : "fTot10";
+	histogram10->Fit( f10_to_fit, "IREM+" );
 
-	histogram10->Fit( "fTot10", "IREM+" );
-
-	TF1 *fitResultTot10 = histogram10->GetFunction( "fTot10" );
+	TF1 *fitResultTot10 = histogram10->GetFunction( f10_to_fit );
 	auto slopeDc_tot10 = fitResultTot10->GetParameter( SlopeDc_tot );
 	auto slopeDc_tot10_err = fitResultTot10->GetParError( SlopeDc_tot );
 
 	DBG( std::clog << "slopeDc_tot10: " << slopeDc_tot10 << " +- " << slopeDc_tot10_err << std::endl
 	; , ; )
 
-	auto bending_angle5_tot = fitResultTot5->GetParameter( 8 );
-	;
-	auto bending_angle5_tot_err = fitResultTot5->GetParError( 8 );
-	;
-	auto bending_angle10_tot = fitResultTot10->GetParameter( 8 );
-	auto bending_angle10_tot_err = fitResultTot10->GetParError( 8 );
+	auto npar_meanCh = 9;
+	auto bending_angle5_tot = fitResultTot5->GetParameter( npar_meanCh );
+	auto bending_angle5_tot_err = fitResultTot5->GetParError( npar_meanCh );
+	auto bending_angle10_tot = fitResultTot10->GetParameter( npar_meanCh );
+	auto bending_angle10_tot_err = fitResultTot10->GetParError( npar_meanCh );
 
 	auto map5_tot = *calculate_cystal_params_from_fit( thickness, bending_angle5_tot, bending_angle5_tot_err,
 			slopeDc_tot5, slopeDc_tot5_err );
