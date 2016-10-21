@@ -25,6 +25,7 @@
 #include <map>
 #include <sstream>
 #include <array>
+#include <cmath>
 
 #include <TROOT.h>
 #include <TH1.h>
@@ -74,62 +75,41 @@ int main_macro(int argc, char* argv[]) {
 	using mions::FieldCrystalDataTable510;
 	using mions::CrystalDataTable510;
 	using mions::electronic_dechanneling;
+	using std::pow;
 
 //	// No arguments:  argc=1, argv[0]=nome_comando
-//	// TODO WIP
-//	if (argc >= 2) {
-//
-//		//First Setting: dat files vs root files
-//		if (string( argv[1] ) == string( "-dat" )){
-//			cout << "[SETTING]: Prefers to use .dat file if exist, else try with .root" << endl;
-//			PREFER_DAT_FILES = true;
-//		} else if (string( argv[1] ) == string( "-root" )) {
-//			cout << "[SETTING]: Prefers to use .root file if exist, else try with .dat" << endl;
-//			PREFER_DAT_FILES = false;
-//		} else {
-//			cout << "[ERROR]: either you use no options to use default, or you must indicate all of the following:" << endl;
-//			cout <<	"	1) first option should be either \"-dat\" or \"-root\", to select preferred file type" << endl;
-//			cout <<	"	2) second option should be either \"-smooth\" or \"-sharp\", to select preferred file type" << endl;
-//			return -1;
-//		}
-//
-//
-//		//Second setting: smoothed or sharp expo for dechanneling fitting
-//		if (string( argv[2] ) == string( "-smooth" )){
-//			cout << "[SETTING]: Use gausssian-smoothed interval expo for dechanneling fitting" << endl;
-//			SMOOTHED_EXPO = true;
-//		} else if (string( argv[1] ) == string( "-sharp" )) {
-//			cout << "[SETTING]: Use sharp interval expo for dechanneling fitting" << endl;
-//			SMOOTHED_EXPO = false;
-//		} else {
-//			cout << "[ERROR]: either you use no options to use default, or you must indicate all of the following:" << endl;
-//			cout <<	"	1) first option should be either \"-dat\" or \"-root\", to select preferred file type" << endl;
-//			cout <<	"	2) second option should be either \"-smooth\" or \"-sharp\", to select preferred dechanneling fitting function" << endl;
-//			return -1;
-//		}
-//
-//	} else if (argc < 2) {
-//		cout
-//				<< "[WARNING][SETTING]: No file preference indicated. Prefers to use .dat file if exist, else try with .root"
-//				<< endl;
-//		cout << "[WARNING]: use option \"-dat\" or \"-root\" (but without ticks) to select a preferred file type."
-//				<< endl;
-//		cout
-//				<< "[WARNING][SETTING]: No smoothed exponential preference indicated. Use default (sharp interval) exponential for the fitting"
-//				<< endl;
-//		cout << "[WARNING]: use second option \"-smooth\" or \"-sharp\", to select preferred fitting function for dechanneling"
-//				<< endl;
-//		PREFER_DAT_FILES = true;
-//		SMOOTHED_EXPO = false;
-//	}
+	// TODO WIP
+	if (argc >= 2) {
+
+		//First Setting: dat files vs root files
+		if (string( argv[1] ) == string( "-dat" )){
+			cout << "[SETTING]: Prefers to use .dat file if exist, else try with .root" << endl;
+			PREFER_DAT_FILES = true;
+		} else if (string( argv[1] ) == string( "-root" )) {
+			cout << "[SETTING]: Prefers to use .root file if exist, else try with .dat" << endl;
+			PREFER_DAT_FILES = false;
+		} else {
+			cout << "[ERROR]: either you use no options to use default, or you must indicate all of the following:" << endl;
+			cout <<	"	1) first option should be either \"-dat\" or \"-root\", to select preferred file type" << endl;
+			cout <<	"	2) second option should be either \"-smooth\" or \"-sharp\", to select preferred file type" << endl;
+			return -1;
+		}
 
 
-	if (argc >= 2 && string( argv[1] ) == string( "-dat" )) {
-		cout << "[SETTING]: Prefers to use .dat file if exist, else try with .root" << endl;
-		PREFER_DAT_FILES = true;
-	} else if (argc >= 2 && string( argv[1] ) == string( "-root" )) {
-		cout << "[SETTING]: Prefers to use .root file if exist, else try with .dat" << endl;
-		PREFER_DAT_FILES = false;
+		//Second setting: smoothed or sharp expo for dechanneling fitting
+		if (string( argv[2] ) == string( "-smooth" )){
+			cout << "[SETTING]: Use gausssian-smoothed interval expo for dechanneling fitting" << endl;
+			SMOOTHED_EXPO = true;
+		} else if ( string( argv[2] ) == string( "-sharp" )) {
+			cout << "[SETTING]: Use sharp interval expo for dechanneling fitting" << endl;
+			SMOOTHED_EXPO = false;
+		} else {
+			cout << "[ERROR]: either you use no options to use default, or you must indicate all of the following:" << endl;
+			cout <<	"	1) first option should be either \"-dat\" or \"-root\", to select preferred file type" << endl;
+			cout <<	"	2) second option should be either \"-smooth\" or \"-sharp\", to select preferred dechanneling fitting function" << endl;
+			return -1;
+		}
+
 	} else if (argc < 2) {
 		cout
 				<< "[WARNING][SETTING]: No file preference indicated. Prefers to use .dat file if exist, else try with .root"
@@ -139,16 +119,42 @@ int main_macro(int argc, char* argv[]) {
 		cout
 				<< "[WARNING][SETTING]: No smoothed exponential preference indicated. Use default (sharp interval) exponential for the fitting"
 				<< endl;
-		cout << "[WARNING]: use second option \"-smooth\" or \"-sharp\", to select preferred file type"
+		cout << "[WARNING]: use second option \"-smooth\" or \"-sharp\", to select preferred fitting function for dechanneling"
 				<< endl;
 		PREFER_DAT_FILES = true;
 		SMOOTHED_EXPO = false;
-	} else {
-		cout << "[ERROR]: either you use no options to use default, or you must indicate all of the following:" << endl;
-		cout <<	"	1) first option should be either \"-dat\" or \"-root\", to select preferred file type" << endl;
-		cout <<	"	2) second option should be either \"-smooth\" or \"-sharp\", to select preferred fitting function for dechanneling" << endl;
-		return -1;
 	}
+
+
+
+
+//	if (argc >= 2 && string( argv[1] ) == string( "-dat" )) {
+//		cout << "[SETTING]: Prefers to use .dat file if exist, else try with .root" << endl;
+//		PREFER_DAT_FILES = true;
+//	} else if (argc >= 2 && string( argv[1] ) == string( "-root" )) {
+//		cout << "[SETTING]: Prefers to use .root file if exist, else try with .dat" << endl;
+//		PREFER_DAT_FILES = false;
+//	} else if (argc < 2) {
+//		cout
+//				<< "[WARNING][SETTING]: No file preference indicated. Prefers to use .dat file if exist, else try with .root"
+//				<< endl;
+//		cout << "[WARNING]: use option \"-dat\" or \"-root\" (but without ticks) to select a preferred file type."
+//				<< endl;
+//		cout
+//				<< "[WARNING][SETTING]: No smoothed exponential preference indicated. Use default (sharp interval) exponential for the fitting"
+//				<< endl;
+//		cout << "[WARNING]: use second option \"-smooth\" or \"-sharp\", to select preferred file type"
+//				<< endl;
+//		PREFER_DAT_FILES = true;
+//		SMOOTHED_EXPO = false;
+//	} else {
+//		cout << "[ERROR]: either you use no options to use default, or you must indicate all of the following:" << endl;
+//		cout <<	"	1) first option should be either \"-dat\" or \"-root\", to select preferred file type" << endl;
+//		cout <<	"	2) second option should be either \"-smooth\" or \"-sharp\", to select preferred fitting function for dechanneling" << endl;
+//		return -1;
+//	}
+
+
 
 	// Save the directory of the project (remember you are expected to start it from the
 	// top folder of the repo)
@@ -165,15 +171,21 @@ int main_macro(int argc, char* argv[]) {
 	std::vector<const char*> elenco_cristalli { "STF38", "STF45", "STF47", "STF49", "STF51", "QMP27", "QMP29", "QMP32" };
 
 	std::vector<const char*> elenco_cristalli_buoni_orig { "STF45", "STF38", "STF49", "QMP27", "QMP32" };
-	std::vector<const char*> elenco_cristalli_buoni { "QMP25", "QMP27",
+	std::vector<const char*> elenco_cristalli_buoni {
+		"QMP25",
+		"QMP27",
 	//	"QMP29",
-			"QMP32", "QMP36",
+			"QMP32",
+			"QMP36",
 			//	"QMP38", // Low Efficiency
-			"STF38", "STF45",
+			"STF38",
+			"STF45",
 			//	"STF47",  //45 ThetaB, Troppo poco piegato
 			"STF49",
-			//  "STF51",  //30 ThetaB Troppo poco piegato
-			"STF9", "STF99" };
+			// "STF51",  //30 ThetaB Troppo poco piegato
+			// "STF9",
+			"STF99"
+	};
 
 	//std::vector<const char*> elenco_cristalli { "QMP32" };
 	clog << "Start main_macro..." << endl;
@@ -302,7 +314,7 @@ int main_macro(int argc, char* argv[]) {
 		//currentDir->cd();
 
 		outdatafile << ch << " ";
-		for (auto d : map_dati_crist_calc[ch]) {
+		for (auto d : map_dati_crist_calc_tot[ch]) {
 			outdatafile << d << " ";
 		}
 
@@ -350,37 +362,45 @@ int main_macro(int argc, char* argv[]) {
 	vector<Double_t> Ld10_tot_err;
 
 	auto LDe = electronic_dechanneling( 1, 400 );
+	const auto Rcrit = 1.0; // Critical radius at 400 GeV
 
 	for (const auto& crys : elenco_cristalli_buoni) {
 		const auto& crysdata_three_pieces = map_dati_crist_calc[crys];
 		const auto& crysdata_tot = map_dati_crist_calc_tot[crys];
 		const auto& crysdata = crysdata_three_pieces;
 
-		Rc5.emplace_back( crysdata[(int) FieldCrystalDataTable510::raggio_curvatura5] );
-		Rc5_err.emplace_back( crysdata[(int) FieldCrystalDataTable510::raggio_curvatura5_err] );
-		Ld5.emplace_back( crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght5] );
-		Ld5_err.emplace_back( crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght5_err] );
 
-		Rc10.emplace_back( crysdata[(int) FieldCrystalDataTable510::raggio_curvatura10] );
-		Rc10_err.emplace_back( crysdata[(int) FieldCrystalDataTable510::raggio_curvatura10_err] );
-		Ld10.emplace_back( crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght10] );
-		Ld10_err.emplace_back( crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght10_err] );
+		// THeory: Lnuclear = Lelectronic/k, L
+		// Sigma(1-Rc/R) = Rc*sigmaR / R^2
+		Rc5.emplace_back( pow(1 - Rcrit / crysdata[(int) FieldCrystalDataTable510::raggio_curvatura5] ,2) );
+		Rc5_err.emplace_back( Rcrit * crysdata[(int) FieldCrystalDataTable510::raggio_curvatura5_err] /
+							  pow(crysdata[(int) FieldCrystalDataTable510::raggio_curvatura5],2) );
+		Ld5.emplace_back( crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght5] / LDe);
+		Ld5_err.emplace_back( crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght5_err] / LDe );
+		Rc10.emplace_back( pow(1 - Rcrit / crysdata[(int) FieldCrystalDataTable510::raggio_curvatura10] ,2) );
+		Rc10_err.emplace_back( Rcrit * crysdata[(int) FieldCrystalDataTable510::raggio_curvatura10_err] /
+				  	  	  	  pow(crysdata[(int) FieldCrystalDataTable510::raggio_curvatura10],2) );
+		Ld10.emplace_back( crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght10] / LDe );
+		Ld10_err.emplace_back( crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght10_err] / LDe );
 
 		//Total data
-		Rc5_tot.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura5] );
-		Rc5_tot_err.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura5_err] );
-		Ld5_tot.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::dechanneling_lenght5] );
-		Ld5_tot_err.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::dechanneling_lenght5_err] );
+		Rc5_tot.emplace_back( pow(1 - Rcrit / crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura5] ,2) );
+		Rc5_tot_err.emplace_back( Rcrit * crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura5_err] /
+				  	  	  	  	  pow(crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura5],2) );
+		Ld5_tot.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::dechanneling_lenght5] / LDe );
+		Ld5_tot_err.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::dechanneling_lenght5_err] / LDe );
 
-		Rc10_tot.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura10] );
-		Rc10_tot_err.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura10_err] );
-		Ld10_tot.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::dechanneling_lenght10] );
-		Ld10_tot_err.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::dechanneling_lenght10_err] );
+		Rc10_tot.emplace_back( pow(1 - Rcrit / crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura10] ,2) );
+		Rc10_tot_err.emplace_back( Rcrit * crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura10_err] /
+	  	  	  	  	  	  	  	  pow(crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura10],2) );
+		Ld10_tot.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::dechanneling_lenght10]  / LDe );
+		Ld10_tot_err.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::dechanneling_lenght10_err] / LDe );
 	}
 
 	//If I put other options, I could write the other options directly on canvas title
 
-	string canvas_name = (argc >= 2) ? "Rc vs Ld " + string( argv[1] ) :  "Rc vs Ld " + string( "-dat" );
+	string canvas_name = (argc >= 2) ? "LDnuc/LDelet vs 1-Rc/R " + string( argv[1] ) + " " +
+			string(argv[2]) :  "Rc vs Ld " + string( "-dat" ) + string( "-sharp" );
 
 	auto cRcLd = new TCanvas( "cRcLd", canvas_name.c_str() );
 	// 2 rows, 2 columns

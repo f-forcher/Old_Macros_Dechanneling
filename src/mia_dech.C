@@ -411,8 +411,8 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 
 	//fDech->SetParameter("MeanAm",-5);
 
-	histogram5->Fit( fDech5, "I0REM+" );
-	histogram10->Fit( fDech10, "I0REM+" );
+	histogram5->Fit( fDech5, "IREM+" );
+	histogram10->Fit( fDech10, "IREM+" );
 
 	TF1 *fitResultDech5 = histogram5->GetFunction( "fDech5" );
 	TF1 *fitResultDech10 = histogram10->GetFunction( "fDech10" );
@@ -573,7 +573,7 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 			slopeDc5,          // 4
 			meanAm5 + 3*sigmaAm5,  // 5
 			meanCh5 - 3*sigmaCh5,  // 6
-			sigmaAm5 / 3.0,		// 7
+			sigmaAm5,		// 7
 			//Channeling peak
 			constCh5,          // 8
 			meanCh5,           // 9
@@ -583,12 +583,16 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 	fTot5->SetParameters( param5 );
 	fTot5_2->SetParameters( param5_smooth );
 
-	fTot5->FixParameter( 5, meanAm5 + 2 * sigmaAm5 );
-	fTot5->FixParameter( 6, meanCh5 - 2 * sigmaCh5 );
-	fTot5_2->FixParameter( 5, meanAm5 + 2 * sigmaAm5 );
-	fTot5_2->FixParameter( 6, meanCh5 - 2 * sigmaCh5 );
+	fTot5->FixParameter( 5, meanAm5 + 2.5 * sigmaAm5 );
+	fTot5->FixParameter( 6, meanCh5 - 2.5 * sigmaCh5 );
+
+	//fTot5_2->FixParameter( 5, meanAm5 + 2.5 * sigmaAm5 );
+	//fTot5_2->FixParameter( 6, meanCh5 - 2.5 * sigmaCh5 );
 	//fTot5_2->FixParameter( 7, sigmaAm5 );
-	fTot5_2->SetParLimits(7,0.05*sigmaAm5,0.5*sigmaAm5);
+
+	fTot5_2->SetParLimits(5,meanAm5 + 1.6 * sigmaAm5,meanAm5 + 3.1 * sigmaAm5);
+	fTot5_2->SetParLimits(6,meanCh5 - 1.6 * sigmaCh5,meanCh5 - 3.1 * sigmaCh5);
+	fTot5_2->SetParLimits(7,0.1*sigmaAm5,2*sigmaAm5);
 
 	auto f5_to_fit = SMOOTHED_EXPO ? "fTot5_smooth" : "fTot5";
 	histogram5->Fit( f5_to_fit, "ILREM+" );
@@ -604,9 +608,14 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 	//TF1* fDech10_2  = new TF1("fDech10_2", "expo(3)", meanAm10+sigmaAm10, meanCh10-sigmaCh10);
 	TF1* fTot10 = new TF1( "fTot10", "gaus(0) + expo(3) * ( x > [5] && x < [6] ) + gaus(7)", meanAm10 - 4 * sigmaAm10,
 			meanCh10 + 4 * sigmaCh10 );
+//	TF1* fTot10_2 = new TF1("fTot10_smooth", "gaus(0) + "
+//								 "(exp([3] + ([4]*[4] * [7]*[7])/4.0 + [4]*x)*(TMath::Erf((-2*[5] + [4]*[7]*[7] + 2*x)/(2*[7])) +"
+//								 " TMath::Erf([6]/[7] - ([4]*[7])/2.0 - x/[7])))/(2 * sqrt(2))"
+//								 "+ gaus(8)", meanAm10 - 4 * sigmaAm10, meanCh10 + 4 * sigmaCh10);
+
 	TF1* fTot10_2 = new TF1("fTot10_smooth", "gaus(0) + "
-								 "(exp([3] + ([4]*[4] * [7]*[7])/4.0 + [4]*x)*(TMath::Erf((-2*[5] + [4]*[7]*[7] + 2*x)/(2*[7])) +"
-								 " TMath::Erf([6]/[7] - ([4]*[7])/2.0 - x/[7])))/(2 * sqrt(2))"
+								 "(exp([3] + ([4]*[4] * [7]*[7])/4.0 + [4]*x)*(erf((-2*[5] + [4]*[7]*[7] + 2*x)/(2*[7])) +"
+								 " erf([6]/[7] - ([4]*[7])/2.0 - x/[7])))/(2 * sqrt(2))"
 								 "+ gaus(8)", meanAm10 - 4 * sigmaAm10, meanCh10 + 4 * sigmaCh10);
 
 	const Double_t param10[10] = {
@@ -634,7 +643,7 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 			slopeDc10,          // 4
 			meanAm10 + 3*sigmaAm10, // 5
 			meanCh10 - 3*sigmaCh10, // 6
-			sigmaAm10 / 3.0,		// 7
+			sigmaAm10,		// 7
 			//Channeling peak
 			constCh10,          // 8
 			meanCh10,           // 9
@@ -644,12 +653,16 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 	fTot10->SetParameters( param10 );
 	fTot10_2->SetParameters( param10_smooth );
 
-	fTot10->FixParameter( 5, meanAm10 + 2 * sigmaAm10 );
-	fTot10->FixParameter( 6, meanCh10 - 2 * sigmaCh10 );
-	fTot10_2->FixParameter( 5, meanAm10 + 2 * sigmaAm10 );
-	fTot10_2->FixParameter( 6, meanCh10 - 2 * sigmaCh10 );
+	fTot10->FixParameter( 5, meanAm10 + 2.5 * sigmaAm10 );
+	fTot10->FixParameter( 6, meanCh10 - 2.5 * sigmaCh10 );
+
+	//fTot10_2->FixParameter( 5, meanAm10 + 2.5 * sigmaAm10 );
+	//fTot10_2->FixParameter( 6, meanCh10 - 2.5 * sigmaCh10 );
 //	fTot10_2->FixParameter( 7, sigmaAm10 / 3.0 );
-	fTot10_2->SetParLimits(7,0.05*sigmaAm10,0.5*sigmaAm10);
+
+	fTot10_2->SetParLimits(5,meanAm10 + 1.6 * sigmaAm10,meanAm10 + 3.1 * sigmaAm10);
+	fTot10_2->SetParLimits(6,meanCh10 - 1.6 * sigmaCh10,meanCh10 - 3.1 * sigmaCh10);
+	fTot10_2->SetParLimits(7,0.1*sigmaAm10,2*sigmaAm10);
 
 	auto f10_to_fit = SMOOTHED_EXPO ? "fTot10_smooth" : "fTot10";
 	histogram10->Fit( f10_to_fit, "IREM+" );
