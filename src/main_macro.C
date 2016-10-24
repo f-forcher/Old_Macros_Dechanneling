@@ -364,6 +364,7 @@ int main_macro(int argc, char* argv[]) {
 	auto LDe = electronic_dechanneling( 1, 400 );
 	const auto Rcrit = 1.0; // Critical radius at 400 GeV
 
+
 	for (const auto& crys : elenco_cristalli_buoni) {
 		const auto& crysdata_three_pieces = map_dati_crist_calc[crys];
 		const auto& crysdata_tot = map_dati_crist_calc_tot[crys];
@@ -374,6 +375,39 @@ int main_macro(int argc, char* argv[]) {
 		// Sigma(1-Rc/R) = Rc*sigmaR / R^2
 		Rc5.emplace_back( pow(1 - Rcrit / crysdata[(int) FieldCrystalDataTable510::raggio_curvatura5] ,2) );
 		Rc5_err.emplace_back( Rcrit * crysdata[(int) FieldCrystalDataTable510::raggio_curvatura5_err] /
+							  pow(crysdata[(int) FieldCrystalDataTable510::raggio_curvatura5],2) );
+		Ld5.emplace_back( crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght5] / LDe);
+		Ld5_err.emplace_back( crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght5_err] / LDe );
+		Rc10.emplace_back( pow(1 - Rcrit / crysdata[(int) FieldCrystalDataTable510::raggio_curvatura10] ,2) );
+		Rc10_err.emplace_back( Rcrit * crysdata[(int) FieldCrystalDataTable510::raggio_curvatura10_err] /
+				  	  	  	  pow(crysdata[(int) FieldCrystalDataTable510::raggio_curvatura10],2) );
+		Ld10.emplace_back( crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght10] / LDe );
+		Ld10_err.emplace_back( crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght10_err] / LDe );
+
+		//Total data
+		Rc5_tot.emplace_back( pow(1 - Rcrit / crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura5] ,2) );
+		Rc5_tot_err.emplace_back( Rcrit * crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura5_err] /
+				  	  	  	  	  pow(crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura5],2) );
+		Ld5_tot.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::dechanneling_lenght5] / LDe );
+		Ld5_tot_err.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::dechanneling_lenght5_err] / LDe );
+
+		Rc10_tot.emplace_back( pow(1 - Rcrit / crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura10] ,2) );
+		Rc10_tot_err.emplace_back( Rcrit * crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura10_err] /
+	  	  	  	  	  	  	  	  pow(crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura10],2) );
+		Ld10_tot.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::dechanneling_lenght10]  / LDe );
+		Ld10_tot_err.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::dechanneling_lenght10_err] / LDe );
+	}
+
+	for (const auto& crys : elenco_cristalli_buoni) {
+		const auto& crysdata_three_pieces = map_dati_crist_calc[crys];
+		const auto& crysdata_tot = map_dati_crist_calc_tot[crys];
+		const auto& crysdata = crysdata_three_pieces;
+
+		//TODO finire! mettere il raggio diretto e poi fittare con [0]*(1-[1]/x)^2
+		// THeory: Lnuclear = Lelectronic/k, L
+		// Sigma(1-Rc/R) = Rc*sigmaR / R^2
+		Rc5.emplace_back( crysdata[(int) FieldCrystalDataTable510::raggio_curvatura5]);
+		Rc5_err.emplace_back( cr  ysdata[(int) FieldCrystalDataTable510::raggio_curvatura5_err] /
 							  pow(crysdata[(int) FieldCrystalDataTable510::raggio_curvatura5],2) );
 		Ld5.emplace_back( crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght5] / LDe);
 		Ld5_err.emplace_back( crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght5_err] / LDe );
@@ -445,7 +479,8 @@ int main_macro(int argc, char* argv[]) {
 		 *	"Y+" 	The Y-axis is drawn on the right side of the plot.
 		 */
 
-		TF1 *fRcLd_5 = new TF1( "fRcLd_5", "pol1" );
+		//TF1 *fRcLd_5 = new TF1( "fRcLd_5", "pol1" );
+		TF1 *fRcLd_5 = new TF1( "fRcLd_5", "[0]*pow(1-[b]/x,2)" );
 		TFitResultPtr fit_RcLd_5 = RcLd_5->Fit( fRcLd_5, "S" );
 		RcLd_5->SetTitle( "Rc vs Ld (cuts at 5)" );
 		RcLd_5->GetXaxis()->SetTitle( "Rc [m]" );
