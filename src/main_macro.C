@@ -364,7 +364,7 @@ int main_macro(int argc, char* argv[]) {
 	auto LDe = electronic_dechanneling( 1, 400 );
 	const auto Rcrit = 1.0; // Critical radius at 400 GeV
 
-
+/*
 	for (const auto& crys : elenco_cristalli_buoni) {
 		const auto& crysdata_three_pieces = map_dati_crist_calc[crys];
 		const auto& crysdata_tot = map_dati_crist_calc_tot[crys];
@@ -397,7 +397,7 @@ int main_macro(int argc, char* argv[]) {
 		Ld10_tot.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::dechanneling_lenght10]  / LDe );
 		Ld10_tot_err.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::dechanneling_lenght10_err] / LDe );
 	}
-
+*/
 	for (const auto& crys : elenco_cristalli_buoni) {
 		const auto& crysdata_three_pieces = map_dati_crist_calc[crys];
 		const auto& crysdata_tot = map_dati_crist_calc_tot[crys];
@@ -407,26 +407,22 @@ int main_macro(int argc, char* argv[]) {
 		// THeory: Lnuclear = Lelectronic/k, L
 		// Sigma(1-Rc/R) = Rc*sigmaR / R^2
 		Rc5.emplace_back( crysdata[(int) FieldCrystalDataTable510::raggio_curvatura5]);
-		Rc5_err.emplace_back( cr  ysdata[(int) FieldCrystalDataTable510::raggio_curvatura5_err] /
-							  pow(crysdata[(int) FieldCrystalDataTable510::raggio_curvatura5],2) );
+		Rc5_err.emplace_back( crysdata[(int) FieldCrystalDataTable510::raggio_curvatura5_err] );
 		Ld5.emplace_back( crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght5] / LDe);
 		Ld5_err.emplace_back( crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght5_err] / LDe );
-		Rc10.emplace_back( pow(1 - Rcrit / crysdata[(int) FieldCrystalDataTable510::raggio_curvatura10] ,2) );
-		Rc10_err.emplace_back( Rcrit * crysdata[(int) FieldCrystalDataTable510::raggio_curvatura10_err] /
-				  	  	  	  pow(crysdata[(int) FieldCrystalDataTable510::raggio_curvatura10],2) );
+		Rc10.emplace_back( crysdata[(int) FieldCrystalDataTable510::raggio_curvatura10] );
+		Rc10_err.emplace_back( crysdata[(int) FieldCrystalDataTable510::raggio_curvatura10_err] );
 		Ld10.emplace_back( crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght10] / LDe );
 		Ld10_err.emplace_back( crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght10_err] / LDe );
 
 		//Total data
-		Rc5_tot.emplace_back( pow(1 - Rcrit / crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura5] ,2) );
-		Rc5_tot_err.emplace_back( Rcrit * crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura5_err] /
-				  	  	  	  	  pow(crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura5],2) );
+		Rc5_tot.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura5] );
+		Rc5_tot_err.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura5_err] );
 		Ld5_tot.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::dechanneling_lenght5] / LDe );
 		Ld5_tot_err.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::dechanneling_lenght5_err] / LDe );
 
-		Rc10_tot.emplace_back( pow(1 - Rcrit / crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura10] ,2) );
-		Rc10_tot_err.emplace_back( Rcrit * crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura10_err] /
-	  	  	  	  	  	  	  	  pow(crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura10],2) );
+		Rc10_tot.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura10] );
+		Rc10_tot_err.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura10_err] );
 		Ld10_tot.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::dechanneling_lenght10]  / LDe );
 		Ld10_tot_err.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::dechanneling_lenght10_err] / LDe );
 	}
@@ -435,6 +431,9 @@ int main_macro(int argc, char* argv[]) {
 
 	string canvas_name = (argc >= 2) ? "LDnuc/LDelet vs 1-Rc/R " + string( argv[1] ) + " " +
 			string(argv[2]) :  "Rc vs Ld " + string( "-dat" ) + string( "-sharp" );
+//	string canvas_name = (argc >= 2) ? "LDnuc/LDelet vs 1-Rc/R " + string( argv[1] ) + " " +
+//			string(argv[2]) :  "Rc vs Ld " + string( "-dat" ) + string( "-sharp" );
+
 
 	auto cRcLd = new TCanvas( "cRcLd", canvas_name.c_str() );
 	// 2 rows, 2 columns
