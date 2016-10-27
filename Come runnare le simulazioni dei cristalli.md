@@ -76,7 +76,8 @@ Make a folder with the crystal name, eg *STF45* (`--no-preserve=mode` is needed 
     >.TRUE. .FALSE. ScanCrysAngle-lb 12345 1 1.  
     >NEXT  
     >ENDE
- * sixtrack_batch.sh (the "**100**" as indicated by `# <-- Here`):
+
+  * sixtrack_batch.sh (the "**100**" as indicated by `# <-- Here`):
     ```sh
     #!/bin/bash
 
