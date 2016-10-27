@@ -9,7 +9,7 @@ Make a folder with the crystal name, eg *STF45* (`--no-preserve=mode` is needed 
  * `cp -r prova/sixtrack_batch.sh STF45/ --no-preserve=mode`
  * `cd STF45/`
 
- Check that the number of _packets?_ (in the "file <<<EOF" .job) is the same as in clean_input/fort.3  
+Check that the number of _packets?_ (in the "file <<<EOF" .job) is the same as in clean_input/fort.3  
 
    * clean_input/fort.3 (number of _packets?_ "**100**" in **bold**):
 
