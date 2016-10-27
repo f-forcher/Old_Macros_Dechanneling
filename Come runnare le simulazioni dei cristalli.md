@@ -11,7 +11,7 @@ Make a folder with the crystal name, eg *STF45* (`--no-preserve=mode` is needed 
 
 Check that the number of _packets?_ (in the "file <<<EOF" .job) is the same as in clean_input/fort.3  
 
-   1. clean_input/fort.3 (number of _packets?_ "**100**" in **bold**):
+   1. clean_input/fort.3 (number of _packets?_ "_**100**_" in _**bold italic**_):
 
   >GEOM  
   >PRINTOUT  
@@ -60,7 +60,7 @@ Check that the number of _packets?_ (in the "file <<<EOF" .job) is the same as i
   >NEXT  
   >COLLIMATION  
   >.TRUE.   
-  >**100** 400000  
+  >_**100**_ 400000  
   >4 3.7 0.05 0. 0. "distr_in.dat" 0.00 75.5  
   >.FALSE. 15.0 18.0 18.0 20.0 6.2 7.0 7.0 10.0 10.0 900.0 8.0 7.5 900.0  
   >8.3  8.3  8.3  8.3  8.3  8.3  8.3 8.3  900.0 900.0 6.0  
