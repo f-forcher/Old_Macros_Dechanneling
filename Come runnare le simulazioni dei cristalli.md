@@ -77,75 +77,72 @@ Make a folder with the crystal name, eg *STF45* (`--no-preserve=mode` is needed 
     >NEXT  
     >ENDE
 
-sdsds
+  * sixtrack_batch.sh (the "**100**" as indicated by `# <-- Here`):
+    ```sh
+    #!/bin/bash
 
-<pre lang="sh">
-<code>
-#!/bin/bash
-
-# ALWAYS check:
-# beam 1 or 2
-# batch queue
+    # ALWAYS check:
+    # beam 1 or 2
+    # batch queue
 
 
-# LocalPWD : where on the mac should the files be copied. Does the directory exist?
-# post-processing programs to run
-# which output files should be copied back
-# should previous dirs run* be deleted
+    # LocalPWD : where on the mac should the files be copied. Does the directory exist?
+    # post-processing programs to run
+    # which output files should be copied back
+    # should previous dirs run* be deleted
 
 
-PWD=`pwd`
-LocalPWD="/media/Daniele/STF45_H8_eff90_th/"
+    PWD=`pwd`
+    LocalPWD="/media/Daniele/STF45_H8_eff90_th/"
 
-beam=b1
-LIMIT=1000
+    beam=b1
+    LIMIT=1000
 
-echo $PWD
-#scp -r $PWD/clean_input dmirarch@pcen33066:"${LocalPWD}"
-#scp $PWD/sixtrack_batch.sh dmirarch@pcen33066:"${LocalPWD}clean_input"
+    echo $PWD
+    #scp -r $PWD/clean_input dmirarch@pcen33066:"${LocalPWD}"
+    #scp $PWD/sixtrack_batch.sh dmirarch@pcen33066:"${LocalPWD}clean_input"
 
 
 
 
 
 
-#rm -r run*
+    #rm -r run*
 
-for ((a=1; a <= LIMIT ; a++))
-  do
-  index=$a
-  zero=0
-  while [ "${#index}" -lt "4" ]
-    do
-    index=$zero$index
-  done
-  mkdir run$index
+    for ((a=1; a <= LIMIT ; a++))
+      do
+      index=$a
+      zero=0
+      while [ "${#index}" -lt "4" ]
+        do
+        index=$zero$index
+      done
+      mkdir run$index
 
-  cat > run$index/SixTr$index.job << EOF
-  #!/bin/bash
-  cp $PWD/clean_input/* .
-  cp $PWD/../H8_initial_distr.dat .
+      cat > run$index/SixTr$index.job << EOF
+      #!/bin/bash
+      cp $PWD/clean_input/* .
+      cp $PWD/../H8_initial_distr.dat .
 
-  ./make_distr H8_initial_distr.dat $a <b>100</b>
+      ./make_distr H8_initial_distr.dat $a 100 # <---HERE
 
-  ./SixTrack_dan_RELEASE_CRYSTAL > screenout
+      ./SixTrack_dan_RELEASE_CRYSTAL > screenout
 
-  cp cr_interaction.dat $PWD/run$index/
+      cp cr_interaction.dat $PWD/run$index/
 
-#  scp -r $PWD/run${index} dmirarch@pcen33066:"${LocalPWD}"
-#  rm -r $PWD/run${index}
-  exit
-EOF
-if [ -d "run$index" ]; then
-    cd run$index
-    chmod 777 SixTr$index.job
-    bsub -q 1nh -R "rusage[pool=30000]" SixTr$index.job
-    cd ..
-fi
+    #  scp -r $PWD/run${index} dmirarch@pcen33066:"${LocalPWD}"
+    #  rm -r $PWD/run${index}
+      exit
+    EOF
+    if [ -d "run$index" ]; then
+        cd run$index
+        chmod 777 SixTr$index.job
+        bsub -q 1nh -R "rusage[pool=30000]" SixTr$index.job
+        cd ..
+    fi
 
-done
-</code>
-</pre>
+    done
+    ```
 
 
   cp non_writable ./copy --no-preserve=mode
