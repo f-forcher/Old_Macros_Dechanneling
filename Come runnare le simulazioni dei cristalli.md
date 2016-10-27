@@ -79,7 +79,7 @@ Make a folder with the crystal name, eg *STF45* (`--no-preserve=mode` is needed 
 
 sdsds
 
-<pre>
+<pre lang="sh">
 <code>
 #!/bin/bash
 
