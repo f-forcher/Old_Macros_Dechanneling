@@ -11,7 +11,7 @@ Make a folder with the crystal name, eg *STF45* (`--no-preserve=mode` is needed 
 
 Check that the number of _packets?_ (in the "file <<<EOF" .job) is the same as in clean_input/fort.3  
 
-   * clean_input/fort.3 (number of _packets?_ "**100**" in **bold**):
+   1. clean_input/fort.3 (number of _packets?_ "**100**" in **bold**):
 
   >GEOM  
   >PRINTOUT  
@@ -79,7 +79,7 @@ Check that the number of _packets?_ (in the "file <<<EOF" .job) is the same as i
   >NEXT  
   >ENDE  
 
-   * sixtrack_batch.sh (the "**100**" as indicated by `# <-- Here`):  
+   2. sixtrack_batch.sh (the "**100**" as indicated by `# <-- Here`):  
 
     ```sh
     #!/bin/bash
