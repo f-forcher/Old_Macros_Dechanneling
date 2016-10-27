@@ -77,7 +77,7 @@ Make a folder with the crystal name, eg *STF45* (`--no-preserve=mode` is needed 
     >NEXT  
     >ENDE
 
-  * sixtrack_batch.sh (the "**100**" as indicated by `# <-- Here`):
+   * sixtrack_batch.sh (the "**100**" as indicated by `# <-- Here`):
     ```sh
     #!/bin/bash
 
@@ -101,10 +101,6 @@ Make a folder with the crystal name, eg *STF45* (`--no-preserve=mode` is needed 
     echo $PWD
     #scp -r $PWD/clean_input dmirarch@pcen33066:"${LocalPWD}"
     #scp $PWD/sixtrack_batch.sh dmirarch@pcen33066:"${LocalPWD}clean_input"
-
-
-
-
 
 
     #rm -r run*
