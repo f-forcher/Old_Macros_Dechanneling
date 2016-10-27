@@ -11,74 +11,74 @@ Make a folder with the crystal name, eg *STF45* (`--no-preserve=mode` is needed 
 
  Check that the number of _packets?_ (in the "file <<<EOF" .job) is the same as in clean_input/fort.3  
    * clean_input/fort.3 (number of _packets?_ "**100**" in **bold**):
-    >GEOM  
-    >PRINTOUT  
-    >NEXT  
-    >TRACKING  
-    >1 0 32 0 17 0 1  
-    >1 1 0 0 0  
-    >0 0 1 1 1 20000 2  
-    >NEXT  
-    >INITIAL COORDINATES  
-    >2 0 0 1  
-    >0.0  
-    >0.0  
-    >0.0  
-    >0.0  
-    >0.0  
-    >0.0  
-    >0.0  
-    >.000001  
-    >0.0  
-    >0.0  
-    >0.0  
-    >0.0  
-    >400000.0  
-    >400000.0  
-    >400000.0  
-    >NEXT  
-    >FLUCTUATION  
-    >100000 1 7 3  
-    >NEXT  
-    >ITERATION ACCURACY  
-    >50 0.10E-13 0.10E-14  
-    >10 0.10E-09 0.10E-09  
-    >10 0.10E-04 0.10E-05  
-    >0.10E-07 0.10E-11 0.10E-09  
-    >NEXT  
-    >LINEAR OPTICS  
-    >ELEMENT  0 1 1 3.5 3.5  
-    >NEXT  
-    >BEAM  
-    >0.110E+12 2.89 2.89  0.0755E+00  1.0E-03 1 1 1  
-    >NEXT  
-    >SYNC  
-    >4616 .00192 3.05 0 6911.5038 938.2796 1  
-    >1 1  
-    >NEXT  
-    >COLLIMATION  
-    >.TRUE.   
-    >**100** 400000  
-    >4 3.7 0.05 0. 0. "distr_in.dat" 0.00 75.5  
-    >.FALSE. 15.0 18.0 18.0 20.0 6.2 7.0 7.0 10.0 10.0 900.0 8.0 7.5 900.0  
-    >8.3  8.3  8.3  8.3  8.3  8.3  8.3 8.3  900.0 900.0 6.0  
-    >0 19789.0 20150.0 1 1  
-    >0.0 0.4e-3 -0.4e-3 0.0 0.0 0.0 -1.0  
-    >0.0 0.4e-3 -0.4e-3 0.0 0.0 0.0 -1.0  
-    >1.0E-08 1.0E-08  
-    >.FALSE. .FALSE. 0 .TRUE. CRY.A6L7.B1 .FALSE. .TRUE. .TRUE. .TRUE.  
-    >0 0 0 0  
-    >0E0  0E0 0E0 0E0  0E0  0E0  0E0  0E0  25  0E0  .FALSE.  
-    >.FALSE. 5.958 .0015  
-    >0 0 .FALSE. .FALSE.  
-    >0 .0025 0.0 1.0E-3 1  
-    >"SPS_horCrystal.dat" 1  
-    >.TRUE. .FALSE. ScanCrysAngle-lb 12345 1 1.  
-    >NEXT  
-    >ENDE
+  >GEOM  
+  >PRINTOUT  
+  >NEXT  
+  >TRACKING  
+  >1 0 32 0 17 0 1  
+  >1 1 0 0 0  
+  >0 0 1 1 1 20000 2  
+  >NEXT  
+  >INITIAL COORDINATES  
+  >2 0 0 1  
+  >0.0  
+  >0.0  
+  >0.0  
+  >0.0  
+  >0.0  
+  >0.0  
+  >0.0  
+  >.000001  
+  >0.0  
+  >0.0  
+  >0.0  
+  >0.0  
+  >400000.0  
+  >400000.0  
+  >400000.0  
+  >NEXT  
+  >FLUCTUATION  
+  >100000 1 7 3  
+  >NEXT  
+  >ITERATION ACCURACY  
+  >50 0.10E-13 0.10E-14  
+  >10 0.10E-09 0.10E-09  
+  >10 0.10E-04 0.10E-05  
+  >0.10E-07 0.10E-11 0.10E-09  
+  >NEXT  
+  >LINEAR OPTICS  
+  >ELEMENT  0 1 1 3.5 3.5  
+  >NEXT  
+  >BEAM  
+  >0.110E+12 2.89 2.89  0.0755E+00  1.0E-03 1 1 1  
+  >NEXT  
+  >SYNC  
+  >4616 .00192 3.05 0 6911.5038 938.2796 1  
+  >1 1  
+  >NEXT  
+  >COLLIMATION  
+  >.TRUE.   
+  >**100** 400000  
+  >4 3.7 0.05 0. 0. "distr_in.dat" 0.00 75.5  
+  >.FALSE. 15.0 18.0 18.0 20.0 6.2 7.0 7.0 10.0 10.0 900.0 8.0 7.5 900.0  
+  >8.3  8.3  8.3  8.3  8.3  8.3  8.3 8.3  900.0 900.0 6.0  
+  >0 19789.0 20150.0 1 1  
+  >0.0 0.4e-3 -0.4e-3 0.0 0.0 0.0 -1.0  
+  >0.0 0.4e-3 -0.4e-3 0.0 0.0 0.0 -1.0  
+  >1.0E-08 1.0E-08  
+  >.FALSE. .FALSE. 0 .TRUE. CRY.A6L7.B1 .FALSE. .TRUE. .TRUE. .TRUE.  
+  >0 0 0 0  
+  >0E0  0E0 0E0 0E0  0E0  0E0  0E0  0E0  25  0E0  .FALSE.  
+  >.FALSE. 5.958 .0015  
+  >0 0 .FALSE. .FALSE.  
+  >0 .0025 0.0 1.0E-3 1  
+  >"SPS_horCrystal.dat" 1  
+  >.TRUE. .FALSE. ScanCrysAngle-lb 12345 1 1.  
+  >NEXT  
+  >ENDE
 
    * sixtrack_batch.sh (the "**100**" as indicated by `# <-- Here`):  
-   
+
     ```sh
     #!/bin/bash
 
