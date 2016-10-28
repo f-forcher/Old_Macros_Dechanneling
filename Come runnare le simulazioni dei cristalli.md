@@ -143,7 +143,7 @@ Check that the number of _packets?_ (in the "file <<<EOF" .job) is the same as i
     done
     ```
   * Set the number of jobs to start using the LIMITS variable in sixtrack_batch.sh
-  * Modify the file `clean_input/SPS-horCrystal.dat`:  
+  * Modify the file `clean_input/SPS-horCrystal.dat` (btw, those ~~"formats"~~ mess should **really** be reconsidered, guys. Like, at least, `field=value` input?):  
 
    >`# Database for cleaning insertion collimators`  
    >2  
@@ -175,9 +175,25 @@ Check that the number of _packets?_ (in the "file <<<EOF" .job) is the same as i
    > 340.8223790000000000  
    >  46.4189010000000000
 
-
   The two marked numbers (here **_0.002_** and **_13.91_**) are respectively the lenght z of the crystal and the
   radius of curvature (both in _meters_).
+  The other values are as follows, apparently starting to count the lines from the _fourth_ (after the `#`):  
+   >  * **1-2** Crystal collimator name (which should match with the name specified in the fort.2    file)  
+   >  * **3** Normalized aperture in sigma units.  
+   >  * **4** Crystal material. The crystal routine of SixTrack allows to treat
+   >    Silicon, Tungsten, Carbon or Germanium crystals.  
+   >  * **5** Crystal total length [m], considered as the length of the curved surface of the    crystal.  
+   >  * **6** Azimuthal angle rad of crystal (θtilt in picture 3.3/1). For the moment only purely    horizontal or vertical crystal are treated in the code (θtilt = 0 or θtilt = π/2 respectively).
+   >  * **7** Transverse collimator gap offset [m].
+   >  * **8** Bending radius [m].
+   >  * **9-10** Transverse x-z dimension [m].
+   >  * **11** Thickness of the amorphous layer at the crystal edge [m].
+   >  * **12** Orientation of the crystal planes for silicon crystals (integer, can be 1 for the Si    110, or 2 for the Si 111). This parameter is ineffective in case of non-Si crystals.  
+   >  * **13** (Wrong in the thesis table) Crystal tilt [rad].  
+   >  * **14** (Wrong in the thesis table) Miscut angle [rad].  
+   >  * **15-16** (Wrong in the thesis table) Design horizontal and vertical β-function [m] at the  collimator location  
+
+
 
   * Run the script `./sixtrack_batch.sh`
   * Wait for results to be processed, there will be `$LIMIT` folders named like `run0523` in which the most important file is `cr_interaction.dat`, which has this format:
