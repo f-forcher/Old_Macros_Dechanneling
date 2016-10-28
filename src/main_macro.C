@@ -239,11 +239,25 @@ int main_macro(int argc, char* argv[]) {
 //	*outputdechanneling
 //			<< "# Crystal | dechanneling L at +-5 microrad [m] | dechanneling L at +-10 microrad [m]"
 //			<< endl;
-	outdatafile << "#Crystal," << "raggio_curvatura5[m]," << "raggio_curvatura5_err[m]," << "raggio_curvatura10[m],"
-			<< "raggio_curvatura10_err[m]," << "bending_angle5[microrad]," << "bending_angle5_err[microrad],"
-			<< "bending_angle10[microrad]," << "bending_angle10_err[microrad]," << "thickness[mm],"
-			<< "dechanneling_lenght5[m]," << "dechanneling_lenght5_err[m]," << "dechanneling_lenght10[m],"
-			<< "dechanneling_lenght10_err[m]" << endl;
+	outdatafile << "#Crystal,"
+			<< "raggio_curvatura5[m],"
+			<< "raggio_curvatura5_err[m],"
+			<< "raggio_curvatura10[m],"
+			<< "raggio_curvatura10_err[m],"
+			<< "bending_angle5[microrad],"
+			<< "bending_angle5_err[microrad],"
+			<< "bending_angle10[microrad],"
+			<< "bending_angle10_err[microrad],"
+			<< "thickness[mm],"
+			<< "slopeDc5[1/microrad],"
+			<< "slopeDc5_err[1/microrad],"
+			<< "slopeDc10[1/microrad],"
+			<< "slopeDc10_err[1/microrad],"
+			<< "dechanneling_lenght5[m],"
+			<< "dechanneling_lenght5_err[m],"
+			<< "dechanneling_lenght10[m],"
+			<< "dechanneling_lenght10_err[m]"
+			<< endl;
 
 	ROOT_PROJDIR = gDirectory;
 	TDirectory* currentDir = gDirectory;
@@ -495,7 +509,8 @@ int main_macro(int argc, char* argv[]) {
 		auto len = Rc10.size();
 		auto RcLd_10 = new TGraphErrors( len, Rc10.data(), Ld10.data(), Rc10_err.data(), Ld10_err.data() );
 
-		TF1 *fRcLd_10 = new TF1( "fRcLd_10", "pol1" );
+		//TF1 *fRcLd_10 = new TF1( "fRcLd_10", "pol1" );
+		TF1 *fRcLd_10 = new TF1( "fRcLd_5", "[0]*pow(1-[b]/x,2)" );
 		TFitResultPtr fit_RcLd_10 = RcLd_10->Fit( fRcLd_10, "S" );
 		RcLd_10->SetTitle( "Rc vs Ld (cuts at 10)" );
 		RcLd_10->GetXaxis()->SetTitle( "Rc [m]" );
@@ -512,7 +527,8 @@ int main_macro(int argc, char* argv[]) {
 		auto RcLd_5_tot = new TGraphErrors( len, Rc5_tot.data(), Ld5_tot.data(), Rc5_tot_err.data(),
 				Ld5_tot_err.data() );
 
-		TF1 *fRcLd_5_tot = new TF1( "fRcLd_5_tot", "pol1" );
+		//TF1 *fRcLd_5_tot = new TF1( "fRcLd_5_tot", "pol1" );
+		TF1 *fRcLd_5_tot = new TF1( "fRcLd_5", "[0]*pow(1-[b]/x,2)" );
 		TFitResultPtr fit_RcLd_5_tot = RcLd_5_tot->Fit( fRcLd_5_tot, "S" );
 		RcLd_5_tot->SetTitle( "Rc vs Ld (cuts at 5), total sum fit" );
 		RcLd_5_tot->GetXaxis()->SetTitle( "Rc [m]" );
@@ -528,7 +544,8 @@ int main_macro(int argc, char* argv[]) {
 		auto len = Rc10_tot.size();
 		auto RcLd_10_tot = new TGraphErrors( len, Rc10_tot.data(), Ld10_tot.data(), Rc10_err.data(), Ld10_err.data() );
 
-		TF1 *fRcLd_10_tot = new TF1( "fRcLd_10_tot", "pol1" );
+		//TF1 *fRcLd_10_tot = new TF1( "fRcLd_10_tot", "pol1" );
+		TF1 *fRcLd_10_tot = new TF1( "fRcLd_5", "[0]*pow(1-[b]/x,2)" );
 		TFitResultPtr fit_RcLd_5 = RcLd_10_tot->Fit( fRcLd_10_tot, "S" );
 		RcLd_10_tot->SetTitle( "Rc vs Ld (cuts at 10), total sum fit" );
 		RcLd_10_tot->GetXaxis()->SetTitle( "Rc [m]" );
