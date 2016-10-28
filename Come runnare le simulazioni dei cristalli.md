@@ -145,9 +145,9 @@ Check that the number of _packets?_ (in the "file <<<EOF" .job) is the same as i
   * Set the number of jobs to start using the LIMITS variable in sixtrack_batch.sh
   * Modify the file `clean_input/SPS-horCrystal.dat`:  
 
-   ># Database for cleaning insertion collimators    
+   >`# Database for cleaning insertion collimators`  
    >2  
-   >#  
+   >`#`  
    >CRY.SPS.EXP    
    >cry.sps.exp  
    >0.0  
@@ -164,7 +164,7 @@ Check that the number of _packets?_ (in the "file <<<EOF" .job) is the same as i
    >0.0  
    >137.62762  
    >90.64693  
-   >#  
+   >`#`  
    >TCLA.SPSTAL     
    >tcla.spstal      
    >  20.0  
@@ -216,7 +216,7 @@ Check that the number of _packets?_ (in the "file <<<EOF" .job) is the same as i
 
   ```
   The _first_ number is the particle ID, not important since they pass only once in the crystal. The _fourth_ is the previous interaction, `-1` since it's the first time they pass. The _fifth_ is the interaction type:
-  * **-1**: out
+  * **-1**: *out*
   * **1**: *AM*
   * **2**: *VR*
   * **3**: *CH*
