@@ -198,7 +198,7 @@ Check that the number of _packets?_ (in the "file <<<EOF" .job) is the same as i
 
 
 * Run the script `./sixtrack_batch.sh`
-* Wait for results to be processed, there will be `$LIMIT` folders named like `run0523` in which the most important file is `cr_interaction.dat`, which has this format:  
+* Wait for results to be processed, there will be `$LIMIT` folders named like `run0523` in which the most important file is `cr_interaction.dat`, which has this format:
   ```
   #1=ipart 2=nturn 3=icoll 4=previous interaction 5=interaction      6=kick_x 7=kick_y 8=E_in 9=E_out 10=xp_in 11=yp_in 12=cr_ang
   101 1 1 -1 3 -1.407458291926671E-04 0.000000000000000E+00 400.0000000000000 399.9994375913847 -3.035623000000000E-06 -5.586757000000000E-06 0.000000000000000E+00
@@ -213,7 +213,7 @@ Check that the number of _packets?_ (in the "file <<<EOF" .job) is the same as i
   114 1 1 -1 3 -1.374773039497378E-04 0.000000000000000E+00 400.0000000000000 399.9994375913847 -1.462492000000000E-06 2.207778000000000E-05 0.000000000000000E+00
   115 1 1 -1 3 -1.362022184153167E-04 0.000000000000000E+00 400.0000000000000 399.9994375913847 -6.658456000000000E-06 4.708235000000000E-06 0.000000000000000E+00
   116 1 1 -1 3 -1.529013645974008E-04 0.000000000000000E+00 400.0000000000000 399.9994375913847
-  ```
+  ```  
   The _first_ number is the particle ID, not important since they pass only once in the crystal. The _fourth_ is the previous interaction, `-1` since it's the first time they pass. The _fifth_ is the interaction type:
   * **-1**: *out*
   * **1**: *AM*
