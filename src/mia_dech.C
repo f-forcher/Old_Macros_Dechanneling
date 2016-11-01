@@ -19,6 +19,8 @@
 #include "dech.h"
 #include "DatiChanneling.h"
 #include "my_typedefs.h"
+#include "read_histograms.h"
+
 
 //extern TDirectory* ROOT_PROJDIR;
 //extern 	std::vector<TH1*> vHistograms;
@@ -156,6 +158,9 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 	 * if .dat exist but is not preferred, use .root
 	 * if .dat does not exist and is not prefferred... all's right with the world, use .root
 	 */
+
+
+	//TODO Sostituire con una funzione il caricamento degli istogrammi, per poi spostarlo nell'altro programma
 	auto in_file_root = new TFile( filedati_root.c_str() );
 	if (bool( file_dat ) and (PREFER_DAT_FILES or not in_file_root->IsOpen())) {
 		// Il codice per la mia analisi qua
