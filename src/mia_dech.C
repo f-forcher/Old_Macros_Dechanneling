@@ -505,23 +505,24 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 	//Create key with name nome_cristallo
 	auto& crystal_calc_ref = dati_cristalli_calcolati[nome_cristallo];
 
-	crystal_calc_ref[(int) FieldCrystalDataTable510::bending_angle5] = bending_angle5;
-	crystal_calc_ref[(int) FieldCrystalDataTable510::bending_angle5_err] = bending_angle5_err;
-	crystal_calc_ref[(int) FieldCrystalDataTable510::bending_angle10] = bending_angle10;
-	crystal_calc_ref[(int) FieldCrystalDataTable510::bending_angle10_err] = bending_angle10_err;
-	crystal_calc_ref[(int) FieldCrystalDataTable510::raggio_curvatura5] = map5["Rc"];
-	crystal_calc_ref[(int) FieldCrystalDataTable510::raggio_curvatura5_err] = map5["Rc_err"];
-	crystal_calc_ref[(int) FieldCrystalDataTable510::raggio_curvatura10] = map10["Rc"];
-	crystal_calc_ref[(int) FieldCrystalDataTable510::raggio_curvatura10_err] = map10["Rc_err"];
-	crystal_calc_ref[(int) FieldCrystalDataTable510::thickness] = thickness;
-	crystal_calc_ref[(int) FieldCrystalDataTable510::slopeDc5] = map5["slopeDc"];
-	crystal_calc_ref[(int) FieldCrystalDataTable510::slopeDc5_err] = map5["slopeDc_err"];
-	crystal_calc_ref[(int) FieldCrystalDataTable510::slopeDc10] = map10["slopeDc"];
-	crystal_calc_ref[(int) FieldCrystalDataTable510::slopeDc10_err] = map10["slopeDc_err"];
-	crystal_calc_ref[(int) FieldCrystalDataTable510::dechanneling_lenght5] = map5["dechanneling_lenght"];
-	crystal_calc_ref[(int) FieldCrystalDataTable510::dechanneling_lenght5_err] = map5["dechanneling_lenght_err"];
-	crystal_calc_ref[(int) FieldCrystalDataTable510::dechanneling_lenght10] = map10["dechanneling_lenght"];
-	crystal_calc_ref[(int) FieldCrystalDataTable510::dechanneling_lenght10_err] = map10["dechanneling_lenght_err"];
+	using FCDT = FieldCrystalDataTable510;
+	crystal_calc_ref[(int) FCDT::bending_angle5] = bending_angle5;
+	crystal_calc_ref[(int) FCDT::bending_angle5_err] = bending_angle5_err;
+	crystal_calc_ref[(int) FCDT::bending_angle10] = bending_angle10;
+	crystal_calc_ref[(int) FCDT::bending_angle10_err] = bending_angle10_err;
+	crystal_calc_ref[(int) FCDT::raggio_curvatura5] = map5["Rc"];
+	crystal_calc_ref[(int) FCDT::raggio_curvatura5_err] = map5["Rc_err"];
+	crystal_calc_ref[(int) FCDT::raggio_curvatura10] = map10["Rc"];
+	crystal_calc_ref[(int) FCDT::raggio_curvatura10_err] = map10["Rc_err"];
+	crystal_calc_ref[(int) FCDT::thickness] = thickness;
+	crystal_calc_ref[(int) FCDT::slopeDc5] = map5["slopeDc"];
+	crystal_calc_ref[(int) FCDT::slopeDc5_err] = map5["slopeDc_err"];
+	crystal_calc_ref[(int) FCDT::slopeDc10] = map10["slopeDc"];
+	crystal_calc_ref[(int) FCDT::slopeDc10_err] = map10["slopeDc_err"];
+	crystal_calc_ref[(int) FCDT::dechanneling_lenght5] = map5["dechanneling_lenght"];
+	crystal_calc_ref[(int) FCDT::dechanneling_lenght5_err] = map5["dechanneling_lenght_err"];
+	crystal_calc_ref[(int) FCDT::dechanneling_lenght10] = map10["dechanneling_lenght"];
+	crystal_calc_ref[(int) FCDT::dechanneling_lenght10_err] = map10["dechanneling_lenght_err"];
 
 	/*
 	 * Test con somma
@@ -707,23 +708,24 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 	//Create key with name nome_cristallo
 	auto& crystal_calctot_ref = dati_cristalli_calcolati_ftot[nome_cristallo];
 
-	crystal_calctot_ref[(int) FieldCrystalDataTable510::bending_angle5] = bending_angle5_tot;
-	crystal_calctot_ref[(int) FieldCrystalDataTable510::bending_angle5_err] = bending_angle5_tot_err;
-	crystal_calctot_ref[(int) FieldCrystalDataTable510::bending_angle10] = bending_angle10_tot;
-	crystal_calctot_ref[(int) FieldCrystalDataTable510::bending_angle10_err] = bending_angle10_tot_err;
-	crystal_calctot_ref[(int) FieldCrystalDataTable510::raggio_curvatura5] = map5_tot["Rc"];
-	crystal_calctot_ref[(int) FieldCrystalDataTable510::raggio_curvatura5_err] = map5_tot["Rc_err"];
-	crystal_calctot_ref[(int) FieldCrystalDataTable510::raggio_curvatura10] = map10_tot["Rc"];
-	crystal_calctot_ref[(int) FieldCrystalDataTable510::raggio_curvatura10_err] = map10_tot["Rc_err"];
-	crystal_calctot_ref[(int) FieldCrystalDataTable510::thickness] = thickness;
-	crystal_calctot_ref[(int) FieldCrystalDataTable510::slopeDc5] = map5_tot["slopeDc"];
-	crystal_calctot_ref[(int) FieldCrystalDataTable510::slopeDc5_err] = map5_tot["slopeDc_err"];
-	crystal_calctot_ref[(int) FieldCrystalDataTable510::slopeDc10] = map10_tot["slopeDc"];
-	crystal_calctot_ref[(int) FieldCrystalDataTable510::slopeDc10_err] = map10_tot["slopeDc_err"];
-	crystal_calctot_ref[(int) FieldCrystalDataTable510::dechanneling_lenght5] = map5_tot["dechanneling_lenght"];
-	crystal_calctot_ref[(int) FieldCrystalDataTable510::dechanneling_lenght5_err] = map5_tot["dechanneling_lenght_err"];
-	crystal_calctot_ref[(int) FieldCrystalDataTable510::dechanneling_lenght10] = map10_tot["dechanneling_lenght"];
-	crystal_calctot_ref[(int) FieldCrystalDataTable510::dechanneling_lenght10_err] = map10_tot["dechanneling_lenght_err"];
+	using FCDT = FieldCrystalDataTable510;
+	crystal_calctot_ref[(int) FCDT::bending_angle5] = bending_angle5_tot;
+	crystal_calctot_ref[(int) FCDT::bending_angle5_err] = bending_angle5_tot_err;
+	crystal_calctot_ref[(int) FCDT::bending_angle10] = bending_angle10_tot;
+	crystal_calctot_ref[(int) FCDT::bending_angle10_err] = bending_angle10_tot_err;
+	crystal_calctot_ref[(int) FCDT::raggio_curvatura5] = map5_tot["Rc"];
+	crystal_calctot_ref[(int) FCDT::raggio_curvatura5_err] = map5_tot["Rc_err"];
+	crystal_calctot_ref[(int) FCDT::raggio_curvatura10] = map10_tot["Rc"];
+	crystal_calctot_ref[(int) FCDT::raggio_curvatura10_err] = map10_tot["Rc_err"];
+	crystal_calctot_ref[(int) FCDT::thickness] = thickness;
+	crystal_calctot_ref[(int) FCDT::slopeDc5] = map5_tot["slopeDc"];
+	crystal_calctot_ref[(int) FCDT::slopeDc5_err] = map5_tot["slopeDc_err"];
+	crystal_calctot_ref[(int) FCDT::slopeDc10] = map10_tot["slopeDc"];
+	crystal_calctot_ref[(int) FCDT::slopeDc10_err] = map10_tot["slopeDc_err"];
+	crystal_calctot_ref[(int) FCDT::dechanneling_lenght5] = map5_tot["dechanneling_lenght"];
+	crystal_calctot_ref[(int) FCDT::dechanneling_lenght5_err] = map5_tot["dechanneling_lenght_err"];
+	crystal_calctot_ref[(int) FCDT::dechanneling_lenght10] = map10_tot["dechanneling_lenght"];
+	crystal_calctot_ref[(int) FCDT::dechanneling_lenght10_err] = map10_tot["dechanneling_lenght_err"];
 
 	//TCanvas* mio_c1 = new TCanvas();
 	//vCanvases.push_back(new TCanvas(nome_cristallo.c_str()));
