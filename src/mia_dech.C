@@ -27,9 +27,9 @@
 //extern 	std::vector<TH1*> vHistograms10;
 //extern std::vector<TCanvas*> vCanvases;
 extern char PROJECT_DIR[FILENAME_MAX];
-extern bool PREFER_DAT_FILES;
+// extern bool PREFER_DAT_FILES; //Transferred in read_histograms
 extern bool SMOOTHED_EXPO;
-extern std::vector<std::string> lista_crist_sia_root_sia_dat;
+//extern std::vector<std::string> lista_crist_sia_root_sia_dat;
 
 namespace mions {
 
@@ -109,6 +109,8 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 	using std::stringstream;
 	using std::pow;
 
+	using mions::read_histograms;
+
 	//gStyle->SetPalette(1);
 	//gStyle->SetOptStat(0);
 	//gStyle->SetOptTitle(0);
@@ -116,26 +118,26 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 
 	string cartella_cristallo = "ForFrancesco/" + nome_cristallo + "_exp/";
 	gSystem->ChangeDirectory( cartella_cristallo.c_str() );
-	string pathfiledati_dat = //cartella_cristallo +
-			"recoDataSimple_" + nome_cristallo + ".torsion.correction.histo.dat";
+//	string pathfiledati_dat = //cartella_cristallo +
+//			"recoDataSimple_" + nome_cristallo + ".torsion.correction.histo.dat";
 
 	string nomefiledati_dat = "recoDataSimple_" + nome_cristallo + ".torsion.correction.histo.dat";
 
-	std::string pathfiledati_root = cartella_cristallo + "recoDataSimple_renamed.torsion.correction.histo.root";
+//	std::string pathfiledati_root = cartella_cristallo + "recoDataSimple_renamed.torsion.correction.histo.root";
 
-	std::string filedati_root = "recoDataSimple_renamed.torsion.correction.histo.root";
+	std::string nomefiledati_root = "recoDataSimple_renamed.torsion.correction.histo.root";
 
-	ifstream file_dat( pathfiledati_dat );
+	//ifstream file_dat( pathfiledati_dat );
 
 	//600 bin ,da -200 a 400
 	// Scelti guardando i grafici fatti da dech.C
 
 	// select +- 5 microrad in nomehisto5, +-10 in nomehisto10
-	string nomehisto5 = "hdati5_" + nome_cristallo;
-	string nomehisto10 = "hdati10_" + nome_cristallo;
-	string titlehisto5 = nome_cristallo + ", cuts at +- 5 microrad";
-	string titlehisto10 = nome_cristallo + ", cuts at +- 10 microrad";
-	clog << nomehisto5 << endl;
+//	string nomehisto5 = "hdati5_" + nome_cristallo;
+//	string nomehisto10 = "hdati10_" + nome_cristallo;
+//	string titlehisto5 = nome_cristallo + ", cuts at +- 5 microrad";
+//	string titlehisto10 = nome_cristallo + ", cuts at +- 10 microrad";
+//	clog << nomehisto5 << endl;
 
 	// vHistograms.push_back( new TH1D(
 	// /* name */nomehisto.c_str(),
@@ -147,8 +149,8 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 	//	/* title */titlehisto5.c_str(),
 	//	/* X-dimension */600/4, -200, 400);
 
-	TH1D* histogram5;
-	TH1D* histogram10;
+	TH1D* histogram5 = nullptr;
+	TH1D* histogram10 = nullptr;
 
 	//vHistograms.front()->SetNameTitle(nomehisto5.c_str(),nome_cristallo.c_str());
 
@@ -159,9 +161,10 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 	 * if .dat does not exist and is not prefferred... all's right with the world, use .root
 	 */
 
-
+	read_histograms(nome_cristallo, nomefiledati_dat, nomefiledati_root, histogram5, histogram10);
 	//TODO Sostituire con una funzione il caricamento degli istogrammi, per poi spostarlo nell'altro programma
-	auto in_file_root = new TFile( filedati_root.c_str() );
+/*
+	auto in_file_root = new TFile( nomefiledati_root.c_str() );
 	if (bool( file_dat ) and (PREFER_DAT_FILES or not in_file_root->IsOpen())) {
 		// Il codice per la mia analisi qua
 
@@ -184,14 +187,14 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 		auto datisize = dati.getSize();
 
 		auto histogram5_dat = new TH1D(
-		/* name */nomehisto5.c_str(),
-		/* title */titlehisto5.c_str(),
-		/* X-dimension */600 / 4, -200, 400 );
+		 name nomehisto5.c_str(),
+		 title titlehisto5.c_str(),
+		 X-dimension 600 / 4, -200, 400 );
 
 		auto histogram10_dat = new TH1D(
-		/* name */nomehisto10.c_str(),
-		/* title */titlehisto10.c_str(),
-		/* X-dimension */600 / 4, -200, 400 );
+		 name nomehisto10.c_str(),
+		 title titlehisto10.c_str(),
+		 X-dimension 600 / 4, -200, 400 );
 
 		//dati.print(datisize);
 
@@ -250,13 +253,13 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 		if (nome_cristallo == string( "QMP36" )) {
 			clog << "QMP36, flipping the histogram orizontally" << endl;
 			auto h5_qmp36_new = new TH1D(
-			/* name */nomehisto5.c_str(),
-			/* title */titlehisto5.c_str(),
-			/* X-dimension */800 / 4, -400, 400 );
+			 name nomehisto5.c_str(),
+			 title titlehisto5.c_str(),
+			 X-dimension 800 / 4, -400, 400 );
 			auto h10_qmp36_new = new TH1D(
-			/* name */nomehisto10.c_str(),
-			/* title */titlehisto10.c_str(),
-			/* X-dimension */800 / 4, -400, 400 );
+			 name nomehisto10.c_str(),
+			 title titlehisto10.c_str(),
+			 X-dimension 800 / 4, -400, 400 );
 			auto nbin = h5->GetNbinsX();
 
 			for (auto i = 0; i <= nbin; ++i) {
@@ -283,6 +286,7 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 		cerr << "[ERROR]: Logic error, at line: " << __LINE__ << endl;
 		return;
 	}
+*/
 
 	// FITTING
 	//Alla fine dovro' scrivere sul file dechanneling_table.txt

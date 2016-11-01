@@ -4,7 +4,23 @@
  *  Created on: Oct 28, 2016
  *      Author: fforcher
  */
+
+#include <iostream>
+#include <sstream>
+#include <cmath>
+//#include <map>
+#include <string>
+#include <memory>
+#include <fstream>
+
+#include "TFile.h"
+#include "TH1.h"
+#include "TH2.h"
+#include "TH1D.h"
+
 #include "dbg_macro.h"
+#include "DatiChanneling.h"
+
 extern bool PREFER_DAT_FILES;
 
 namespace mions {
@@ -12,13 +28,38 @@ using std::string;
 using std::ifstream;
 using std::stringstream;
 using std::pow;
+using std::endl;
+using std::cout;
+using std::clog;
+using std::cerr;
 
-class TFile;
+
 
 //TODO Finire! Aggiungere tutte le variabili nei parametri
-void read_histograms(ifstream file_dat,
-		             TFile* in_file_root, ) {
+void read_histograms(string nome_cristallo,
+					 string nomefiledati_dat,
+		 	 	 	 string nomefiledati_root,
+					 TH1D*& histogram5,
+					 TH1D*& histogram10
+					 ) {
 
+
+	//We should already be inside the right folder
+
+	auto pathfiledati_dat = nomefiledati_dat;
+	auto pathfiledati_root = nomefiledati_root;
+
+
+	// select +- 5 microrad in nomehisto5, +-10 in nomehisto10
+	string nomehisto5 = "hdati5_" + nome_cristallo;
+	string nomehisto10 = "hdati10_" + nome_cristallo;
+	string titlehisto5 = nome_cristallo + ", cuts at +- 5 microrad";
+	string titlehisto10 = nome_cristallo + ", cuts at +- 10 microrad";
+	clog << nomehisto5 << endl;
+
+
+	ifstream file_dat( pathfiledati_dat );
+	auto in_file_root = new TFile( pathfiledati_root.c_str() );
 	if (bool( file_dat ) and (PREFER_DAT_FILES or not in_file_root->IsOpen())) {
 		// Il codice per la mia analisi qua
 
@@ -27,15 +68,18 @@ void read_histograms(ifstream file_dat,
 		//gStyle->SetOptTitle(1);
 		//TGaxis::SetMaxDigits(3);
 
+		/*
 		DBG(
 				clog << "[LOG]: " << "Crystal " << nome_cristallo << endl; clog << "[LOG]: File "<< nomefiledati_dat << endl << endl;,
 				; )
 		clog << "[LOG]: Using .dat file";
+		 */
 
 		//ifstream file_dat(pathfiledati);
 
 		//Riempi gli istogrammi
-		DatiChanneling dati( nomefiledati_dat );
+		DatiChanneling dati( pathfiledati_dat );
+		auto in_file_root = new TFile( nomefiledati_root.c_str() );
 
 		EventoDechanneling ev;
 		auto datisize = dati.getSize();

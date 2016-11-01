@@ -1,5 +1,5 @@
 # Analysis of fast nuclear dechanneling in highly bent crystals
-<!--![bg 80%](channeling_small.gif)-->
+<!-- ![bg 80%](channeling_small.gif) -->
 
 ---
 
@@ -28,6 +28,7 @@ Where
 * $a_{TF}$, $d_p$, and $I$ are respectively the **Thomas-Fermi radius**, the **interplanar distance** and the **mean excitation energy** (properties of the crystal's *material* and channeling *plane*).
 
 ---
+
 ## Limitations of this model
 The simple exponential model can be used approximatively from  
 $$ z > 0.2 \, L_D$$  
@@ -35,6 +36,9 @@ For $400\ GeV/c$ protons in Si crystals, $L_D $ is roughly $22\ cm$, but the cry
 
 ---
 
+## Nuclear dechanneling
+
+---
 
 ## Crystal bending
 

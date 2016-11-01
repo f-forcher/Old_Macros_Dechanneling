@@ -101,11 +101,11 @@ constexpr Double_t electronic_dechanneling(UShort_t Z, Double_t E_GeV) {
 	//Constants from NIST
 	Double_t c = 299792458; //Speed of light [m/s]
 	Double_t r_e = 2.8179403227e-15; //Classical electron radius [m]
-	Double_t c_p = 1.60217733e-19; // Carica protone [Coul]
+	// Double_t c_p = 1.60217733e-19; // Carica protone [Coul]
 	Double_t m_e = 9.10938356e-31; // Electron mass [kg]
-	Double_t m_e_ev = m_e / (1 / (c * c) * ELECTRONVOLT_); //Electron mass [eV] ~ 511000 ev
+	// Double_t m_e_ev = m_e / (1 / (c * c) * ELECTRONVOLT_); //Electron mass [eV] ~ 511000 ev
 	Double_t m_p = 1.672621898e-27; //Proton mass [Kg]
-	Double_t m_p_ev = m_p / (1 / (c * c) * ELECTRONVOLT_); //Proton mass [eV] ~ 938272 ev
+	// Double_t m_p_ev = m_p / (1 / (c * c) * ELECTRONVOLT_); //Proton mass [eV] ~ 938272 ev
 	//DBG( std::clog << "m_e: " << m_e << std::endl; , ; );
 	Double_t I = 173.0 * ELECTRONVOLT_; // I: Mean Excitation Energy [Joule]
 
