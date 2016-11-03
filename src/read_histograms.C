@@ -83,6 +83,8 @@ void read_histograms(string nome_cristallo,
 
 		EventoDechanneling ev;
 		auto datisize = dati.getSize();
+		//auto datisize = 40000;
+		DBG( std::clog << "datisize: " << datisize << std::endl; , ; )
 
 		auto histogram5_dat = new TH1D(
 		/* name */nomehisto5.c_str(),

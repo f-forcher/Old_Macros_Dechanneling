@@ -328,7 +328,7 @@ int main_macro(int argc, char* argv[]) {
 		//currentDir->cd();
 
 		outdatafile << ch << " ";
-		for (auto d : map_dati_crist_calc_tot[ch]) {
+		for (auto d : map_dati_crist_calc[ch]) {
 			outdatafile << d << " ";
 		}
 
