@@ -79,7 +79,7 @@ void read_histograms(string nome_cristallo,
 
 		//Riempi gli istogrammi
 		DatiChanneling dati( pathfiledati_dat );
-		auto in_file_root = new TFile( nomefiledati_root.c_str() );
+		//auto in_file_root = new TFile( nomefiledati_root.c_str() );
 
 		EventoDechanneling ev;
 		auto datisize = dati.getSize();

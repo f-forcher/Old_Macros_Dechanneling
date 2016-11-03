@@ -21,7 +21,7 @@ Where N is the dechanneled fraction of the particles, z is the depth distance in
 ---
 
 An analytical approximation of $L_D$ is the following:
-$$L_D = \frac{256}{\pi^2} \frac{pv}{ln(2 m_e c^2 \gamma I^{-1})-1} \frac{a_{TF} d_p}{Z_i r_e m_e c^2}$$
+$$ L_D = \frac{256}{\pi^2} \frac{pv}{ln(2 m_e c^2 \gamma I^{-1})-1} \frac{a_{TF} d_p}{Z_i r_e m_e c^2} $$
 Where 
 * $p$, $v$, $\gamma$ and $Z_i$ are the *incoming particle*'s **momentum**, **speed**, **gamma** and **charge number**.
 * $c$, $r_e$, $m_e$ are the **speed of light**, the **mass** and the **classical radius** of the *electron*.

@@ -1,6 +1,6 @@
 # How to run crystal simulations
 Go to the right folder
- * `./wrk` or `cd /afs/cern.ch/work/f/fforcher/`
+ * `cd /afs/cern.ch/work/f/fforcher/` (I have aliased it as `wrk`)
  * `cd simulazioni_h8/`
 
 Make a folder with the crystal name, eg *STF45* (`--no-preserve=mode` is needed because the original clean_input is write-protected, but we want the copy writable)
@@ -9,9 +9,9 @@ Make a folder with the crystal name, eg *STF45* (`--no-preserve=mode` is needed 
  * `cp -r prova/sixtrack_batch.sh STF45/ --no-preserve=mode`
  * `cd STF45/`
 
-Check that the number of _packets?_ (in the "file <<<EOF" .job) is the same as in clean_input/fort.3  
+Check that the number of _packets_ (in the "file <<<EOF" .job) is the same as in clean_input/fort.3  
 
-1. `clean_input/fort.3` (number of _packets?_ here is _**"100"**_ in _**bold italic**_):
+1. `clean_input/fort.3` (number of _packets_ here is _**"100"**_ in _**bold italic**_):
 
   >GEOM  
   >PRINTOUT  
