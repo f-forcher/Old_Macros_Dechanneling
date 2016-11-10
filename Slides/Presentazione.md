@@ -37,7 +37,7 @@ For $400\ GeV/c$ protons in Si crystals, $L_D $ is roughly $22\ cm$, but the cry
 ---
 
 ## Nuclear dechanneling
-
+We assume that
 ---
 
 ## Crystal bending

@@ -170,8 +170,8 @@ void read_histograms(string nome_cristallo,
 			histogram5 = h5_qmp36_new;
 			histogram10 = h10_qmp36_new;
 
-			histogram5->SetTitle( titlehisto5.c_str() );
-			histogram10->SetTitle( titlehisto10.c_str() );
+			histogram5->SetNameTitle( nomehisto5.c_str(), titlehisto5.c_str() );
+			histogram10->SetNameTitle( nomehisto10.c_str(), titlehisto10.c_str() );
 
 			//h5_qmp36
 
@@ -179,8 +179,8 @@ void read_histograms(string nome_cristallo,
 			histogram5 = h5;
 			histogram10 = h10;
 
-			histogram5->SetTitle( titlehisto5.c_str() );
-			histogram10->SetTitle( titlehisto10.c_str() );
+			histogram5->SetNameTitle( nomehisto5.c_str(), titlehisto5.c_str() );
+			histogram10->SetNameTitle( nomehisto10.c_str(), titlehisto10.c_str() );
 		}
 	} else {
 		cerr << "[ERROR]: Logic error, at line: " << __LINE__ << endl;
