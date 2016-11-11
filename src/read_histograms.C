@@ -89,12 +89,12 @@ void read_histograms(string nome_cristallo,
 		auto histogram5_dat = new TH1D(
 		/* name */nomehisto5.c_str(),
 		/* title */titlehisto5.c_str(),
-		/* X-dimension */600 / 4, -200, 400 );
+		/* X-dimension */120, -200, 400 );
 
 		auto histogram10_dat = new TH1D(
 		/* name */nomehisto10.c_str(),
 		/* title */titlehisto10.c_str(),
-		/* X-dimension */600 / 4, -200, 400 );
+		/* X-dimension */120, -200, 400 );
 
 		//dati.print(datisize);
 
@@ -144,10 +144,10 @@ void read_histograms(string nome_cristallo,
 
 		auto h5 = (TH1D*) (h2D->ProjectionY( titlehisto5.c_str(), min5, max5 ));
 		h5->GetXaxis()->SetTitle( "#Delta#theta_{x} [#murad]" );
-		h5->Rebin( 4 );
+		h5->Rebin( 5 );
 		auto h10 = (TH1D*) (h2D->ProjectionY( titlehisto10.c_str(), min10, max10 ));
 		h10->GetXaxis()->SetTitle( "#Delta#theta_{x} [#murad]" );
-		h10->Rebin( 4 );
+		h10->Rebin( 5 );
 
 		//Crystal qmp36 has been mounted reversed, so we must flip the graph along x axis
 		if (nome_cristallo == string( "QMP36" )) {
@@ -155,11 +155,11 @@ void read_histograms(string nome_cristallo,
 			auto h5_qmp36_new = new TH1D(
 			/* name */nomehisto5.c_str(),
 			/* title */titlehisto5.c_str(),
-			/* X-dimension */800 / 4, -400, 400 );
+			/* X-dimension */160, -400, 400 );
 			auto h10_qmp36_new = new TH1D(
 			/* name */nomehisto10.c_str(),
 			/* title */titlehisto10.c_str(),
-			/* X-dimension */800 / 4, -400, 400 );
+			/* X-dimension */160, -400, 400 );
 			auto nbin = h5->GetNbinsX();
 
 			for (auto i = 0; i <= nbin; ++i) {
