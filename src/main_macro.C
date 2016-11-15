@@ -33,6 +33,8 @@
 #include <TGraphErrors.h>
 #include <TCanvas.h>
 #include <TF1.h>
+#include <TFitResult.h>
+#include <TFitResultPtr.h>
 
 #include "mia_dech.h"
 //#include "analizza_dechanneling.h"
@@ -378,41 +380,42 @@ int main_macro(int argc, char* argv[]) {
 	auto LDe = electronic_dechanneling( 1, 400 );
 	const auto Rcrit = 1.0; // Critical radius at 400 GeV
 
-/*
+
 	for (const auto& crys : elenco_cristalli_buoni) {
 		const auto& crysdata_three_pieces = map_dati_crist_calc[crys];
 		const auto& crysdata_tot = map_dati_crist_calc_tot[crys];
 		const auto& crysdata = crysdata_three_pieces;
 
+		using CDT = FieldCrystalDataTable510;
 
 		// THeory: Lnuclear = Lelectronic/k, L
 		// Sigma(1-Rc/R) = Rc*sigmaR / R^2
 		Rc5.emplace_back( pow(1 - Rcrit / crysdata[(int) FieldCrystalDataTable510::raggio_curvatura5] ,2) );
-		Rc5_err.emplace_back( Rcrit * crysdata[(int) FieldCrystalDataTable510::raggio_curvatura5_err] /
-							  pow(crysdata[(int) FieldCrystalDataTable510::raggio_curvatura5],2) );
+		Rc5_err.emplace_back( 2 * (crysdata[(int) CDT::raggio_curvatura5] - Rcrit)* Rcrit * crysdata[(int) CDT::raggio_curvatura5_err] /
+							  pow(crysdata[(int) CDT::raggio_curvatura5], 3) );
 		Ld5.emplace_back( crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght5] / LDe);
 		Ld5_err.emplace_back( crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght5_err] / LDe );
 		Rc10.emplace_back( pow(1 - Rcrit / crysdata[(int) FieldCrystalDataTable510::raggio_curvatura10] ,2) );
-		Rc10_err.emplace_back( Rcrit * crysdata[(int) FieldCrystalDataTable510::raggio_curvatura10_err] /
-				  	  	  	  pow(crysdata[(int) FieldCrystalDataTable510::raggio_curvatura10],2) );
+		Rc10_err.emplace_back( 2 * (crysdata[(int) CDT::raggio_curvatura10] - Rcrit)* Rcrit * crysdata[(int) CDT::raggio_curvatura10_err] /
+				  	  	  	  pow(crysdata[(int) CDT::raggio_curvatura10], 3) );
 		Ld10.emplace_back( crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght10] / LDe );
 		Ld10_err.emplace_back( crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght10_err] / LDe );
 
 		//Total data
 		Rc5_tot.emplace_back( pow(1 - Rcrit / crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura5] ,2) );
-		Rc5_tot_err.emplace_back( Rcrit * crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura5_err] /
-				  	  	  	  	  pow(crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura5],2) );
+		Rc5_tot_err.emplace_back( 2 * (crysdata_tot[(int) CDT::raggio_curvatura5] - Rcrit)* Rcrit * crysdata_tot[(int) CDT::raggio_curvatura5_err] /
+	  	  	  	  	  	  	  	  pow(crysdata_tot[(int) CDT::raggio_curvatura5], 3) );
 		Ld5_tot.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::dechanneling_lenght5] / LDe );
 		Ld5_tot_err.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::dechanneling_lenght5_err] / LDe );
 
 		Rc10_tot.emplace_back( pow(1 - Rcrit / crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura10] ,2) );
-		Rc10_tot_err.emplace_back( Rcrit * crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura10_err] /
-	  	  	  	  	  	  	  	  pow(crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura10],2) );
+		Rc10_tot_err.emplace_back( 2 * (crysdata_tot[(int) CDT::raggio_curvatura10] - Rcrit)* Rcrit * crysdata_tot[(int) CDT::raggio_curvatura10_err] /
+	  	  	  	  	  	  	  	  	pow(crysdata_tot[(int) CDT::raggio_curvatura10], 3) );
 		Ld10_tot.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::dechanneling_lenght10]  / LDe );
 		Ld10_tot_err.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::dechanneling_lenght10_err] / LDe );
 	}
-*/
-	for (const auto& crys : elenco_cristalli_buoni) {
+
+/*	for (const auto& crys : elenco_cristalli_buoni) {
 		const auto& crysdata_three_pieces = map_dati_crist_calc[crys];
 		const auto& crysdata_tot = map_dati_crist_calc_tot[crys];
 		const auto& crysdata = crysdata_three_pieces;
@@ -439,7 +442,7 @@ int main_macro(int argc, char* argv[]) {
 		Rc10_tot_err.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura10_err] );
 		Ld10_tot.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::dechanneling_lenght10]  / LDe );
 		Ld10_tot_err.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::dechanneling_lenght10_err] / LDe );
-	}
+	}*/
 
 	//If I put other options, I could write the other options directly on canvas title
 
@@ -447,6 +450,12 @@ int main_macro(int argc, char* argv[]) {
 			string(argv[2]) :  "Rc vs Ld " + string( "-dat" ) + string( "-sharp" );
 //	string canvas_name = (argc >= 2) ? "LDnuc/LDelet vs 1-Rc/R " + string( argv[1] ) + " " +
 //			string(argv[2]) :  "Rc vs Ld " + string( "-dat" ) + string( "-sharp" );
+
+
+
+	for (int i = 0; i < 10; ++i) {
+		cout << endl;
+	}
 
 
 	auto cRcLd = new TCanvas( "cRcLd", canvas_name.c_str() );
@@ -492,10 +501,20 @@ int main_macro(int argc, char* argv[]) {
 		 *	"Y+" 	The Y-axis is drawn on the right side of the plot.
 		 */
 
-		//TF1 *fRcLd_5 = new TF1( "fRcLd_5", "pol1" );
-		TF1 *fRcLd_5 = new TF1( "fRcLd_5", "[0]*pow(1-[b]/x,2)" );
+		TF1 *fRcLd_5 = new TF1( "fRcLd_5", "pol1" );
+		//TF1 *fRcLd_5 = new TF1( "fRcLd_5", "[0]*pow(1-[b]/x,2)" );
 		TFitResultPtr fit_RcLd_5 = RcLd_5->Fit( fRcLd_5, "S" );
-		RcLd_5->SetTitle( "Rc vs Ld (cuts at 5)" );
+		cout << "Results for the +-5 cuts sharp fit" << endl;
+		fit_RcLd_5->Print("V");
+
+		clog << "k: " << fit_RcLd_5->Parameter(1) << endl;
+		clog << "kerr: " << fit_RcLd_5->Error(1) << endl;
+		cout << "1/k = " << 1.0/fit_RcLd_5->Parameter(1)
+			 << " +- "<< fit_RcLd_5->Error(1)/pow(fit_RcLd_5->Parameter(1),2)
+			 << endl;
+
+		//RcLd_5->SetTitle( "Rc vs Ld (cuts at 5)" );
+		RcLd_5->SetTitle( "Ln/Le vs (1-Rc/R)^2 (cuts at 5)" );
 		RcLd_5->GetXaxis()->SetTitle( "Rc [m]" );
 		RcLd_5->GetYaxis()->SetTitle( "Ld [m]" );
 		RcLd_5->Draw( "AP*" );
@@ -509,10 +528,19 @@ int main_macro(int argc, char* argv[]) {
 		auto len = Rc10.size();
 		auto RcLd_10 = new TGraphErrors( len, Rc10.data(), Ld10.data(), Rc10_err.data(), Ld10_err.data() );
 
-		//TF1 *fRcLd_10 = new TF1( "fRcLd_10", "pol1" );
-		TF1 *fRcLd_10 = new TF1( "fRcLd_5", "[0]*pow(1-[b]/x,2)" );
+		TF1 *fRcLd_10 = new TF1( "fRcLd_10", "pol1" );
+		//TF1 *fRcLd_10 = new TF1( "fRcLd_5", "[0]*pow(1-[b]/x,2)" );
 		TFitResultPtr fit_RcLd_10 = RcLd_10->Fit( fRcLd_10, "S" );
-		RcLd_10->SetTitle( "Rc vs Ld (cuts at 10)" );
+		cout << "Results for the +-10 cuts sharp fit" << endl;
+		fit_RcLd_10->Print("V");
+
+		clog << "k: " << fit_RcLd_10->Parameter(1) << endl;
+		clog << "kerr: " << fit_RcLd_10->Error(1) << endl;
+		cout << "1/k = " << 1.0/fit_RcLd_10->Parameter(1)
+			 << " +- "<< fit_RcLd_10->Error(1)/pow(fit_RcLd_10->Parameter(1),2)
+			 << endl;
+
+		RcLd_10->SetTitle( "Ln/Le vs (1-Rc/R)^2 (cuts at 10)" );
 		RcLd_10->GetXaxis()->SetTitle( "Rc [m]" );
 		RcLd_10->GetYaxis()->SetTitle( "Ld [m]" );
 		RcLd_10->Draw( "AP*" );
@@ -527,10 +555,10 @@ int main_macro(int argc, char* argv[]) {
 		auto RcLd_5_tot = new TGraphErrors( len, Rc5_tot.data(), Ld5_tot.data(), Rc5_tot_err.data(),
 				Ld5_tot_err.data() );
 
-		//TF1 *fRcLd_5_tot = new TF1( "fRcLd_5_tot", "pol1" );
-		TF1 *fRcLd_5_tot = new TF1( "fRcLd_5", "[0]*pow(1-[b]/x,2)" );
+		TF1 *fRcLd_5_tot = new TF1( "fRcLd_5_tot", "pol1" );
+		//TF1 *fRcLd_5_tot = new TF1( "fRcLd_5", "[0]*pow(1-[b]/x,2)" );
 		TFitResultPtr fit_RcLd_5_tot = RcLd_5_tot->Fit( fRcLd_5_tot, "S" );
-		RcLd_5_tot->SetTitle( "Rc vs Ld (cuts at 5), total sum fit" );
+		RcLd_5_tot->SetTitle( "Ln/Le vs (1-Rc/R)^2 (cuts at 5), total sum fit" );
 		RcLd_5_tot->GetXaxis()->SetTitle( "Rc [m]" );
 		RcLd_5_tot->GetYaxis()->SetTitle( "Ld [m]" );
 		RcLd_5_tot->Draw( "AP*" );
@@ -544,10 +572,10 @@ int main_macro(int argc, char* argv[]) {
 		auto len = Rc10_tot.size();
 		auto RcLd_10_tot = new TGraphErrors( len, Rc10_tot.data(), Ld10_tot.data(), Rc10_err.data(), Ld10_err.data() );
 
-		//TF1 *fRcLd_10_tot = new TF1( "fRcLd_10_tot", "pol1" );
-		TF1 *fRcLd_10_tot = new TF1( "fRcLd_5", "[0]*pow(1-[b]/x,2)" );
+		TF1 *fRcLd_10_tot = new TF1( "fRcLd_10_tot", "pol1" );
+		//TF1 *fRcLd_10_tot = new TF1( "fRcLd_5", "[0]*pow(1-[b]/x,2)" );
 		TFitResultPtr fit_RcLd_5 = RcLd_10_tot->Fit( fRcLd_10_tot, "S" );
-		RcLd_10_tot->SetTitle( "Rc vs Ld (cuts at 10), total sum fit" );
+		RcLd_10_tot->SetTitle( "Ln/Le vs (1-Rc/R)^2 (cuts at 10), total sum fit" );
 		RcLd_10_tot->GetXaxis()->SetTitle( "Rc [m]" );
 		RcLd_10_tot->GetYaxis()->SetTitle( "Ld [m]" );
 		RcLd_10_tot->Draw( "AP*" );
