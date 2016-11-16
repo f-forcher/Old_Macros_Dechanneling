@@ -415,6 +415,21 @@ int main_macro(int argc, char* argv[]) {
 		Ld10_tot_err.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::dechanneling_lenght10_err] / LDe );
 	}
 
+
+	// Print out on a text file the "10 cuts" graph
+	// Because ROOT 5 can't read ROOT 6 files, so we save the data in a text file and then a ROOT 5/6 macro can replot them
+	ofstream file_10_cuts_dat("./10_cuts_dat");
+	for (auto i = 0; i < Rc10.size(); ++i) {
+		file_10_cuts_dat
+		   << Rc10[i] << "    "
+		   << Ld10[i] << "    "
+		   << Rc10_err[i] << "    "
+		   << Ld10_err[i] << endl;
+	}
+
+
+
+
 /*	for (const auto& crys : elenco_cristalli_buoni) {
 		const auto& crysdata_three_pieces = map_dati_crist_calc[crys];
 		const auto& crysdata_tot = map_dati_crist_calc_tot[crys];
