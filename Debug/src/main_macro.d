@@ -76,9 +76,23 @@ src/main_macro.o: ../src/main_macro.C \
  /home/fforcher/ROOT/v6-06-08/include/TObjArray.h \
  /home/fforcher/ROOT/v6-06-08/include/TMethodCall.h \
  /home/fforcher/ROOT/v6-06-08/include/Math/ParamFunctor.h \
- ../src/mia_dech.h ../src/my_typedefs.h \
- /home/fforcher/ROOT/v6-06-08/include/Rtypes.h ../src/dbg_macro.h \
- ../src/dech.h ../src/DatiChanneling.h
+ /home/fforcher/ROOT/v6-06-08/include/TFitResult.h \
+ /home/fforcher/ROOT/v6-06-08/include/Fit/FitResult.h \
+ /home/fforcher/ROOT/v6-06-08/include/Math/IFunctionfwd.h \
+ /home/fforcher/ROOT/v6-06-08/include/Math/IParamFunctionfwd.h \
+ /home/fforcher/ROOT/v6-06-08/include/TMatrixDSym.h \
+ /home/fforcher/ROOT/v6-06-08/include/TMatrixTSym.h \
+ /home/fforcher/ROOT/v6-06-08/include/TMatrixTBase.h \
+ /home/fforcher/ROOT/v6-06-08/include/TMatrixFBasefwd.h \
+ /home/fforcher/ROOT/v6-06-08/include/TMatrixDBasefwd.h \
+ /home/fforcher/ROOT/v6-06-08/include/TError.h \
+ /home/fforcher/ROOT/v6-06-08/include/TMatrixTUtils.h \
+ /home/fforcher/ROOT/v6-06-08/include/TMatrixDSymfwd.h \
+ /home/fforcher/ROOT/v6-06-08/include/TMatrixDUtils.h \
+ /home/fforcher/ROOT/v6-06-08/include/TMatrixDUtilsfwd.h \
+ /home/fforcher/ROOT/v6-06-08/include/TFitResultPtr.h ../src/mia_dech.h \
+ ../src/my_typedefs.h /home/fforcher/ROOT/v6-06-08/include/Rtypes.h \
+ ../src/dbg_macro.h ../src/dech.h ../src/DatiChanneling.h
 
 /home/fforcher/ROOT/v6-06-08/include/TROOT.h:
 
@@ -233,6 +247,36 @@ src/main_macro.o: ../src/main_macro.C \
 /home/fforcher/ROOT/v6-06-08/include/TMethodCall.h:
 
 /home/fforcher/ROOT/v6-06-08/include/Math/ParamFunctor.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TFitResult.h:
+
+/home/fforcher/ROOT/v6-06-08/include/Fit/FitResult.h:
+
+/home/fforcher/ROOT/v6-06-08/include/Math/IFunctionfwd.h:
+
+/home/fforcher/ROOT/v6-06-08/include/Math/IParamFunctionfwd.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TMatrixDSym.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TMatrixTSym.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TMatrixTBase.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TMatrixFBasefwd.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TMatrixDBasefwd.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TError.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TMatrixTUtils.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TMatrixDSymfwd.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TMatrixDUtils.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TMatrixDUtilsfwd.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TFitResultPtr.h:
 
 ../src/mia_dech.h:
 

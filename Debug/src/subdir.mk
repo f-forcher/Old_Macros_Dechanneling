@@ -7,7 +7,8 @@ C_UPPER_SRCS += \
 ../src/dech.C \
 ../src/main_macro.C \
 ../src/mia_dech.C \
-../src/read_histograms.C 
+../src/read_histograms.C \
+../src/readandplot.C 
 
 CPP_SRCS += \
 ../src/DatiChanneling.cpp \
@@ -17,7 +18,8 @@ C_UPPER_DEPS += \
 ./src/dech.d \
 ./src/main_macro.d \
 ./src/mia_dech.d \
-./src/read_histograms.d 
+./src/read_histograms.d \
+./src/readandplot.d 
 
 OBJS += \
 ./src/DatiChanneling.o \
@@ -25,7 +27,8 @@ OBJS += \
 ./src/main.o \
 ./src/main_macro.o \
 ./src/mia_dech.o \
-./src/read_histograms.o 
+./src/read_histograms.o \
+./src/readandplot.o 
 
 CPP_DEPS += \
 ./src/DatiChanneling.d \

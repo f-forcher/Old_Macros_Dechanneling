@@ -92,7 +92,7 @@ src/main_macro.o: ../src/main_macro.C \
  /home/fforcher/ROOT/v6-06-08/include/TMatrixDUtilsfwd.h \
  /home/fforcher/ROOT/v6-06-08/include/TFitResultPtr.h ../src/mia_dech.h \
  ../src/my_typedefs.h /home/fforcher/ROOT/v6-06-08/include/Rtypes.h \
- ../src/dbg_macro.h ../src/dech.h ../src/DatiChanneling.h
+ ../src/dbg_macro.h ../src/dech.h ../src/slices.h ../src/DatiChanneling.h
 
 /home/fforcher/ROOT/v6-06-08/include/TROOT.h:
 
@@ -287,5 +287,7 @@ src/main_macro.o: ../src/main_macro.C \
 ../src/dbg_macro.h:
 
 ../src/dech.h:
+
+../src/slices.h:
 
 ../src/DatiChanneling.h:

@@ -41,6 +41,7 @@
 #include "dbg_macro.h"
 #include "my_typedefs.h"
 #include "dech.h"
+#include "slices.h"
 
 // Per poter usare questa macro sia compilando che eseguendo.
 // https://root.cern.ch/root/htmldoc/guides/users-guide/ROOTUsersGuide.html#moving-between-interpreter-and-compiler
@@ -77,6 +78,7 @@ int main_macro(int argc, char* argv[]) {
 	using mions::FieldCrystalDataTable510;
 	using mions::CrystalDataTable510;
 	using mions::electronic_dechanneling;
+	using mions::slices;
 	using std::pow;
 
 //	// No arguments:  argc=1, argv[0]=nome_comando
@@ -390,29 +392,38 @@ int main_macro(int argc, char* argv[]) {
 
 		// THeory: Lnuclear = Lelectronic/k, L
 		// Sigma(1-Rc/R) = Rc*sigmaR / R^2
-		Rc5.emplace_back( pow(1 - Rcrit / crysdata[(int) FieldCrystalDataTable510::raggio_curvatura5] ,2) );
+		Rc5.emplace_back( pow(1 - Rcrit / crysdata[(int) CDT::raggio_curvatura5] ,2) );
 		Rc5_err.emplace_back( 2 * (crysdata[(int) CDT::raggio_curvatura5] - Rcrit)* Rcrit * crysdata[(int) CDT::raggio_curvatura5_err] /
 							  pow(crysdata[(int) CDT::raggio_curvatura5], 3) );
-		Ld5.emplace_back( crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght5] / LDe);
-		Ld5_err.emplace_back( crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght5_err] / LDe );
-		Rc10.emplace_back( pow(1 - Rcrit / crysdata[(int) FieldCrystalDataTable510::raggio_curvatura10] ,2) );
+		Ld5.emplace_back( crysdata[(int) CDT::dechanneling_lenght5] / LDe);
+		Ld5_err.emplace_back( crysdata[(int) CDT::dechanneling_lenght5_err] / LDe );
+		Rc10.emplace_back( pow(1 - Rcrit / crysdata[(int) CDT::raggio_curvatura10] ,2) );
 		Rc10_err.emplace_back( 2 * (crysdata[(int) CDT::raggio_curvatura10] - Rcrit)* Rcrit * crysdata[(int) CDT::raggio_curvatura10_err] /
 				  	  	  	  pow(crysdata[(int) CDT::raggio_curvatura10], 3) );
-		Ld10.emplace_back( crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght10] / LDe );
-		Ld10_err.emplace_back( crysdata[(int) FieldCrystalDataTable510::dechanneling_lenght10_err] / LDe );
+		Ld10.emplace_back( crysdata[(int) CDT::dechanneling_lenght10] / LDe );
+		Ld10_err.emplace_back( crysdata[(int) CDT::dechanneling_lenght10_err] / LDe );
 
 		//Total data
-		Rc5_tot.emplace_back( pow(1 - Rcrit / crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura5] ,2) );
+		Rc5_tot.emplace_back( pow(1 - Rcrit / crysdata_tot[(int) CDT::raggio_curvatura5] ,2) );
 		Rc5_tot_err.emplace_back( 2 * (crysdata_tot[(int) CDT::raggio_curvatura5] - Rcrit)* Rcrit * crysdata_tot[(int) CDT::raggio_curvatura5_err] /
 	  	  	  	  	  	  	  	  pow(crysdata_tot[(int) CDT::raggio_curvatura5], 3) );
-		Ld5_tot.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::dechanneling_lenght5] / LDe );
-		Ld5_tot_err.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::dechanneling_lenght5_err] / LDe );
+		Ld5_tot.emplace_back( crysdata_tot[(int) CDT::dechanneling_lenght5] / LDe );
+		Ld5_tot_err.emplace_back( crysdata_tot[(int) CDT::dechanneling_lenght5_err] / LDe );
 
-		Rc10_tot.emplace_back( pow(1 - Rcrit / crysdata_tot[(int) FieldCrystalDataTable510::raggio_curvatura10] ,2) );
+		Rc10_tot.emplace_back( pow(1 - Rcrit / crysdata_tot[(int) CDT::raggio_curvatura10] ,2) );
 		Rc10_tot_err.emplace_back( 2 * (crysdata_tot[(int) CDT::raggio_curvatura10] - Rcrit)* Rcrit * crysdata_tot[(int) CDT::raggio_curvatura10_err] /
 	  	  	  	  	  	  	  	  	pow(crysdata_tot[(int) CDT::raggio_curvatura10], 3) );
-		Ld10_tot.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::dechanneling_lenght10]  / LDe );
-		Ld10_tot_err.emplace_back( crysdata_tot[(int) FieldCrystalDataTable510::dechanneling_lenght10_err] / LDe );
+		Ld10_tot.emplace_back( crysdata_tot[(int) CDT::dechanneling_lenght10]  / LDe );
+		Ld10_tot_err.emplace_back( crysdata_tot[(int) CDT::dechanneling_lenght10_err] / LDe );
+
+		cout << crys << " Le/Ln [cut 10]: " << LDe / crysdata[(int) CDT::dechanneling_lenght10] << endl;
+//				" +- " << LDe / crysdata_tot[(int) CDT::dechanneling_lenght10_err] << endl;
+
+		cout << crys << " Ln/Le [cut 10]: " << crysdata[(int) CDT::dechanneling_lenght10] / LDe // << endl;
+						<< " +- " << crysdata[(int) CDT::dechanneling_lenght10_err] / LDe << endl;
+
+		//cout << crys << " Le * slope [cut 10]: " << LDe * crysdata[(int) CDT::slopeDc10] << " +- "
+		//		<< LDe * crysdata[(int) CDT::slopeDc10_err] << endl;
 	}
 
 
@@ -543,6 +554,8 @@ int main_macro(int argc, char* argv[]) {
 		auto len = Rc10.size();
 		auto RcLd_10 = new TGraphErrors( len, Rc10.data(), Ld10.data(), Rc10_err.data(), Ld10_err.data() );
 
+		RcLd_10->Print();
+
 		TF1 *fRcLd_10 = new TF1( "fRcLd_10", "pol1" );
 		//TF1 *fRcLd_10 = new TF1( "fRcLd_5", "[0]*pow(1-[b]/x,2)" );
 		TFitResultPtr fit_RcLd_10 = RcLd_10->Fit( fRcLd_10, "S" );
@@ -560,6 +573,7 @@ int main_macro(int argc, char* argv[]) {
 		RcLd_10->GetYaxis()->SetTitle( "Ld [m]" );
 		RcLd_10->Draw( "AP*" );
 		RcLd_10->Write();
+		RcLd_10->Print();
 	}
 
 	// Plots Total at 5 cuts
@@ -600,6 +614,13 @@ int main_macro(int argc, char* argv[]) {
 	cout << "LDe(1,400): " << electronic_dechanneling( 1, 400 ) << endl;
 	currentDir->cd();
 	//mia_dech(); TCanvas
+
+
+	// Parte per analisi del triangolino finale
+	auto deltaslice = 1; //[murad]
+	for (int i = 160; i < 190; i=i+deltaslice) {
+		slices(i,i+deltaslice);
+	}
 
 	//char t = 'a';
 	//while (cin >> t)
