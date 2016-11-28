@@ -143,14 +143,14 @@ void dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_dech
 	g10am->GetParameters( &par_10[0] );
 	g10->GetParameters( &par_10[5] );
 
-	cout << "paramteri fit" << endl;
+	cout << "parametri fit" << endl;
 	cout << par_ch10[2] << endl;
 	cout << par_ch10[1] << endl;
 
 	Double_t ch_min10 = par_ch10[1] - (par_ch10[2] * 2);
 	Double_t ch_max10 = par_ch10[1] + (par_ch10[2] * 2);
 
-	cout << "paramteri fit" << endl;
+	cout << "parametri fit" << endl;
 	cout << par_am10[2] << endl;
 	cout << par_am10[1] << endl;
 

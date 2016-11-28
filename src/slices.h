@@ -15,7 +15,7 @@
 namespace mions {
 
 
-void slices(Double_t cut1, Double_t cut2);
+void slices(Double_t cut1, Double_t cut2, TH1D*& hist, bool makepng = false);
 
 }
 #else

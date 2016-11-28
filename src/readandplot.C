@@ -72,4 +72,6 @@ int readandplot(std::string file_in, std::string file_out) {
 	TFile* ten_cuts_dat_rootfile = new TFile("10_cuts_dat.root", "RECREATE");
 
 	RcLd_10->Write();
+
+	return 0;
 }

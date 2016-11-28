@@ -41,7 +41,7 @@
 #include "dbg_macro.h"
 #include "my_typedefs.h"
 #include "dech.h"
-#include "slices.h"
+#include "analisi_VRtoAM.h"
 
 // Per poter usare questa macro sia compilando che eseguendo.
 // https://root.cern.ch/root/htmldoc/guides/users-guide/ROOTUsersGuide.html#moving-between-interpreter-and-compiler
@@ -78,7 +78,7 @@ int main_macro(int argc, char* argv[]) {
 	using mions::FieldCrystalDataTable510;
 	using mions::CrystalDataTable510;
 	using mions::electronic_dechanneling;
-	using mions::slices;
+	using mions::analisi_VRtoAM;
 	using std::pow;
 
 //	// No arguments:  argc=1, argv[0]=nome_comando
@@ -616,15 +616,37 @@ int main_macro(int argc, char* argv[]) {
 	//mia_dech(); TCanvas
 
 
-	// Parte per analisi del triangolino finale
-	auto deltaslice = 1; //[murad]
-	for (int i = 160; i < 190; i=i+deltaslice) {
-		slices(i,i+deltaslice);
-	}
 
-	//char t = 'a';
-	//while (cin >> t)
-	//	return 0;
+
+
+
+
+	// Parte per analisi del triangolino finale
+//	auto deltaslice = 1; //[murad]
+//	system("rm -f Varie/Video/*.png");
+//	system("rm -f Varie/Video/GIF_slices.gif");
+//	vector<TH1D*> vhist;
+//	vhist.reserve(32);
+//	for (int i = 160; i < 190; i=i+deltaslice) {
+//		TH1D* thistogram;
+//		slices(i,i+deltaslice,thistogram,true);
+//		vhist.push_back(thistogram);
+//	}
+//
+//	// Requires imagemagick
+//	// sudo apt-get install imagemagick
+//	auto gifreturnval = system("convert -delay 20 -loop 0 Varie/Video/*.png Varie/Video/GIF_slices.gif");
+//	if ( bool(gifreturnval) ) {
+//		clog << "[WARNING]: Failed making the .gif" << endl;
+//		clog << "[WARNING]: Maybe you have to install imagemagick?" << endl;
+//		clog << "[WARNING]: sudo apt-get install imagemagick" << endl;
+//	}
+//
+//	TH1D* hVR;
+//	TH1D* hAM;
+//	slices(160,160+deltaslice,hVR);
+//	slices(190,190+deltaslice,hAM);
+	analisi_VRtoAM();
 
 	return 0;
 }

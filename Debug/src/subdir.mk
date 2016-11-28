@@ -4,31 +4,37 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_UPPER_SRCS += \
+../src/analisi_VRtoAM.C \
 ../src/dech.C \
 ../src/main_macro.C \
 ../src/mia_dech.C \
 ../src/read_histograms.C \
-../src/readandplot.C 
+../src/readandplot.C \
+../src/slices.C 
 
 CPP_SRCS += \
 ../src/DatiChanneling.cpp \
 ../src/main.cpp 
 
 C_UPPER_DEPS += \
+./src/analisi_VRtoAM.d \
 ./src/dech.d \
 ./src/main_macro.d \
 ./src/mia_dech.d \
 ./src/read_histograms.d \
-./src/readandplot.d 
+./src/readandplot.d \
+./src/slices.d 
 
 OBJS += \
 ./src/DatiChanneling.o \
+./src/analisi_VRtoAM.o \
 ./src/dech.o \
 ./src/main.o \
 ./src/main_macro.o \
 ./src/mia_dech.o \
 ./src/read_histograms.o \
-./src/readandplot.o 
+./src/readandplot.o \
+./src/slices.o 
 
 CPP_DEPS += \
 ./src/DatiChanneling.d \

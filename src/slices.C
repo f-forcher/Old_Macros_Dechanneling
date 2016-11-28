@@ -13,6 +13,7 @@
 #include <memory>
 #include <fstream>
 
+
 #include "TFile.h"
 #include "TH1.h"
 #include "TH2.h"
@@ -48,7 +49,7 @@ using std::cerr;
 //		 Double cut2
 //		 ) {
 
-void slices(Double_t cut1, Double_t cut2) {
+void slices(Double_t cut1, Double_t cut2, TH1D*& hist, bool makepng) {
 
 	auto nome_cristallo = string("STF45");
 	auto pathfiledati_root = string("ForFrancesco/STF45_exp/recoDataSimple_renamed.torsion.correction.histo.root");
@@ -90,11 +91,17 @@ void slices(Double_t cut1, Double_t cut2) {
 	//h5->GetXaxis()->SetTitle( "#Delta#theta_{x} [#murad]" );
 	histogram->Rebin( 2 );
 	histogram->GetXaxis()->SetRangeUser(-40,40);
+	histogram->GetYaxis()->SetRangeUser(0,180);
 
-	auto c_slices = new TCanvas("c_slices", "c_slices");
-	histogram->Draw();
-	auto nomefilepng = "Varie/Video/" + nomehisto + ".png";
-	c_slices->SaveAs(nomefilepng.c_str());
+	hist = histogram;
+	if (makepng) {
+
+		auto c_slices = new TCanvas("c_slices", "c_slices");
+		histogram->Draw();
+
+		auto nomefilepng = "Varie/Video/" + nomehisto + ".png";
+		c_slices->SaveAs(nomefilepng.c_str());
+	}
 
 }
 

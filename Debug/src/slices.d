@@ -1,5 +1,6 @@
-src/main_macro.o: ../src/main_macro.C \
- /home/fforcher/ROOT/v6-06-08/include/TROOT.h \
+src/slices.o: ../src/slices.C \
+ /home/fforcher/ROOT/v6-06-08/include/TFile.h \
+ /home/fforcher/ROOT/v6-06-08/include/TDirectoryFile.h \
  /home/fforcher/ROOT/v6-06-08/include/TDirectory.h \
  /home/fforcher/ROOT/v6-06-08/include/TNamed.h \
  /home/fforcher/ROOT/v6-06-08/include/TObject.h \
@@ -27,6 +28,9 @@ src/main_macro.o: ../src/main_macro.C \
  /home/fforcher/ROOT/v6-06-08/include/TIterator.h \
  /home/fforcher/ROOT/v6-06-08/include/TDatime.h \
  /home/fforcher/ROOT/v6-06-08/include/TUUID.h \
+ /home/fforcher/ROOT/v6-06-08/include/TMap.h \
+ /home/fforcher/ROOT/v6-06-08/include/THashTable.h \
+ /home/fforcher/ROOT/v6-06-08/include/TUrl.h \
  /home/fforcher/ROOT/v6-06-08/include/TH1.h \
  /home/fforcher/ROOT/v6-06-08/include/TAxis.h \
  /home/fforcher/ROOT/v6-06-08/include/TAttAxis.h \
@@ -43,13 +47,12 @@ src/main_macro.o: ../src/main_macro.C \
  /home/fforcher/ROOT/v6-06-08/include/TVectorFfwd.h \
  /home/fforcher/ROOT/v6-06-08/include/TVectorDfwd.h \
  /home/fforcher/ROOT/v6-06-08/include/TFitResultPtr.h \
- /home/fforcher/ROOT/v6-06-08/include/TFile.h \
- /home/fforcher/ROOT/v6-06-08/include/TDirectoryFile.h \
- /home/fforcher/ROOT/v6-06-08/include/TMap.h \
- /home/fforcher/ROOT/v6-06-08/include/THashTable.h \
- /home/fforcher/ROOT/v6-06-08/include/TUrl.h \
- /home/fforcher/ROOT/v6-06-08/include/TGraphErrors.h \
- /home/fforcher/ROOT/v6-06-08/include/TGraph.h \
+ /home/fforcher/ROOT/v6-06-08/include/TH2.h \
+ /home/fforcher/ROOT/v6-06-08/include/TMatrixFBasefwd.h \
+ /home/fforcher/ROOT/v6-06-08/include/TMatrixDBasefwd.h \
+ /home/fforcher/ROOT/v6-06-08/include/TH1D.h \
+ /home/fforcher/ROOT/v6-06-08/include/TRandom.h \
+ /home/fforcher/ROOT/v6-06-08/include/TRandom3.h \
  /home/fforcher/ROOT/v6-06-08/include/TCanvas.h \
  /home/fforcher/ROOT/v6-06-08/include/TPad.h \
  /home/fforcher/ROOT/v6-06-08/include/TVirtualPad.h \
@@ -69,33 +72,11 @@ src/main_macro.o: ../src/main_macro.C \
  /home/fforcher/ROOT/v6-06-08/include/TAttBBox2D.h \
  /home/fforcher/ROOT/v6-06-08/include/TPoint.h \
  /home/fforcher/ROOT/v6-06-08/include/TAttCanvas.h \
- /home/fforcher/ROOT/v6-06-08/include/TCanvasImp.h \
- /home/fforcher/ROOT/v6-06-08/include/TF1.h \
- /home/fforcher/ROOT/v6-06-08/include/TFormula.h \
- /home/fforcher/ROOT/v6-06-08/include/TBits.h \
- /home/fforcher/ROOT/v6-06-08/include/TObjArray.h \
- /home/fforcher/ROOT/v6-06-08/include/TMethodCall.h \
- /home/fforcher/ROOT/v6-06-08/include/Math/ParamFunctor.h \
- /home/fforcher/ROOT/v6-06-08/include/TFitResult.h \
- /home/fforcher/ROOT/v6-06-08/include/Fit/FitResult.h \
- /home/fforcher/ROOT/v6-06-08/include/Math/IFunctionfwd.h \
- /home/fforcher/ROOT/v6-06-08/include/Math/IParamFunctionfwd.h \
- /home/fforcher/ROOT/v6-06-08/include/TMatrixDSym.h \
- /home/fforcher/ROOT/v6-06-08/include/TMatrixTSym.h \
- /home/fforcher/ROOT/v6-06-08/include/TMatrixTBase.h \
- /home/fforcher/ROOT/v6-06-08/include/TMatrixFBasefwd.h \
- /home/fforcher/ROOT/v6-06-08/include/TMatrixDBasefwd.h \
- /home/fforcher/ROOT/v6-06-08/include/TError.h \
- /home/fforcher/ROOT/v6-06-08/include/TMatrixTUtils.h \
- /home/fforcher/ROOT/v6-06-08/include/TMatrixDSymfwd.h \
- /home/fforcher/ROOT/v6-06-08/include/TMatrixDUtils.h \
- /home/fforcher/ROOT/v6-06-08/include/TMatrixDUtilsfwd.h \
- /home/fforcher/ROOT/v6-06-08/include/TFitResultPtr.h ../src/mia_dech.h \
- ../src/my_typedefs.h /home/fforcher/ROOT/v6-06-08/include/Rtypes.h \
- ../src/dbg_macro.h ../src/dech.h ../src/analisi_VRtoAM.h \
- ../src/DatiChanneling.h
+ /home/fforcher/ROOT/v6-06-08/include/TCanvasImp.h
 
-/home/fforcher/ROOT/v6-06-08/include/TROOT.h:
+/home/fforcher/ROOT/v6-06-08/include/TFile.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TDirectoryFile.h:
 
 /home/fforcher/ROOT/v6-06-08/include/TDirectory.h:
 
@@ -151,6 +132,12 @@ src/main_macro.o: ../src/main_macro.C \
 
 /home/fforcher/ROOT/v6-06-08/include/TUUID.h:
 
+/home/fforcher/ROOT/v6-06-08/include/TMap.h:
+
+/home/fforcher/ROOT/v6-06-08/include/THashTable.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TUrl.h:
+
 /home/fforcher/ROOT/v6-06-08/include/TH1.h:
 
 /home/fforcher/ROOT/v6-06-08/include/TAxis.h:
@@ -183,19 +170,17 @@ src/main_macro.o: ../src/main_macro.C \
 
 /home/fforcher/ROOT/v6-06-08/include/TFitResultPtr.h:
 
-/home/fforcher/ROOT/v6-06-08/include/TFile.h:
+/home/fforcher/ROOT/v6-06-08/include/TH2.h:
 
-/home/fforcher/ROOT/v6-06-08/include/TDirectoryFile.h:
+/home/fforcher/ROOT/v6-06-08/include/TMatrixFBasefwd.h:
 
-/home/fforcher/ROOT/v6-06-08/include/TMap.h:
+/home/fforcher/ROOT/v6-06-08/include/TMatrixDBasefwd.h:
 
-/home/fforcher/ROOT/v6-06-08/include/THashTable.h:
+/home/fforcher/ROOT/v6-06-08/include/TH1D.h:
 
-/home/fforcher/ROOT/v6-06-08/include/TUrl.h:
+/home/fforcher/ROOT/v6-06-08/include/TRandom.h:
 
-/home/fforcher/ROOT/v6-06-08/include/TGraphErrors.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TGraph.h:
+/home/fforcher/ROOT/v6-06-08/include/TRandom3.h:
 
 /home/fforcher/ROOT/v6-06-08/include/TCanvas.h:
 
@@ -236,59 +221,3 @@ src/main_macro.o: ../src/main_macro.C \
 /home/fforcher/ROOT/v6-06-08/include/TAttCanvas.h:
 
 /home/fforcher/ROOT/v6-06-08/include/TCanvasImp.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TF1.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TFormula.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TBits.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TObjArray.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TMethodCall.h:
-
-/home/fforcher/ROOT/v6-06-08/include/Math/ParamFunctor.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TFitResult.h:
-
-/home/fforcher/ROOT/v6-06-08/include/Fit/FitResult.h:
-
-/home/fforcher/ROOT/v6-06-08/include/Math/IFunctionfwd.h:
-
-/home/fforcher/ROOT/v6-06-08/include/Math/IParamFunctionfwd.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TMatrixDSym.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TMatrixTSym.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TMatrixTBase.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TMatrixFBasefwd.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TMatrixDBasefwd.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TError.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TMatrixTUtils.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TMatrixDSymfwd.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TMatrixDUtils.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TMatrixDUtilsfwd.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TFitResultPtr.h:
-
-../src/mia_dech.h:
-
-../src/my_typedefs.h:
-
-/home/fforcher/ROOT/v6-06-08/include/Rtypes.h:
-
-../src/dbg_macro.h:
-
-../src/dech.h:
-
-../src/analisi_VRtoAM.h:
-
-../src/DatiChanneling.h:
