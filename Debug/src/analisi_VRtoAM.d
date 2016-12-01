@@ -88,7 +88,8 @@ src/analisi_VRtoAM.o: ../src/analisi_VRtoAM.C \
  /home/fforcher/ROOT/v6-06-08/include/TMatrixDSymfwd.h \
  /home/fforcher/ROOT/v6-06-08/include/TMatrixDUtils.h \
  /home/fforcher/ROOT/v6-06-08/include/TMatrixDUtilsfwd.h \
- /home/fforcher/ROOT/v6-06-08/include/TFitResultPtr.h ../src/slices.h \
+ /home/fforcher/ROOT/v6-06-08/include/TFitResultPtr.h \
+ /home/fforcher/ROOT/v6-06-08/include/TSpectrum.h ../src/slices.h \
  ../src/dbg_macro.h ../src/my_typedefs.h \
  /home/fforcher/ROOT/v6-06-08/include/Rtypes.h
 
@@ -271,6 +272,8 @@ src/analisi_VRtoAM.o: ../src/analisi_VRtoAM.C \
 /home/fforcher/ROOT/v6-06-08/include/TMatrixDUtilsfwd.h:
 
 /home/fforcher/ROOT/v6-06-08/include/TFitResultPtr.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TSpectrum.h:
 
 ../src/slices.h:
 
