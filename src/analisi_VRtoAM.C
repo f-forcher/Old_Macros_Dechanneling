@@ -133,25 +133,25 @@ void analisi_VRtoAM() {
 
 
 	//auto i = 5;
-	vector<TH1D*> vhTRANS(6);
-	for (auto i = 0; i < 5; ++i)
+	vector<TH1D*> vhTRANS(24);
+	for (auto i = 0; i < 24; i=i+1)
 	{
 		auto& hTRANS = vhTRANS[i];
 		//TODO fit totale
 
-		slices( 160 + i + 11 - 1, 160 + i + 11 + 1, hTRANS );
+		//slices( 160 + i + 11 - 1, 160 + i + 11 + 1, hTRANS );
+		slices( 160 + i + 1 /*- 1*/, 160 + i + 1 + 1, hTRANS );
 
 
-
-		hTRANS->Scale(1.0/hTRANS->Integral());
-		TF1* fVRAM = new TF1( "fVRAM", "[0]*exp(-0.5 * std::pow( ( x-[1]) / [2], 2) ) + (1-[0])*exp(-0.5 * std::pow( ( x-[4]) / [5], 2) )", -40, 40 );
-		//TF1* fVRAM = new TF1( "fVRAM", "gaus(0) + gaus(3)", -40, 40 );
+		//hTRANS->Scale(1.0/hTRANS->Integral()); c1
+		//TF1* fVRAM = new TF1( "fVRAM", "[0]*exp(-0.5 * std::pow( ( x-[1]) / [2], 2) ) + (1-[0])*exp(-0.5 * std::pow( ( x-[4]) / [5], 2) )", -40, 40 );
+		TF1* fVRAM = new TF1( "fVRAM", "gaus(0) + gaus(3)", -40, 40 );
 
 		//hTRANS->Smooth();
 
 		auto npeaks = 2;
 		auto expectedsigma = 5; // A little smaller through
-		auto thresoldpeaks = 0.05; // Minimum peak height relative to max bin
+		auto thresoldpeaks = 0.10; // Minimum peak height relative to max bin
 		TSpectrum *s = new TSpectrum( 2 * npeaks );
 		Int_t nfound = s->Search( hTRANS, expectedsigma, "", thresoldpeaks );
 		printf( "Found %d candidate peaks to fit\n", nfound );
@@ -159,7 +159,7 @@ void analisi_VRtoAM() {
 		if (nfound != npeaks) {
 			cerr << "[ERROR]: Found " << nfound << "peaks "
 					"instead of 2"<< endl;
-			return;
+		//	return;
 		}
 		//Estimate background using TSpectrum::Background
 		//TH1 *hb = s->Background(h,20,"same");
@@ -170,6 +170,8 @@ void analisi_VRtoAM() {
 		Double_t *ypeaks = s->GetPositionY();
 
 
+
+/*
 
 //		//Set parameters, pars from 0 to 2 are from VR, pars from 3 to 5 are from AM
 		auto startconst = hTRANS->Integral();
@@ -189,13 +191,15 @@ void analisi_VRtoAM() {
 		fVRAM->SetParameter(4,ypeaks[1]);
 		fVRAM->SetParameter(5,expectedsigma+1);
 
+*/
 
 
 		TCanvas* c_fitVRAM = new TCanvas("c_fitVRAM","c_fitVRAM");
 		c_fitVRAM->cd();
 
 		//hTRANS->Smooth();
-		hTRANS->Fit( fVRAM, "IREM+" );
+		//hTRANS->Fit( fVRAM, "IREM+" );
+
 		hTRANS->Draw();
 
 		string nomehisto = hTRANS->GetName();

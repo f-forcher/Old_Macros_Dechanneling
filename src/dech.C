@@ -64,11 +64,11 @@ void dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_dech
 	//TH2F * h = (TH2F*) in_file->Get("hH8");
 	TH1D *h1 = h->ProjectionY();
 
-	TCanvas *c = new TCanvas();
-	h->Draw( "colz" );
-
-	TCanvas *c1 = new TCanvas();
-	h1->Draw();
+//	TCanvas *c = new TCanvas();
+//	h->Draw( "colz" );
+//
+//	//TCanvas *c1 = new TCanvas();
+//	h1->Draw();
 
 	//test preliminare e inizializzazione parametri
 

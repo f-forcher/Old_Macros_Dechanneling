@@ -91,7 +91,7 @@ void slices(Double_t cut1, Double_t cut2, TH1D*& hist, bool makepng) {
 	//h5->GetXaxis()->SetTitle( "#Delta#theta_{x} [#murad]" );
 	histogram->Rebin( 1 );
 	histogram->GetXaxis()->SetRangeUser(-40,40);
-	histogram->GetYaxis()->SetRangeUser(1,180);
+	histogram->GetYaxis()->SetRangeUser(1,100);
 
 	hist = histogram;
 	if (makepng) {
