@@ -1,4 +1,4 @@
-/*
+ /*
  * analisi_VRtoAM.C
  *
  *  Created on: Nov 24, 2016
@@ -39,7 +39,7 @@ void analisi_VRtoAM() {
 	using namespace std;
 	using mions::slices;
 
-	auto deltaslice = 1; //[murad]
+	auto deltaslice = 2; //[murad]
 	system( "rm -f Varie/Video/*.png" );
 	system( "rm -f Varie/Video/GIF_slices.gif" );
 	vector<TH1D*> vhist;
@@ -67,9 +67,9 @@ void analisi_VRtoAM() {
 
 
 	// First gaussian
-	TF1* fVR = new TF1( "fVR", "gaus", -40, 40 );
+	TF1* fVR = new TF1( "fVR", "gaus", -40, 30 );
 	// Second gaussian
-	TF1* fAM = new TF1( "fAM", "gaus", -40, 40 );
+	TF1* fAM = new TF1( "fAM", "gaus", -40, 30 );
 
 	hVR->Fit( fVR, "IREM+" );
 	hAM->Fit( fAM, "IREM+" );
@@ -134,8 +134,9 @@ void analisi_VRtoAM() {
 
 	//auto i = 5;
 	vector<TH1D*> vhTRANS(24);
-	for (auto i = 0; i < 24; i=i+1)
+	for (auto i = 0; i < 24; ++i)
 	{
+		cout << "ii: " << i <<endl;
 		auto& hTRANS = vhTRANS[i];
 		//TODO fit totale
 
@@ -145,33 +146,71 @@ void analisi_VRtoAM() {
 
 		//hTRANS->Scale(1.0/hTRANS->Integral()); c1
 		//TF1* fVRAM = new TF1( "fVRAM", "[0]*exp(-0.5 * std::pow( ( x-[1]) / [2], 2) ) + (1-[0])*exp(-0.5 * std::pow( ( x-[4]) / [5], 2) )", -40, 40 );
-		TF1* fVRAM = new TF1( "fVRAM", "gaus(0) + gaus(3)", -40, 40 );
+		TF1* fVRAMdoub = new TF1( "fVRAM", "gaus(0) + gaus(3)", -40, 30 );
+		TF1* fVRAMsing = new TF1( "fVRAM", "gaus(0)", -40, 30 );
+
 
 		//hTRANS->Smooth();
+		// Markov Smoothing
+		TSpectrum *smoother = new TSpectrum( 4 ); // Random 4, I don't think is needed here.
+		auto nbinsTRANS = hTRANS->GetXaxis()->GetLast();
+		DBG( std::clog << "nbinsTRANS: " << nbinsTRANS << std::endl; , ; )
+		Double_t* dataTRANS = new Double_t[nbinsTRANS];
+		for (auto i = 0; i < nbinsTRANS; i++) dataTRANS[i] = hTRANS->GetBinContent(i + 1);
 
+		TH1D *hSmooth = (TH1D*)(hTRANS->Clone());
+		hSmooth->SetLineColor(kGreen);
+		smoother->SmoothMarkov(dataTRANS,nbinsTRANS,3); //3, 7, 10
+		for (auto i = 0; i < nbinsTRANS; i++) hSmooth->SetBinContent(i + 1,dataTRANS[i]);
+
+
+
+
+
+		//Peak search
 		auto npeaks = 2;
-		auto expectedsigma = 5; // A little smaller through
+		auto expectedsigma = 4; // A little smaller through
 		auto thresoldpeaks = 0.10; // Minimum peak height relative to max bin
 		TSpectrum *s = new TSpectrum( 2 * npeaks );
 		Int_t nfound = s->Search( hTRANS, expectedsigma, "", thresoldpeaks );
-		printf( "Found %d candidate peaks to fit\n", nfound );
+		printf( "Found %d candidate peaks in hTRANS to fit\n", nfound );
 		s->Print();
-		if (nfound != npeaks) {
-			cerr << "[ERROR]: Found " << nfound << "peaks "
-					"instead of 2"<< endl;
-		//	return;
-		}
-		//Estimate background using TSpectrum::Background
-		//TH1 *hb = s->Background(h,20,"same");
-		//if (hb) c1->Update();
-		//if (np <0) return;
-
 		Double_t *xpeaks = s->GetPositionX();
 		Double_t *ypeaks = s->GetPositionY();
 
 
+		//Peak search smooth
+		TSpectrum *s_sm = new TSpectrum( 2 * npeaks );
+		Int_t nfound_sm = s_sm->Search( hSmooth, expectedsigma, "", thresoldpeaks );
+		printf( "Found %d candidate peaks in hSmooth to fit\n", nfound_sm );
+		s_sm->Print();
+		Double_t *xpeaks_sm = s_sm->GetPositionX();
+		Double_t *ypeaks_sm = s_sm->GetPositionY();
 
-/*
+
+		auto& fVRAM = nfound == 1 ? fVRAMsing : fVRAMdoub;
+		if (nfound != 1 and nfound != 2 ) {
+			cerr << "[ERROR]: Found " << nfound << " peaks "
+					"instead of 1 or 2"<< endl;
+			cerr << "[ERROR]: Found " << nfound_sm << " smoothed peaks "
+								"instead of 1 or 2"<< endl;
+
+			return;
+		} else {
+					cerr << "[LOG] Found " << nfound << "peak(s)" << endl;
+					cerr << "[LOG] Found " << nfound_sm << " smoothed peak(s)" << endl;
+				//	return;
+		}
+
+
+
+
+
+
+
+
+
+
 
 //		//Set parameters, pars from 0 to 2 are from VR, pars from 3 to 5 are from AM
 		auto startconst = hTRANS->Integral();
@@ -183,24 +222,54 @@ void analisi_VRtoAM() {
 //			fVRAM->SetParameter(i,parVR[i]);
 //			fVRAM->SetParameter(i+3,parAM[i]);
 //		}
+
+/*
 		fVRAM->SetParameter(0,ypeaks[0]);
 		fVRAM->SetParameter(1,xpeaks[0]);
-		fVRAM->SetParameter(2,expectedsigma+1);
+		fVRAM->SetParameter(2,expectedsigma+4);
 
-		fVRAM->SetParameter(3,ypeaks[1]);
-		fVRAM->SetParameter(4,ypeaks[1]);
-		fVRAM->SetParameter(5,expectedsigma+1);
-
+		if (nfound == 2) {
+			fVRAM->SetParameter(3,ypeaks[1]);
+			fVRAM->SetParameter(4,ypeaks[1]);
+			fVRAM->SetParameter(5,expectedsigma+4);
+		}
 */
+
+		fVRAM->SetParameter(0,ypeaks[0]);
+		fVRAM->SetParameter(1,xpeaks[0]);
+		fVRAM->SetParameter(2,expectedsigma+4);
+
+		if (nfound == 2) {
+			fVRAM->SetParameter(3,ypeaks[1]);
+			fVRAM->SetParameter(4,ypeaks[1]);
+			fVRAM->SetParameter(5,expectedsigma+2);
+		}
+
+
+
+
 
 
 		TCanvas* c_fitVRAM = new TCanvas("c_fitVRAM","c_fitVRAM");
 		c_fitVRAM->cd();
 
 		//hTRANS->Smooth();
-		//hTRANS->Fit( fVRAM, "IREM+" );
 
-		hTRANS->Draw();
+
+
+		//hSmooth->Fit( fVRAM, "IREM+" );
+		//hSmooth->Draw("SAME");
+
+		//Partial fit
+		TF1* fVRpre = new TF1( "fVRAM", "gaus(0)", -40, 30 );
+		TF1* fAMpre = new TF1( "fVRAM", "gaus(0)", -40, 30 );
+		// TODO usare sort o set per ordinare i picchi, quello piu' a destra e' VR
+
+
+
+		//Total fit
+		hTRANS->Fit( fVRAM, "REM+" );
+		hTRANS->Draw("SAME");
 
 		string nomehisto = hTRANS->GetName();
 		auto nomefilepng = "Varie/Video/" + nomehisto + ".png";
@@ -209,15 +278,19 @@ void analisi_VRtoAM() {
 		//std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 
 		TF1 *fitResultVRAM = hTRANS->GetFunction( "fVRAM" );
+		//TF1 *fitResultVRAM = hSmooth->GetFunction( "fVRAM" );
 		if (!fitResultVRAM) {
 			cerr << "[ERROR]: Did not fit" << endl;
 			cerr << "[ERROR]: i: " << i << endl;
-			hTRANS->Draw();
+			hSmooth->Draw();
+			hTRANS->Draw("SAME");
+
 			return;
 		}
 
 		//TFitResultPtr fit_hTRANS = hTRANS->Fit( fVRAM, "IREM+" );
 
+/*
 		// Parameters of the two peaks during transition
 		// In an array and also as named variables
 		Double_t parVRAM[6] = { 0 };
@@ -233,14 +306,14 @@ void analisi_VRtoAM() {
 
 
 		// First gaussian PEAK
-		TF1* fVR2 = new TF1( "fVR", "gaus", -40, 40 );
+		TF1* fVR2 = new TF1( "fVR2", "gaus", -40, 40 );
 		// Second gaussian PEAK. The sum of the two is fVRAM
-		TF1* fAM2 = new TF1( "fAM", "gaus", -40, 40 );
+		TF1* fAM2 = new TF1( "fAM2", "gaus", -40, 40 );
 
 		//Get the parameters for the peaks from fVRAM
-		for (int i = 0; i < 3; ++i) {
-			fVR2->SetParameter(i,parVRAM[i]);
-			fAM2->SetParameter(i,parVRAM[i+3]);
+		for (auto j = 0; j < 3; ++j) {
+			fVR2->SetParameter(j,parVRAM[j]);
+			fAM2->SetParameter(j,parVRAM[j+3]);
 		}
 
 
@@ -254,6 +327,8 @@ void analisi_VRtoAM() {
 		cout << "int_fAM2: " << int_fAM2 << endl;
 
 		cout << "eff: " << int_fVR2 / int_fAM2  << endl;
+		cout << "if: " << i <<endl;
+*/
 
 	}
 

@@ -90,8 +90,8 @@ void slices(Double_t cut1, Double_t cut2, TH1D*& hist, bool makepng) {
 	auto histogram = (TH1D*) (h2D->ProjectionY( titlehisto.c_str(), bincut1, bincut2 ));
 	//h5->GetXaxis()->SetTitle( "#Delta#theta_{x} [#murad]" );
 	histogram->Rebin( 1 );
-	histogram->GetXaxis()->SetRangeUser(-40,40);
-	histogram->GetYaxis()->SetRangeUser(1,100);
+	histogram->GetXaxis()->SetRangeUser(-40,30);
+	histogram->GetYaxis()->SetRangeUser(1,130);
 
 	hist = histogram;
 	if (makepng) {
