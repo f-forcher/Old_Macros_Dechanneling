@@ -17,6 +17,7 @@
 #include <cmath> //ceil floor
 #include <chrono>//milliseconds
 #include <thread>//sleep
+#include <utility> //pair
 
 #include <TH1.h>
 #include <TH1D.h>
@@ -175,8 +176,7 @@ void analisi_VRtoAM() {
 		Int_t nfound = s->Search( hTRANS, expectedsigma, "", thresoldpeaks );
 		printf( "Found %d candidate peaks in hTRANS to fit\n", nfound );
 		s->Print();
-		Double_t *xpeaks = s->GetPositionX();
-		Double_t *ypeaks = s->GetPositionY();
+
 
 
 		//Peak search smooth
@@ -184,8 +184,9 @@ void analisi_VRtoAM() {
 		Int_t nfound_sm = s_sm->Search( hSmooth, expectedsigma, "", thresoldpeaks );
 		printf( "Found %d candidate peaks in hSmooth to fit\n", nfound_sm );
 		s_sm->Print();
-		Double_t *xpeaks_sm = s_sm->GetPositionX();
-		Double_t *ypeaks_sm = s_sm->GetPositionY();
+		// Double_t *xpeaks_sm = s_sm->GetPositionX();
+		// Double_t *ypeaks_sm = s_sm->GetPositionY();
+
 
 
 		auto& fVRAM = nfound == 1 ? fVRAMsing : fVRAMdoub;
@@ -202,7 +203,21 @@ void analisi_VRtoAM() {
 				//	return;
 		}
 
+		vector<pair<Double_t, Double_t> > xypeaks; xypeaks.reserve(2);
 
+		for (int i = 0; i < nfound; ++i) {
+			auto x = s->GetPositionX()[i];
+			auto y = s->GetPositionY()[i];
+
+			auto xy = make_pair(x,y);
+
+			xypeaks.emplace_back(xy);
+		}
+
+		for ( int i = 0; i < nfound; ++i ) {
+			clog << "X" << i << ": " << get<0>(xypeaks[i]) << "  ";
+			clog << "Y" << i << ": " << get<1>(xypeaks[i]) << endl;
+		}
 
 
 
@@ -235,16 +250,19 @@ void analisi_VRtoAM() {
 		}
 */
 
-		fVRAM->SetParameter(0,ypeaks[0]);
-		fVRAM->SetParameter(1,xpeaks[0]);
-		fVRAM->SetParameter(2,expectedsigma+4);
+		{
+			constexpr int X = 0;
+			constexpr int Y = 1;
+			fVRAM->SetParameter( 0, get<Y>(xypeaks[0]) );
+			fVRAM->SetParameter( 1, get<X>(xypeaks[0])  );
+			fVRAM->SetParameter( 2, expectedsigma + 4 );
 
-		if (nfound == 2) {
-			fVRAM->SetParameter(3,ypeaks[1]);
-			fVRAM->SetParameter(4,ypeaks[1]);
-			fVRAM->SetParameter(5,expectedsigma+2);
+			if (nfound == 2) {
+				fVRAM->SetParameter( 3, get<Y>(xypeaks[1]) );
+				fVRAM->SetParameter( 4, get<X>(xypeaks[1]) );
+				fVRAM->SetParameter( 5, expectedsigma + 2 );
+			}
 		}
-
 
 
 
@@ -264,6 +282,7 @@ void analisi_VRtoAM() {
 		TF1* fVRpre = new TF1( "fVRAM", "gaus(0)", -40, 30 );
 		TF1* fAMpre = new TF1( "fVRAM", "gaus(0)", -40, 30 );
 		// TODO usare sort o set per ordinare i picchi, quello piu' a destra e' VR
+
 
 
 
