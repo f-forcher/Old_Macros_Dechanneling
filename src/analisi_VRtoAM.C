@@ -18,6 +18,8 @@
 #include <chrono>//milliseconds
 #include <thread>//sleep
 #include <utility> //pair
+#include <algorithm> //sort
+
 
 #include <TH1.h>
 #include <TH1D.h>
@@ -135,14 +137,14 @@ void analisi_VRtoAM() {
 
 	//auto i = 5;
 	vector<TH1D*> vhTRANS(24);
-	for (auto i = 0; i < 24; ++i)
+	for (auto i = 0; i < 24; i=i+2)
 	{
 		cout << "ii: " << i <<endl;
 		auto& hTRANS = vhTRANS[i];
 		//TODO fit totale
 
 		//slices( 160 + i + 11 - 1, 160 + i + 11 + 1, hTRANS );
-		slices( 160 + i + 1 /*- 1*/, 160 + i + 1 + 1, hTRANS );
+		slices( 160 + i /*- 1*/, 160 + i + 1, hTRANS );
 
 
 		//hTRANS->Scale(1.0/hTRANS->Integral()); c1
@@ -183,7 +185,7 @@ void analisi_VRtoAM() {
 		TSpectrum *s_sm = new TSpectrum( 2 * npeaks );
 		Int_t nfound_sm = s_sm->Search( hSmooth, expectedsigma, "", thresoldpeaks );
 		printf( "Found %d candidate peaks in hSmooth to fit\n", nfound_sm );
-		s_sm->Print();
+//		s_sm->Print();
 		// Double_t *xpeaks_sm = s_sm->GetPositionX();
 		// Double_t *ypeaks_sm = s_sm->GetPositionY();
 
@@ -199,7 +201,7 @@ void analisi_VRtoAM() {
 			return;
 		} else {
 					cerr << "[LOG] Found " << nfound << "peak(s)" << endl;
-					cerr << "[LOG] Found " << nfound_sm << " smoothed peak(s)" << endl;
+//					cerr << "[LOG] Found " << nfound_sm << " smoothed peak(s)" << endl;
 				//	return;
 		}
 
@@ -211,16 +213,22 @@ void analisi_VRtoAM() {
 
 			auto xy = make_pair(x,y);
 
-			xypeaks.emplace_back(xy);
+			xypeaks.push_back(xy);
 		}
 
+		//Sort the peaks
 		for ( int i = 0; i < nfound; ++i ) {
-			clog << "X" << i << ": " << get<0>(xypeaks[i]) << "  ";
+			clog << "[LOG] X" << i << ": " << get<0>(xypeaks[i]) << "  ";
 			clog << "Y" << i << ": " << get<1>(xypeaks[i]) << endl;
 		}
 
+		std::sort(xypeaks.begin(), xypeaks.end());
 
-
+		clog << "[LOG] sorting peaks..." << endl;
+		for ( int i = 0; i < nfound; ++i ) {
+			clog << "[LOG] X" << i << ": " << get<0>(xypeaks[i]) << "  ";
+			clog << "Y" << i << ": " << get<1>(xypeaks[i]) << endl;
+		}
 
 
 
@@ -250,14 +258,18 @@ void analisi_VRtoAM() {
 		}
 */
 
+		//Setting initial parameters for the total fit, using peaks info
 		{
 			constexpr int X = 0;
 			constexpr int Y = 1;
+			// This is the VR or AM one, starting
 			fVRAM->SetParameter( 0, get<Y>(xypeaks[0]) );
 			fVRAM->SetParameter( 1, get<X>(xypeaks[0])  );
 			fVRAM->SetParameter( 2, expectedsigma + 4 );
 
 			if (nfound == 2) {
+				// Since I order the peaks, when there are two peaks this is the AM one,
+				// on the right (bigger X coordinate, near zero)
 				fVRAM->SetParameter( 3, get<Y>(xypeaks[1]) );
 				fVRAM->SetParameter( 4, get<X>(xypeaks[1]) );
 				fVRAM->SetParameter( 5, expectedsigma + 2 );
