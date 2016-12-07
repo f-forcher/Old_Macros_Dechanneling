@@ -54,12 +54,6 @@ void slices(Double_t cut1, Double_t cut2, TH1D*& hist, bool makepng) {
 	auto nome_cristallo = string("STF45");
 	auto pathfiledati_root = string("ForFrancesco/STF45_exp/recoDataSimple_renamed.torsion.correction.histo.root");
 
-	stringstream ss;
-	ss << "Slices_" << cut1 << "_" << cut2 << "_" << nome_cristallo;
-	string nomehisto;
-	string titlehisto;
-	ss >> nomehisto;
-	titlehisto = nomehisto;
 
 
 //	auto histogram = new TH1D(
@@ -83,6 +77,16 @@ void slices(Double_t cut1, Double_t cut2, TH1D*& hist, bool makepng) {
 	auto bincut1 = axis->FindBin( cut1 );
 	auto bincut2 = axis->FindBin( cut2 );
 
+	//Name the image
+	stringstream ss;
+	ss << "Slices_" << cut1 << "_" << cut2 << "_" << nome_cristallo;
+	//ss << "Slices_" << bincut1 << "_" << bincut2 << "_" << nome_cristallo;
+	string nomehisto;
+	string titlehisto;
+	ss >> nomehisto;
+	titlehisto = nomehisto;
+
+
 	//cout << "bin cut" << endl;
 	//cout << "  -5 -> " << min5 << "   5 -> " << max5 << endl;
 	//cout << " -10 -> " << min10 << "  10 -> " << max10 << endl;
@@ -91,7 +95,7 @@ void slices(Double_t cut1, Double_t cut2, TH1D*& hist, bool makepng) {
 	//h5->GetXaxis()->SetTitle( "#Delta#theta_{x} [#murad]" );
 	histogram->Rebin( 1 );
 	histogram->GetXaxis()->SetRangeUser(-40,30);
-	histogram->GetYaxis()->SetRangeUser(1,130);
+	histogram->GetYaxis()->SetRangeUser(1,100);
 
 	hist = histogram;
 	if (makepng) {

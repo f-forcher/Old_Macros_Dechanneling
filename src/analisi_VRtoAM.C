@@ -136,15 +136,25 @@ void analisi_VRtoAM() {
 
 
 	//auto i = 5;
-	vector<TH1D*> vhTRANS(24);
-	for (auto i = 0; i < 24; i=i+2)
+	auto start_analysis = 150; // At what thetaX angle [murad] we should start the slicing
+	auto analysis_width = 50; // For how many thetaX we analyze, from start_analysis
+	vector<TH1D*> vhTRANS(60);
+	// Assume we start in the VR region (one peak around -Rc*bending)
+	int regVR = start_analysis; // When the VR region starts. We assume we are in it when we start. [murad]
+	int regVRAM = 0;   // When the pure VR region ends and the first AM peak appear. [murad]
+	int regAM = 0;     // When the last VR peak has disappeared, we are fully in the AM region. [murad]
+	int last_nfound = 0;   // The number of peaks found in the previous cycle, to detect transitions.
+	// NOTE: using "zero" as the false value assumes we never cross it in analysis,
+	// for example start_analysis = -20 and analysis_width = 40 could not work as intended
+	// TODO: fare grafico di VR e AM
+	for (auto i = 0; i < analysis_width; i=i+2)
 	{
 		cout << "ii: " << i <<endl;
 		auto& hTRANS = vhTRANS[i];
 		//TODO fit totale
 
 		//slices( 160 + i + 11 - 1, 160 + i + 11 + 1, hTRANS );
-		slices( 160 + i /*- 1*/, 160 + i + 1, hTRANS );
+		slices( start_analysis + i /*- 1*/, start_analysis + i + 1, hTRANS );
 
 
 		//hTRANS->Scale(1.0/hTRANS->Integral()); c1
@@ -173,7 +183,7 @@ void analisi_VRtoAM() {
 		//Peak search
 		auto npeaks = 2;
 		auto expectedsigma = 4; // A little smaller through
-		auto thresoldpeaks = 0.10; // Minimum peak height relative to max bin
+		auto thresoldpeaks = 0.09; // Minimum peak height relative to max bin
 		TSpectrum *s = new TSpectrum( 2 * npeaks );
 		Int_t nfound = s->Search( hTRANS, expectedsigma, "", thresoldpeaks );
 		printf( "Found %d candidate peaks in hTRANS to fit\n", nfound );
@@ -200,10 +210,34 @@ void analisi_VRtoAM() {
 
 			return;
 		} else {
-					cerr << "[LOG] Found " << nfound << "peak(s)" << endl;
+					clog << "[LOG] Found " << nfound << "peak(s)" << endl;
+
+					// Check the transitions from the various regions, in a robust way.
+					// The second peak can appear and disappear before reappearing again,
+					// so we define the transition VRAM as the maximum interval, between
+					// the first appearance of two peaks and their very last appearance.
+					if (nfound == 1 and regVRAM == 0){
+						clog << "[LOG] VR region" << endl;
+					} else
+						if(nfound == 2 and regVRAM == 0) {
+						clog << "[LOG] Start of the VRAM region" << endl;
+						regVRAM = start_analysis + i;
+						} else
+							if (nfound == 1 and last_nfound == 2 and regVRAM != 0) {
+								// We cannot know for sure if there is gonna be another peak
+								// until all the slices have been analyzed.
+								clog << "[LOG] Could it be " << start_analysis + i <<
+										" the end of VRAM and start of AM?" << endl;
+								regAM = start_analysis + i;
+					}
+
+
 //					cerr << "[LOG] Found " << nfound_sm << " smoothed peak(s)" << endl;
 				//	return;
 		}
+
+		// now update last_nfound
+		last_nfound = nfound;
 
 		vector<pair<Double_t, Double_t> > xypeaks; xypeaks.reserve(2);
 
@@ -236,7 +270,7 @@ void analisi_VRtoAM() {
 
 
 //		//Set parameters, pars from 0 to 2 are from VR, pars from 3 to 5 are from AM
-		auto startconst = hTRANS->Integral();
+//		auto startconst = hTRANS->Integral();
 //		fVRAM->SetParameter(0,startconst / 2.0);
 //		fVRAM->SetParameter(3,startconst / 2.0);
 //		//fVRAM->FixParameter(4,startconst);
@@ -279,7 +313,6 @@ void analisi_VRtoAM() {
 
 
 
-
 		TCanvas* c_fitVRAM = new TCanvas("c_fitVRAM","c_fitVRAM");
 		c_fitVRAM->cd();
 
@@ -299,7 +332,7 @@ void analisi_VRtoAM() {
 
 
 		//Total fit
-		hTRANS->Fit( fVRAM, "REM+" );
+		TFitResultPtr fit_hTRANS =  hTRANS->Fit( fVRAM, "IREM+" );
 		hTRANS->Draw("SAME");
 
 		string nomehisto = hTRANS->GetName();
@@ -321,12 +354,12 @@ void analisi_VRtoAM() {
 
 		//TFitResultPtr fit_hTRANS = hTRANS->Fit( fVRAM, "IREM+" );
 
-/*
+
 		// Parameters of the two peaks during transition
 		// In an array and also as named variables
 		Double_t parVRAM[6] = { 0 };
 		fitResultVRAM->GetParameters(parVRAM);
-
+/*
 		//auto trans_constVR = fitResultVRAM->GetParameter( CONSTANT );
 		auto trans_meanVR = fitResultVRAM->GetParameter (  MEAN );
 		auto trans_sigmaVR = fitResultVRAM->GetParameter( SIGMA );
@@ -362,6 +395,10 @@ void analisi_VRtoAM() {
 */
 
 	}
+
+	cout << "[LOG]: Start of VRAM transition: " << regVRAM << endl;
+	cout << "[LOG]: Start of AM region: " << regAM << endl;
+
 
 
 
