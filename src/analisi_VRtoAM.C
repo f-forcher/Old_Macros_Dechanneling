@@ -19,7 +19,8 @@
 #include <thread>//sleep
 #include <utility> //pair
 #include <algorithm> //sort
-
+#include <map> //map
+#include <assert.h> //assert
 
 #include <TH1.h>
 #include <TH1D.h>
@@ -136,8 +137,8 @@ void analisi_VRtoAM() {
 
 
 	//auto i = 5;
-	auto start_analysis = 150; // At what thetaX angle [murad] we should start the slicing
-	auto analysis_width = 50; // For how many thetaX we analyze, from start_analysis
+	auto start_analysis = 140; // At what thetaX angle [murad] we should start the slicing
+	auto analysis_width = 56; // For how many thetaX we analyze, from start_analysis
 	vector<TH1D*> vhTRANS(60);
 	// Assume we start in the VR region (one peak around -Rc*bending)
 	int regVR = start_analysis; // When the VR region starts. We assume we are in it when we start. [murad]
@@ -147,14 +148,31 @@ void analisi_VRtoAM() {
 	// NOTE: using "zero" as the false value assumes we never cross it in analysis,
 	// for example start_analysis = -20 and analysis_width = 40 could not work as intended
 	// TODO: fare grafico di VR e AM
-	for (auto i = 0; i < analysis_width; i=i+2)
+	struct GaussParams {
+		Double_t constant;
+		Double_t mean;
+		Double_t sigma;
+
+		GaussParams(Double_t constant_,Double_t mean_,Double_t sigma_) :
+			constant(constant_),
+			mean(mean_),
+			sigma(sigma_) {};
+	};
+
+	// Here, vector<GaussParams> has either one or two elements, depending if there are two peaks.
+	map<Double_t, vector<GaussParams> > mPeaks; // All peaks. Map from thetax to that slice's peak(s) params
+	map<Double_t,GaussParams> mVR; // Save the VR peaks
+	map<Double_t,GaussParams> mAM; // Save the AM peaks
+	//vector<Double_t> vTwoPeaks; vTwoPeaks.reserve(15); // Save the positions which have two peaks
+	// If you change smth, eg the i's increment, remember to change it also on the vector-filling loop (under this one)
+	for (auto i = 0; i < analysis_width; i=i+deltaslice)
 	{
 		cout << "ii: " << i <<endl;
 		auto& hTRANS = vhTRANS[i];
 		//TODO fit totale
 
 		//slices( 160 + i + 11 - 1, 160 + i + 11 + 1, hTRANS );
-		slices( start_analysis + i /*- 1*/, start_analysis + i + 1, hTRANS );
+		slices( start_analysis + i /*- 1*/, start_analysis + i + deltaslice - 1, hTRANS );
 
 
 		//hTRANS->Scale(1.0/hTRANS->Integral()); c1
@@ -201,46 +219,44 @@ void analisi_VRtoAM() {
 
 
 
-		auto& fVRAM = nfound == 1 ? fVRAMsing : fVRAMdoub;
-		if (nfound != 1 and nfound != 2 ) {
+		if (nfound != 1 and nfound != 2) {
+
 			cerr << "[ERROR]: Found " << nfound << " peaks "
-					"instead of 1 or 2"<< endl;
+					"instead of 1 or 2" << endl;
 			cerr << "[ERROR]: Found " << nfound_sm << " smoothed peaks "
-								"instead of 1 or 2"<< endl;
+					"instead of 1 or 2" << endl;
 
 			return;
 		} else {
-					clog << "[LOG] Found " << nfound << "peak(s)" << endl;
+			clog << "[LOG] Found " << nfound << "peak(s)" << endl;
 
-					// Check the transitions from the various regions, in a robust way.
-					// The second peak can appear and disappear before reappearing again,
-					// so we define the transition VRAM as the maximum interval, between
-					// the first appearance of two peaks and their very last appearance.
-					if (nfound == 1 and regVRAM == 0){
-						clog << "[LOG] VR region" << endl;
-					} else
-						if(nfound == 2 and regVRAM == 0) {
-						clog << "[LOG] Start of the VRAM region" << endl;
-						regVRAM = start_analysis + i;
-						} else
-							if (nfound == 1 and last_nfound == 2 and regVRAM != 0) {
-								// We cannot know for sure if there is gonna be another peak
-								// until all the slices have been analyzed.
-								clog << "[LOG] Could it be " << start_analysis + i <<
-										" the end of VRAM and start of AM?" << endl;
-								regAM = start_analysis + i;
-					}
-
+			// Check the transitions from the various regions, in a robust way.
+			// The second peak can appear and disappear before reappearing again,
+			// so we define the transition VRAM as the maximum interval, between
+			// the first appearance of two peaks and their very last appearance.
+			if (nfound == 1 and regVRAM == 0) {
+				clog << "[LOG] VR region" << endl;
+			} else if (nfound == 2 and regVRAM == 0) {
+				clog << "[LOG] Start of the VRAM region" << endl;
+				regVRAM = start_analysis + i;
+			} else if (nfound == 1 and last_nfound == 2 and regVRAM != 0) {
+				// We cannot know for sure if there is gonna be another peak
+				// until all the slices have been analyzed.
+				clog << "[LOG] Could it be " << start_analysis + i << " the end of VRAM and start of AM?" << endl;
+				regAM = start_analysis + i;
+			}
 
 //					cerr << "[LOG] Found " << nfound_sm << " smoothed peak(s)" << endl;
-				//	return;
+			//	return;
 		}
+		// Now select if we fit with one or two gaussians
+		auto& fVRAM =  nfound == 1 ? fVRAMsing : fVRAMdoub;
 
-		// now update last_nfound
+		// update last_nfound
 		last_nfound = nfound;
 
+		//Save the peaks found by TSPectrum
 		vector<pair<Double_t, Double_t> > xypeaks; xypeaks.reserve(2);
-
 		for (int i = 0; i < nfound; ++i) {
 			auto x = s->GetPositionX()[i];
 			auto y = s->GetPositionY()[i];
@@ -312,7 +328,6 @@ void analisi_VRtoAM() {
 
 
 
-
 		TCanvas* c_fitVRAM = new TCanvas("c_fitVRAM","c_fitVRAM");
 		c_fitVRAM->cd();
 
@@ -332,7 +347,7 @@ void analisi_VRtoAM() {
 
 
 		//Total fit
-		TFitResultPtr fit_hTRANS =  hTRANS->Fit( fVRAM, "IREM+" );
+		TFitResultPtr fit_hTRANS = hTRANS->Fit( fVRAM, "IREM+" );
 		hTRANS->Draw("SAME");
 
 		string nomehisto = hTRANS->GetName();
@@ -352,23 +367,38 @@ void analisi_VRtoAM() {
 			return;
 		}
 
-		//TFitResultPtr fit_hTRANS = hTRANS->Fit( fVRAM, "IREM+" );
+
+		{
+			// Now, save parameters of the peaks in an array
+			//
+			Double_t parVRAM[6] = { 0 };
+			fitResultVRAM->GetParameters( parVRAM );
+
+			//Assuming the fit didn't flip the peaks...
+			auto trans_const1 = fitResultVRAM->GetParameter( CONSTANT );
+			auto trans_mean1 = fitResultVRAM->GetParameter( MEAN );
+			auto trans_sigma1 = fitResultVRAM->GetParameter( SIGMA );
+			GaussParams tmp(trans_const1,trans_mean1,trans_sigma1);
+			vector<GaussParams> vtmp;
+			vtmp.push_back(tmp);
+//			tmp.constant = trans_const1;
+//			tmp.mean = trans_mean1;
+//			tmp.sigma = trans_sigma1;
 
 
-		// Parameters of the two peaks during transition
-		// In an array and also as named variables
-		Double_t parVRAM[6] = { 0 };
-		fitResultVRAM->GetParameters(parVRAM);
+			if (nfound == 2) {
+				auto trans_const2 = fitResultVRAM->GetParameter( CONSTANT + 3 );
+				auto trans_mean2 = fitResultVRAM->GetParameter( MEAN + 3 );
+				auto trans_sigma2 = fitResultVRAM->GetParameter( SIGMA + 3 );
+				GaussParams tmp2(trans_const2,trans_mean2,trans_sigma2);
+				vtmp.push_back(tmp2);
+			}
+
+			mPeaks.emplace( make_pair(double(start_analysis + i),vtmp) );
+		}
+
+
 /*
-		//auto trans_constVR = fitResultVRAM->GetParameter( CONSTANT );
-		auto trans_meanVR = fitResultVRAM->GetParameter (  MEAN );
-		auto trans_sigmaVR = fitResultVRAM->GetParameter( SIGMA );
-
-		//auto trans_constAM = fitResultVRAM->GetParameter( CONSTANT + 3 );
-		auto trans_meanAM = fitResultVRAM->GetParameter (  MEAN + 3 );
-		auto trans_sigmaAM = fitResultVRAM->GetParameter( SIGMA + 3 );
-
-
 		// First gaussian PEAK
 		TF1* fVR2 = new TF1( "fVR2", "gaus", -40, 40 );
 		// Second gaussian PEAK. The sum of the two is fVRAM
@@ -396,8 +426,95 @@ void analisi_VRtoAM() {
 
 	}
 
+	/*
+	 * Place the peaks in the right array.
+	 * We use a simple test:
+	 * if there is two, the left one (lesser mean) is VR, the other is
+	 * if there is only one, then the closest to 0 is the AM
+	 * The last condition is somewhat suspect, even if it is theoretically sound.
+	 * Still, we prefer a simple test not involving the complexities of a multi-slice comparison,
+	 * and on STF45 it seems to suffice.
+	 */
+
+	// TODO idea, use the first slice as the mean VR and the last as the AM.
+	// NOTE regAM contains the last 2->1 peak number transition found, so if analysis_width
+	// is too small, we can't be sure that we are fully in the AM region, but this can be checked by looking
+	// at the 2D graph. More important, even then we cannot know in the big slices loop where exactly we are unti
+	// it ends.
+
+	cout << "\n\nTEST PICCHI" << endl;
+	for (const auto& t : mPeaks) {
+		if (t.second.size() == 1) {
+			cout << "Slice " << t.first << ":\n\t " << t.second[0].mean << endl;
+		} else {
+			cout << "Slice" << t.first << ":\n\t " << t.second[0].mean << endl;
+			cout << "\t " << t.second[1].mean << endl;
+		}
+	}
+
+	DBG( std::clog << "qua ci sono: [WARNING] " << std::endl
+	; , ; )
+	auto media_VR = mPeaks.at( start_analysis )[0].mean;
+	auto media_AM = mPeaks.at( start_analysis + analysis_width - deltaslice )[0].mean; //Remember these are maps not vectors
+
+	for (auto i = start_analysis; i < start_analysis + analysis_width; i = i + deltaslice) {
+		//Double_t i = start_analysis + j;
+		DBG( std::clog << "[LOG] i: " << i << std::endl
+		; , ; )
+		auto& peaks = mPeaks.at( i ); // Get a reference to the vector with one or two peaks of this slice
+
+		if (i < regVRAM) {
+			// VR
+			// Should be only one peak here
+			assert( peaks.size() == 1 );
+			mVR.emplace( i, peaks[0] ); // Get the only peak at position (slice) thetax = i
+
+		} else if (i >= regVRAM and i < regAM and peaks.size() == 2) {
+			// VRAM
+			// We are in VRAM e we found two peaks, all ok
+			// TODO sort them and assign accordingly
+
+			//The first has
+			std::sort( peaks.begin(), peaks.end(), [](const GaussParams& a,const GaussParams& b) {
+				return a.mean < b.mean;
+			} );
+
+			mVR.emplace( i, peaks[0] );
+			mAM.emplace( i, peaks[1] );
+
+		} else if (i >= regVRAM and i < regAM and peaks.size() == 1) {
+			//VRAM
+
+			// We are in VRAM but we found only one peaks, we have to identify which one
+			// we use the simple test descripted above, the less distance from a "sure" AM or VR peak
+			if (abs( peaks[0].mean - media_VR ) < abs( peaks[0].mean - media_AM )) {
+				mVR.emplace( i, peaks[0] );
+			} else {
+				mAM.emplace( i, peaks[0] );
+			}
+		} else if (i >= regAM) {
+			// AM
+			// Should be only one peak here
+			assert( peaks.size() == 1 );
+
+			mAM.emplace( i, peaks[0] );
+		}
+	}
+
+	cout << "\n\nPICCHI VR" << endl;
+	for (const auto& t : mVR) {
+
+		cout << "" << t.first << " " << t.second.mean << endl;
+	}
+	cout << "\n\nPICCHI AM" << endl;
+	for (const auto& t : mAM) {
+
+		cout << "" << t.first << " " << t.second.mean << endl;
+	}
+
 	cout << "[LOG]: Start of VRAM transition: " << regVRAM << endl;
 	cout << "[LOG]: Start of AM region: " << regAM << endl;
+
 
 
 
