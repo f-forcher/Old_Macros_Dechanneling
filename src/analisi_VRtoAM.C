@@ -163,6 +163,7 @@ void analisi_VRtoAM() {
 	map<Double_t, vector<GaussParams> > mPeaks; // All peaks. Map from thetax to that slice's peak(s) params
 	map<Double_t,GaussParams> mVR; // Save the VR peaks
 	map<Double_t,GaussParams> mAM; // Save the AM peaks
+	map<Double_t,Double_t> mNorm; // Save the normalization (and incidentally, also all possible keys/slices)
 	//vector<Double_t> vTwoPeaks; vTwoPeaks.reserve(15); // Save the positions which have two peaks
 	// If you change smth, eg the i's increment, remember to change it also on the vector-filling loop (under this one)
 	for (auto i = 0; i < analysis_width; i=i+deltaslice)
@@ -397,6 +398,8 @@ void analisi_VRtoAM() {
 			mPeaks.emplace( make_pair(double(start_analysis + i),vtmp) );
 		}
 
+		mNorm.emplace( double( start_analysis + i ), fitResultVRAM->Integral(-40,30) );
+
 
 /*
 		// First gaussian PEAK
@@ -416,7 +419,7 @@ void analisi_VRtoAM() {
 										trans_meanVR + howmanys*trans_sigmaVR);
 		auto int_fAM2 = fAM2 -> Integral(trans_meanAM - howmanys*trans_sigmaAM,
 											trans_meanAM + howmanys*trans_sigmaAM);
-
+/*
 		cout << "int_fVR2: " << int_fVR2 << endl;
 		cout << "int_fAM2: " << int_fAM2 << endl;
 
@@ -425,6 +428,8 @@ void analisi_VRtoAM() {
 */
 
 	}
+
+
 
 	/*
 	 * Place the peaks in the right array.
@@ -435,13 +440,11 @@ void analisi_VRtoAM() {
 	 * Still, we prefer a simple test not involving the complexities of a multi-slice comparison,
 	 * and on STF45 it seems to suffice.
 	 */
-
-	// TODO idea, use the first slice as the mean VR and the last as the AM.
+	// Idea, use the first slice as the mean VR and the last as the AM.
 	// NOTE regAM contains the last 2->1 peak number transition found, so if analysis_width
 	// is too small, we can't be sure that we are fully in the AM region, but this can be checked by looking
 	// at the 2D graph. More important, even then we cannot know in the big slices loop where exactly we are unti
 	// it ends.
-
 	cout << "\n\nTEST PICCHI" << endl;
 	for (const auto& t : mPeaks) {
 		if (t.second.size() == 1) {
@@ -501,16 +504,31 @@ void analisi_VRtoAM() {
 		}
 	}
 
+
+	//Output some peak information
 	cout << "\n\nPICCHI VR" << endl;
 	for (const auto& t : mVR) {
-
-		cout << "" << t.first << " " << t.second.mean << endl;
+		cout << "" << t.first << " " << t.second.constant << endl;
 	}
 	cout << "\n\nPICCHI AM" << endl;
 	for (const auto& t : mAM) {
-
-		cout << "" << t.first << " " << t.second.mean << endl;
+		cout << "" << t.first << " " << t.second.constant << endl;
 	}
+
+	cout << "\n\nPICCHI VR, normalized" << endl;
+	for (const auto& t : mVR) {
+		//cout << "" << t.first << " " << mVR.at(t.first).constant / mNevents.at(t.first)  << endl;
+		cout << "" << t.first << " " <<
+				t.second.constant * sqrt(2 * M_PI) * t.second.sigma / mNorm.at(t.first) << endl;
+	}
+	cout << "\n\nPICCHI AM, normalized" << endl;
+	for (const auto& t : mAM) {
+		cout << "" << t.first << " " <<
+				t.second.constant * sqrt(2 * M_PI) * t.second.sigma / mNorm.at(t.first) << endl;
+	}
+
+	//For
+
 
 	cout << "[LOG]: Start of VRAM transition: " << regVRAM << endl;
 	cout << "[LOG]: Start of AM region: " << regAM << endl;
