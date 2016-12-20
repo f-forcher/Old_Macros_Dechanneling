@@ -49,10 +49,10 @@ using std::cerr;
 //		 Double cut2
 //		 ) {
 
+//void slices(string nome_cristallo, string pathfiledati_root, Double_t cut1, Double_t cut2, TH1D*& hist, bool makepng) {
 void slices(Double_t cut1, Double_t cut2, TH1D*& hist, bool makepng) {
-
-	auto nome_cristallo = string("STF45");
-	auto pathfiledati_root = string("ForFrancesco/STF45_exp/recoDataSimple_renamed.torsion.correction.histo.root");
+	auto nome_cristallo = string("ST101");
+	auto pathfiledati_root = string("ForFrancesco/ST101_exp/recoDataSimple_renamed.torsion.correction.histo.root");
 
 
 
@@ -70,6 +70,11 @@ void slices(Double_t cut1, Double_t cut2, TH1D*& hist, bool makepng) {
 	}
 
 	auto h2D = (TH2D*) in_file_root->Get( "dTheta_x_vs_Impact_x_cor" );
+
+	//TODO
+	//h2D->Smooth();
+
+
 	//auto h1D = h2D->ProjectionY();
 
 	auto axis = h2D->GetXaxis();
@@ -95,7 +100,7 @@ void slices(Double_t cut1, Double_t cut2, TH1D*& hist, bool makepng) {
 	//h5->GetXaxis()->SetTitle( "#Delta#theta_{x} [#murad]" );
 	histogram->Rebin( 1 );
 	histogram->GetXaxis()->SetRangeUser(-40,30);
-	histogram->GetYaxis()->SetRangeUser(1,100);
+	histogram->GetYaxis()->SetRangeUser(1,1000);
 
 	hist = histogram;
 	if (makepng) {

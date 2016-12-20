@@ -165,6 +165,8 @@ int main_macro(int argc, char* argv[]) {
 	getcwd( PROJECT_DIR, FILENAME_MAX );
 	// store command line parameters
 
+	{ // Start dechanneling scope here, TODO? transfer into function?
+
 	int argc2 = 7;
 	const char* argv2[] = { "./Debug/Ronch_braggPlot_v05", "input", "bragg_events.txt", "hist", "hh", "ranges",
 			"energyRanges" };
@@ -616,10 +618,11 @@ int main_macro(int argc, char* argv[]) {
 	//mia_dech(); TCanvas
 
 
+	} // End dech scope here
 
 
 
-
+	{ // Start VRAM analysis
 
 	// Parte per analisi del triangolino finale
 //	auto deltaslice = 1; //[murad]
@@ -646,8 +649,11 @@ int main_macro(int argc, char* argv[]) {
 //	TH1D* hAM;
 //	slices(160,160+deltaslice,hVR);
 //	slices(190,190+deltaslice,hAM);
-	analisi_VRtoAM();
 
+	auto crystalparamsSTF45 = make_tuple();
+
+	analisi_VRtoAM();
+	}
 	return 0;
 }
 

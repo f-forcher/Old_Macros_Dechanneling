@@ -15,6 +15,7 @@
 namespace mions {
 
 
+//void slices(string nome_cristallo, string pathfiledati_root, Double_t cut1, Double_t cut2, TH1D*& hist, bool makepng = false);
 void slices(Double_t cut1, Double_t cut2, TH1D*& hist, bool makepng = false);
 
 }

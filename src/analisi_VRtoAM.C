@@ -137,8 +137,8 @@ void analisi_VRtoAM() {
 
 
 	//auto i = 5;
-	auto start_analysis = 140; // At what thetaX angle [murad] we should start the slicing
-	auto analysis_width = 56; // For how many thetaX we analyze, from start_analysis
+	auto start_analysis = -210; // At what thetaX angle [murad] we should start the slicing
+	auto analysis_width = 70; // For how many thetaX we analyze, from start_analysis
 	vector<TH1D*> vhTRANS(60);
 	// Assume we start in the VR region (one peak around -Rc*bending)
 	int regVR = start_analysis; // When the VR region starts. We assume we are in it when we start. [murad]
@@ -188,12 +188,12 @@ void analisi_VRtoAM() {
 		auto nbinsTRANS = hTRANS->GetXaxis()->GetLast();
 		DBG( std::clog << "nbinsTRANS: " << nbinsTRANS << std::endl; , ; )
 		Double_t* dataTRANS = new Double_t[nbinsTRANS];
+		Double_t* dataHighRes = new Double_t[nbinsTRANS];
 		for (auto i = 0; i < nbinsTRANS; i++) dataTRANS[i] = hTRANS->GetBinContent(i + 1);
 
 		TH1D *hSmooth = (TH1D*)(hTRANS->Clone());
-		hSmooth->SetLineColor(kGreen);
-		smoother->SmoothMarkov(dataTRANS,nbinsTRANS,3); //3, 7, 10
-		for (auto i = 0; i < nbinsTRANS; i++) hSmooth->SetBinContent(i + 1,dataTRANS[i]);
+//		hSmooth->SetLineColor(kGreen);
+//		smoother->SmoothMarkov(dataTRANS,nbinsTRANS,3); //3, 7, 10
 
 
 
@@ -201,10 +201,28 @@ void analisi_VRtoAM() {
 
 		//Peak search
 		auto npeaks = 2;
-		auto expectedsigma = 4; // A little smaller through
+		auto expectedsigma = 2; // A little smaller through
 		auto thresoldpeaks = 0.09; // Minimum peak height relative to max bin
 		TSpectrum *s = new TSpectrum( 2 * npeaks );
-		Int_t nfound = s->Search( hTRANS, expectedsigma, "", thresoldpeaks );
+		//Int_t nfound = s->Search( hTRANS, expectedsigma, "", thresoldpeaks );
+		//TODO
+		/*
+		 * Int_t TSpectrum::SearchHighRes 	( 	Double_t *  	source,
+		 * Double_t *  	destVector,
+		 * Int_t  	ssize,
+		 * Double_t  	sigma,
+		 * Double_t  	threshold,
+		 * bool  	backgroundRemove,
+		 * Int_t  	deconIterations,
+		 * bool  	markov,
+		 * Int_t  	averWindow
+		 )
+		 */
+		Int_t nfound = s->SearchHighRes( dataTRANS, dataHighRes, nbinsTRANS, expectedsigma, thresoldpeaks,
+				true, 2, true, 3);
+
+
+		for (auto i = 0; i < nbinsTRANS; i++) hSmooth->SetBinContent(i + 1,dataHighRes[i]);
 		printf( "Found %d candidate peaks in hTRANS to fit\n", nfound );
 		s->Print();
 
@@ -224,8 +242,8 @@ void analisi_VRtoAM() {
 
 			cerr << "[ERROR]: Found " << nfound << " peaks "
 					"instead of 1 or 2" << endl;
-			cerr << "[ERROR]: Found " << nfound_sm << " smoothed peaks "
-					"instead of 1 or 2" << endl;
+//			cerr << "[ERROR]: Found " << nfound_sm << " smoothed peaks "
+//					"instead of 1 or 2" << endl;
 
 			return;
 		} else {
@@ -349,6 +367,7 @@ void analisi_VRtoAM() {
 
 		//Total fit
 		TFitResultPtr fit_hTRANS = hTRANS->Fit( fVRAM, "IREM+" );
+		hSmooth->Draw("SAME");
 		hTRANS->Draw("SAME");
 
 		string nomehisto = hTRANS->GetName();
