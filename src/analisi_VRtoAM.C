@@ -204,7 +204,7 @@ void analisi_VRtoAM() {
 		auto expectedsigma = 2; // A little smaller through
 		auto thresoldpeaks = 0.09; // Minimum peak height relative to max bin
 		TSpectrum *s = new TSpectrum( 2 * npeaks );
-		//Int_t nfound = s->Search( hTRANS, expectedsigma, "", thresoldpeaks );
+		Int_t nfound = s->Search( hTRANS, expectedsigma, "", thresoldpeaks );
 		//TODO
 		/*
 		 * Int_t TSpectrum::SearchHighRes 	( 	Double_t *  	source,
@@ -218,8 +218,8 @@ void analisi_VRtoAM() {
 		 * Int_t  	averWindow
 		 )
 		 */
-		Int_t nfound = s->SearchHighRes( dataTRANS, dataHighRes, nbinsTRANS, expectedsigma, thresoldpeaks,
-				true, 2, true, 3);
+//		Int_t nfound = s->SearchHighRes( dataTRANS, dataHighRes, nbinsTRANS, expectedsigma, thresoldpeaks,
+//				true, 2, true, 3);
 
 
 		for (auto i = 0; i < nbinsTRANS; i++) hSmooth->SetBinContent(i + 1,dataHighRes[i]);
