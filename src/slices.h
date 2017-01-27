@@ -8,6 +8,8 @@
 #ifndef SLICES_H_
 #define SLICES_H_
 
+#include <string>
+
 // Per poter usare questa macro sia compilando che eseguendo.
 // https://root.cern.ch/root/htmldoc/guides/users-guide/ROOTUsersGuide.html#moving-between-interpreter-and-compiler
 #ifndef __CLING__
@@ -16,7 +18,7 @@ namespace mions {
 
 
 //void slices(string nome_cristallo, string pathfiledati_root, Double_t cut1, Double_t cut2, TH1D*& hist, bool makepng = false);
-void slices(Double_t cut1, Double_t cut2, TH1D*& hist, bool makepng = false);
+void slices(std::string nome_cristallo, std::string exp_or_sim, Double_t cut1, Double_t cut2, TH1D*& hist, bool makepng = false);
 
 }
 #else

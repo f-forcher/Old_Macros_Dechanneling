@@ -39,9 +39,12 @@
 namespace mions {
 
 
-void analisi_VRtoAM() {
+void analisi_VRtoAM(std::string nome_cristallo, std::string exp_or_sim, int start_analysis, int analysis_width) {
 	using namespace std;
 	using mions::slices;
+
+
+
 
 	auto deltaslice = 2; //[murad]
 	system( "rm -f Varie/Video/*.png" );
@@ -50,7 +53,7 @@ void analisi_VRtoAM() {
 	vhist.reserve( 32 );
 	for (int i = 161; i < 189; i = i + 1) {
 		TH1D* thistogram;
-		slices( i-1, i + 1, thistogram, false );
+		slices( nome_cristallo, exp_or_sim, i-1, i + 1, thistogram, false );
 		vhist.push_back( thistogram );
 	}
 
@@ -66,8 +69,8 @@ void analisi_VRtoAM() {
 	TH1D* hVR;
 	TH1D* hAM;
 
-	slices( 160, 160 + deltaslice, hVR );
-	slices( 190, 190 + deltaslice, hAM );
+	slices( nome_cristallo, exp_or_sim, 160, 160 + deltaslice, hVR );
+	slices( nome_cristallo, exp_or_sim, 190, 190 + deltaslice, hAM );
 
 
 	// First gaussian
@@ -137,8 +140,15 @@ void analisi_VRtoAM() {
 
 
 	//auto i = 5;
-	auto start_analysis = -210; // At what thetaX angle [murad] we should start the slicing
-	auto analysis_width = 70; // For how many thetaX we analyze, from start_analysis
+
+	//ST101
+	//auto start_analysis = -210; // At what thetaX angle [murad] we should start the slicing
+	//auto analysis_width = 70; // For how many thetaX we analyze, from start_analysis
+
+	//STF45
+	//auto start_analysis = 160; // At what thetaX angle [murad] we should start the slicing
+	//auto analysis_width = 190 (o 30??); // For how many thetaX we analyze, from start_analysis
+
 	vector<TH1D*> vhTRANS(60);
 	// Assume we start in the VR region (one peak around -Rc*bending)
 	int regVR = start_analysis; // When the VR region starts. We assume we are in it when we start. [murad]
@@ -173,7 +183,7 @@ void analisi_VRtoAM() {
 		//TODO fit totale
 
 		//slices( 160 + i + 11 - 1, 160 + i + 11 + 1, hTRANS );
-		slices( start_analysis + i /*- 1*/, start_analysis + i + deltaslice - 1, hTRANS );
+		slices( nome_cristallo, exp_or_sim, start_analysis + i /*- 1*/, start_analysis + i + deltaslice - 1, hTRANS );
 
 
 		//hTRANS->Scale(1.0/hTRANS->Integral()); c1
@@ -201,7 +211,7 @@ void analisi_VRtoAM() {
 
 		//Peak search
 		auto npeaks = 2;
-		auto expectedsigma = 2; // A little smaller through
+		auto expectedsigma = 4; // A little smaller through
 		auto thresoldpeaks = 0.09; // Minimum peak height relative to max bin
 		TSpectrum *s = new TSpectrum( 2 * npeaks );
 		Int_t nfound = s->Search( hTRANS, expectedsigma, "", thresoldpeaks );
@@ -371,7 +381,7 @@ void analisi_VRtoAM() {
 		hTRANS->Draw("SAME");
 
 		string nomehisto = hTRANS->GetName();
-		auto nomefilepng = "Varie/Video/" + nomehisto + ".png";
+		auto nomefilepng = "Varie/Video_" +nome_cristallo+ "_" +exp_or_sim+ "/" + nomehisto + ".png";
 		c_fitVRAM->SaveAs(nomefilepng.c_str());
 
 		//std::this_thread::sleep_for(std::chrono::milliseconds(1500));

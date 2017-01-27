@@ -652,7 +652,12 @@ int main_macro(int argc, char* argv[]) {
 
 	auto crystalparamsSTF45 = make_tuple();
 
-	analisi_VRtoAM();
+
+	clog << "\n\n\n***********************************************************\n"
+			"Now analyzing the VR to AM transition\n\n\n";
+	analisi_VRtoAM("ST101","exp",-210, 75);//70
+	//analisi_VRtoAM("STF45", "exp", 160, 30);
+
 	}
 	return 0;
 }
