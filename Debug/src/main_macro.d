@@ -93,7 +93,7 @@ src/main_macro.o: ../src/main_macro.C \
  /home/fforcher/ROOT/v6-06-08/include/TFitResultPtr.h ../src/mia_dech.h \
  ../src/my_typedefs.h /home/fforcher/ROOT/v6-06-08/include/Rtypes.h \
  ../src/dbg_macro.h ../src/dech.h ../src/analisi_VRtoAM.h \
- ../src/DatiChanneling.h
+ ../src/analisi_VRtoAM_chi2.h ../src/DatiChanneling.h
 
 /home/fforcher/ROOT/v6-06-08/include/TROOT.h:
 
@@ -290,5 +290,7 @@ src/main_macro.o: ../src/main_macro.C \
 ../src/dech.h:
 
 ../src/analisi_VRtoAM.h:
+
+../src/analisi_VRtoAM_chi2.h:
 
 ../src/DatiChanneling.h:

@@ -11,15 +11,18 @@
 namespace mions {
 
 #include <vector>
+#include <string>
+
 /*
  * Struct containing the parameters for transition region identification,
  */
 struct AnalisiVRAM_param {
+
 	int start_analysis;
 	int analysis_width;
 	int deltaslice;
 
-	std::vector<double> other_params;
+	std::map<std::string, double> other_params;
 };
 
 

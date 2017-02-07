@@ -91,7 +91,7 @@ src/analisi_VRtoAM.o: ../src/analisi_VRtoAM.C \
  /home/fforcher/ROOT/v6-06-08/include/TFitResultPtr.h \
  /home/fforcher/ROOT/v6-06-08/include/TSpectrum.h ../src/slices.h \
  ../src/dbg_macro.h ../src/my_typedefs.h \
- /home/fforcher/ROOT/v6-06-08/include/Rtypes.h
+ /home/fforcher/ROOT/v6-06-08/include/Rtypes.h ../src/AnalisiVRAM_param.h
 
 /home/fforcher/ROOT/v6-06-08/include/TH1.h:
 
@@ -282,3 +282,5 @@ src/analisi_VRtoAM.o: ../src/analisi_VRtoAM.C \
 ../src/my_typedefs.h:
 
 /home/fforcher/ROOT/v6-06-08/include/Rtypes.h:
+
+../src/AnalisiVRAM_param.h:

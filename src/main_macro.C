@@ -42,6 +42,11 @@
 #include "my_typedefs.h"
 #include "dech.h"
 #include "analisi_VRtoAM.h"
+#include "analisi_VRtoAM_chi2.h"
+
+
+
+
 
 // Per poter usare questa macro sia compilando che eseguendo.
 // https://root.cern.ch/root/htmldoc/guides/users-guide/ROOTUsersGuide.html#moving-between-interpreter-and-compiler
@@ -79,7 +84,9 @@ int main_macro(int argc, char* argv[]) {
 	using mions::CrystalDataTable510;
 	using mions::electronic_dechanneling;
 	using mions::analisi_VRtoAM;
+	using mions::analisi_VRtoAM_chi2;
 	using std::pow;
+
 
 //	// No arguments:  argc=1, argv[0]=nome_comando
 	// TODO WIP
@@ -650,13 +657,30 @@ int main_macro(int argc, char* argv[]) {
 //	slices(160,160+deltaslice,hVR);
 //	slices(190,190+deltaslice,hAM);
 
-	auto crystalparamsSTF45 = make_tuple();
+	// Non sono sicuro sia una buona idea
+	//AnalisiVRAM_param crystalparamsSTF45;
+	//crystalparamsSTF45.start_analysis =
+
+	// "Generic" container for various parameter to use in the analysis
+
+	// Parameters of STF45
+	std::map<std::string, double> STF99_par;
+	STF99_par["chi2_threshold"] = 1;
+
+	std::map<std::string, double> ST101_par;
+	ST101_par["chi2_threshold"] = 80;
+
 
 
 	clog << "\n\n\n***********************************************************\n"
 			"Now analyzing the VR to AM transition\n\n\n";
-	analisi_VRtoAM("ST101","exp",-210, 75);//70
+	//analisi_VRtoAM("ST101","exp",-210, 75);//70
+	//analisi_VRtoAM("STF99","exp",-150, 50);
 	//analisi_VRtoAM("STF45", "exp", 160, 30);
+
+	//analisi_VRtoAM_chi2("STF99","exp",-160, 90, STF99_par);
+	analisi_VRtoAM_chi2("ST101","exp",-206, 75, ST101_par);
+
 
 	}
 	return 0;

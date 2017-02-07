@@ -31,10 +31,12 @@
 #include <TFitResultPtr.h>
 #include <TSpectrum.h>
 
+
+
 #include "slices.h"
 #include "dbg_macro.h"
 #include "my_typedefs.h"
-
+#include "AnalisiVRAM_param.h"
 
 namespace mions {
 
@@ -200,6 +202,10 @@ void analisi_VRtoAM(std::string nome_cristallo, std::string exp_or_sim, int star
 		Double_t* dataTRANS = new Double_t[nbinsTRANS];
 		Double_t* dataHighRes = new Double_t[nbinsTRANS];
 		for (auto i = 0; i < nbinsTRANS; i++) dataTRANS[i] = hTRANS->GetBinContent(i + 1);
+
+		//Write the data to a text file for the python scripts
+		//+nome_cristallo+ "_" +exp_or_sim+ "/" + nomehisto + ".png"
+
 
 		TH1D *hSmooth = (TH1D*)(hTRANS->Clone());
 //		hSmooth->SetLineColor(kGreen);

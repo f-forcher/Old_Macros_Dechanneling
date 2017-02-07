@@ -5,6 +5,7 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_UPPER_SRCS += \
 ../src/analisi_VRtoAM.C \
+../src/analisi_VRtoAM2_chi2.C \
 ../src/dech.C \
 ../src/main_macro.C \
 ../src/mia_dech.C \
@@ -18,6 +19,7 @@ CPP_SRCS += \
 
 C_UPPER_DEPS += \
 ./src/analisi_VRtoAM.d \
+./src/analisi_VRtoAM2_chi2.d \
 ./src/dech.d \
 ./src/main_macro.d \
 ./src/mia_dech.d \
@@ -28,6 +30,7 @@ C_UPPER_DEPS += \
 OBJS += \
 ./src/DatiChanneling.o \
 ./src/analisi_VRtoAM.o \
+./src/analisi_VRtoAM2_chi2.o \
 ./src/dech.o \
 ./src/main.o \
 ./src/main_macro.o \

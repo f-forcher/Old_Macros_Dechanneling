@@ -14,6 +14,7 @@ namespace mions {
 /*
  * Function analysing the slices in the VR to AM transition.
  */
+
 void analisi_VRtoAM(std::string nome_cristallo, std::string exp_or_sim, int start_analysis, int analysis_width);
 
 }
