@@ -208,10 +208,10 @@ void analisi_VRtoAM_chi2(std::string nome_cristallo, std::string exp_or_sim, int
 			// This is the VR or AM one, starting
 			fDoubleGaussTest->SetParameter( 0, hTRANS->GetMaximum() / 2.0 );
 			fDoubleGaussTest->SetParameter( 1, meanVR  );
-			fDoubleGaussTest->SetParameter( 2, expectedsigma + 4 );
+			fDoubleGaussTest->SetParameter( 2, expectedsigma );
 			fDoubleGaussTest->SetParameter( 3, hTRANS->GetMaximum() / 2.0 );
 			fDoubleGaussTest->SetParameter( 4, meanAM  );
-			fDoubleGaussTest->SetParameter( 5, expectedsigma + 4 );
+			fDoubleGaussTest->SetParameter( 5, expectedsigma );
 
 
 		}
@@ -257,8 +257,34 @@ void analisi_VRtoAM_chi2(std::string nome_cristallo, std::string exp_or_sim, int
 
 		auto& fVRAM =  test_f > chi2_threshold ? fVRAMsing : fVRAMdoub;
 		auto nfound = test_f > chi2_threshold ? 1 : 2;
+		if (nfound != 1 and nfound != 2) {
 
+			cerr << "[ERROR]: Found " << nfound << " peaks "
+					"instead of 1 or 2" << endl;
 
+			return;
+		} else {
+			clog << "[LOG] Found " << nfound << "peak(s)" << endl;
+
+			// Check the transitions from the various regions, in a robust way.
+			// The second peak can appear and disappear before reappearing again,
+			// so we define the transition VRAM as the maximum interval, between
+			// the first appearance of two peaks and their very last appearance.
+			if (nfound == 1 and regVRAM == 0) {
+				clog << "[LOG] VR region" << endl;
+			} else if (nfound == 2 and regVRAM == 0) {
+				clog << "[LOG] Start of the VRAM region" << endl;
+				regVRAM = start_analysis + i;
+			} else if (nfound == 1 and last_nfound == 2 and regVRAM != 0) {
+				// We cannot know for sure if there is gonna be another peak
+				// until all the slices have been analyzed.
+				clog << "[LOG] Could it be " << start_analysis + i << " the end of VRAM and start of AM?" << endl;
+				regAM = start_analysis + i;
+			}
+		}
+
+			// update last_nfound
+			last_nfound = nfound;
 
 
 		//Setting initial parameters for the first peak
@@ -267,14 +293,14 @@ void analisi_VRtoAM_chi2(std::string nome_cristallo, std::string exp_or_sim, int
 			// This is the VR or AM one, starting
 			fVRAM->SetParameter( 0, hTRANS->GetMaximum() / 2.0 );
 			fVRAM->SetParameter( 1, meanVR  );
-			fVRAM->SetParameter( 2, expectedsigma + 4 );
+			fVRAM->SetParameter( 2, expectedsigma);
 
 			if (nfound == 2) {
 				// Since I order the peaks, when there are two peaks this is the AM one,
 				// on the right (bigger X coordinate, near zero)
 				fVRAM->SetParameter( 3, hTRANS->GetMaximum() / 2.0 );
 				fVRAM->SetParameter( 4, meanAM );
-				fVRAM->SetParameter( 5, expectedsigma + 2 );
+				fVRAM->SetParameter( 5, expectedsigma);
 			}
 		}
 
@@ -284,17 +310,6 @@ void analisi_VRtoAM_chi2(std::string nome_cristallo, std::string exp_or_sim, int
 		c_fitVRAM->cd();
 
 		//hTRANS->Smooth();
-
-
-
-		//hSmooth->Fit( fVRAM, "IREM+" );
-		//hSmooth->Draw("SAME");
-
-		//Partial fit
-		TF1* fVRpre = new TF1( "fVRAM", "gaus(0)", -40, 30 );
-		TF1* fAMpre = new TF1( "fVRAM", "gaus(0)", -40, 30 );
-		// TODO usare sort o set per ordinare i picchi, quello piu' a destra e' VR
-
 
 
 

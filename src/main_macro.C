@@ -662,6 +662,11 @@ int main_macro(int argc, char* argv[]) {
 	//crystalparamsSTF45.start_analysis =
 
 	// "Generic" container for various parameter to use in the analysis
+	/*
+	 * Orientation:
+	 * 1)
+	 *
+	 */
 
 	// Parameters of STF45
 	std::map<std::string, double> STF99_par;
@@ -669,6 +674,8 @@ int main_macro(int argc, char* argv[]) {
 
 	std::map<std::string, double> ST101_par;
 	ST101_par["chi2_threshold"] = 80;
+	ST101_par["chi2_threshold"] = 80;
+
 
 
 
@@ -679,7 +686,7 @@ int main_macro(int argc, char* argv[]) {
 	//analisi_VRtoAM("STF45", "exp", 160, 30);
 
 	//analisi_VRtoAM_chi2("STF99","exp",-160, 90, STF99_par);
-	analisi_VRtoAM_chi2("ST101","exp",-206, 75, ST101_par);
+	analisi_VRtoAM_chi2("ST101","exp",-190, 50, ST101_par);
 
 
 	}
