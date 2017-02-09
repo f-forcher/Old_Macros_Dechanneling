@@ -1,6 +1,6 @@
-src/main_macro.o: ../src/main_macro.C \
- /home/fforcher/ROOT/v6-06-08/include/TROOT.h \
- /home/fforcher/ROOT/v6-06-08/include/TDirectory.h \
+src/readandplot.o: ../src/readandplot.C \
+ /home/fforcher/ROOT/v6-06-08/include/TH1.h \
+ /home/fforcher/ROOT/v6-06-08/include/TAxis.h \
  /home/fforcher/ROOT/v6-06-08/include/TNamed.h \
  /home/fforcher/ROOT/v6-06-08/include/TObject.h \
  /home/fforcher/ROOT/v6-06-08/include/Rtypes.h \
@@ -21,14 +21,6 @@ src/main_macro.o: ../src/main_macro.C \
  /home/fforcher/ROOT/v6-06-08/include/TMathBase.h \
  /home/fforcher/ROOT/v6-06-08/include/RStringView.h \
  /home/fforcher/ROOT/v6-06-08/include/RConfigure.h \
- /home/fforcher/ROOT/v6-06-08/include/TList.h \
- /home/fforcher/ROOT/v6-06-08/include/TSeqCollection.h \
- /home/fforcher/ROOT/v6-06-08/include/TCollection.h \
- /home/fforcher/ROOT/v6-06-08/include/TIterator.h \
- /home/fforcher/ROOT/v6-06-08/include/TDatime.h \
- /home/fforcher/ROOT/v6-06-08/include/TUUID.h \
- /home/fforcher/ROOT/v6-06-08/include/TH1.h \
- /home/fforcher/ROOT/v6-06-08/include/TAxis.h \
  /home/fforcher/ROOT/v6-06-08/include/TAttAxis.h \
  /home/fforcher/ROOT/v6-06-08/include/TArrayD.h \
  /home/fforcher/ROOT/v6-06-08/include/TArray.h \
@@ -45,6 +37,13 @@ src/main_macro.o: ../src/main_macro.C \
  /home/fforcher/ROOT/v6-06-08/include/TFitResultPtr.h \
  /home/fforcher/ROOT/v6-06-08/include/TFile.h \
  /home/fforcher/ROOT/v6-06-08/include/TDirectoryFile.h \
+ /home/fforcher/ROOT/v6-06-08/include/TDirectory.h \
+ /home/fforcher/ROOT/v6-06-08/include/TList.h \
+ /home/fforcher/ROOT/v6-06-08/include/TSeqCollection.h \
+ /home/fforcher/ROOT/v6-06-08/include/TCollection.h \
+ /home/fforcher/ROOT/v6-06-08/include/TIterator.h \
+ /home/fforcher/ROOT/v6-06-08/include/TDatime.h \
+ /home/fforcher/ROOT/v6-06-08/include/TUUID.h \
  /home/fforcher/ROOT/v6-06-08/include/TMap.h \
  /home/fforcher/ROOT/v6-06-08/include/THashTable.h \
  /home/fforcher/ROOT/v6-06-08/include/TUrl.h \
@@ -90,14 +89,11 @@ src/main_macro.o: ../src/main_macro.C \
  /home/fforcher/ROOT/v6-06-08/include/TMatrixDSymfwd.h \
  /home/fforcher/ROOT/v6-06-08/include/TMatrixDUtils.h \
  /home/fforcher/ROOT/v6-06-08/include/TMatrixDUtilsfwd.h \
- /home/fforcher/ROOT/v6-06-08/include/TFitResultPtr.h ../src/mia_dech.h \
- ../src/my_typedefs.h /home/fforcher/ROOT/v6-06-08/include/Rtypes.h \
- ../src/dbg_macro.h ../src/dech.h ../src/analisi_VRtoAM.h \
- ../src/analisi_VRtoAM_chi2.h ../src/DatiChanneling.h
+ /home/fforcher/ROOT/v6-06-08/include/TFitResultPtr.h
 
-/home/fforcher/ROOT/v6-06-08/include/TROOT.h:
+/home/fforcher/ROOT/v6-06-08/include/TH1.h:
 
-/home/fforcher/ROOT/v6-06-08/include/TDirectory.h:
+/home/fforcher/ROOT/v6-06-08/include/TAxis.h:
 
 /home/fforcher/ROOT/v6-06-08/include/TNamed.h:
 
@@ -139,22 +135,6 @@ src/main_macro.o: ../src/main_macro.C \
 
 /home/fforcher/ROOT/v6-06-08/include/RConfigure.h:
 
-/home/fforcher/ROOT/v6-06-08/include/TList.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TSeqCollection.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TCollection.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TIterator.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TDatime.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TUUID.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TH1.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TAxis.h:
-
 /home/fforcher/ROOT/v6-06-08/include/TAttAxis.h:
 
 /home/fforcher/ROOT/v6-06-08/include/TArrayD.h:
@@ -186,6 +166,20 @@ src/main_macro.o: ../src/main_macro.C \
 /home/fforcher/ROOT/v6-06-08/include/TFile.h:
 
 /home/fforcher/ROOT/v6-06-08/include/TDirectoryFile.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TDirectory.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TList.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TSeqCollection.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TCollection.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TIterator.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TDatime.h:
+
+/home/fforcher/ROOT/v6-06-08/include/TUUID.h:
 
 /home/fforcher/ROOT/v6-06-08/include/TMap.h:
 
@@ -278,19 +272,3 @@ src/main_macro.o: ../src/main_macro.C \
 /home/fforcher/ROOT/v6-06-08/include/TMatrixDUtilsfwd.h:
 
 /home/fforcher/ROOT/v6-06-08/include/TFitResultPtr.h:
-
-../src/mia_dech.h:
-
-../src/my_typedefs.h:
-
-/home/fforcher/ROOT/v6-06-08/include/Rtypes.h:
-
-../src/dbg_macro.h:
-
-../src/dech.h:
-
-../src/analisi_VRtoAM.h:
-
-../src/analisi_VRtoAM_chi2.h:
-
-../src/DatiChanneling.h:

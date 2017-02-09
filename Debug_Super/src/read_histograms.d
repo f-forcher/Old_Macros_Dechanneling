@@ -1,4 +1,4 @@
-src/slices.o: ../src/slices.C \
+src/read_histograms.o: ../src/read_histograms.C \
  /home/fforcher/ROOT/v6-06-08/include/TFile.h \
  /home/fforcher/ROOT/v6-06-08/include/TDirectoryFile.h \
  /home/fforcher/ROOT/v6-06-08/include/TDirectory.h \
@@ -50,29 +50,8 @@ src/slices.o: ../src/slices.C \
  /home/fforcher/ROOT/v6-06-08/include/TH2.h \
  /home/fforcher/ROOT/v6-06-08/include/TMatrixFBasefwd.h \
  /home/fforcher/ROOT/v6-06-08/include/TMatrixDBasefwd.h \
- /home/fforcher/ROOT/v6-06-08/include/TH1D.h \
- /home/fforcher/ROOT/v6-06-08/include/TRandom.h \
- /home/fforcher/ROOT/v6-06-08/include/TRandom3.h \
- /home/fforcher/ROOT/v6-06-08/include/TCanvas.h \
- /home/fforcher/ROOT/v6-06-08/include/TPad.h \
- /home/fforcher/ROOT/v6-06-08/include/TVirtualPad.h \
- /home/fforcher/ROOT/v6-06-08/include/TAttPad.h \
- /home/fforcher/ROOT/v6-06-08/include/TVirtualX.h \
- /home/fforcher/ROOT/v6-06-08/include/TAttText.h \
- /home/fforcher/ROOT/v6-06-08/include/GuiTypes.h \
- /home/fforcher/ROOT/v6-06-08/include/Buttons.h \
- /home/fforcher/ROOT/v6-06-08/include/TQObject.h \
- /home/fforcher/ROOT/v6-06-08/include/TQObjectEmitVA.h \
- /home/fforcher/ROOT/v6-06-08/include/TQConnection.h \
- /home/fforcher/ROOT/v6-06-08/include/Varargs.h \
- /home/fforcher/ROOT/v6-06-08/include/TInterpreter.h \
- /home/fforcher/ROOT/v6-06-08/include/TDictionary.h \
- /home/fforcher/ROOT/v6-06-08/include/ESTLType.h \
- /home/fforcher/ROOT/v6-06-08/include/TVirtualMutex.h \
- /home/fforcher/ROOT/v6-06-08/include/TAttBBox2D.h \
- /home/fforcher/ROOT/v6-06-08/include/TPoint.h \
- /home/fforcher/ROOT/v6-06-08/include/TAttCanvas.h \
- /home/fforcher/ROOT/v6-06-08/include/TCanvasImp.h ../src/./dbg_macro.h
+ /home/fforcher/ROOT/v6-06-08/include/TH1D.h ../src/dbg_macro.h \
+ ../src/DatiChanneling.h /home/fforcher/ROOT/v6-06-08/include/TROOT.h
 
 /home/fforcher/ROOT/v6-06-08/include/TFile.h:
 
@@ -178,48 +157,8 @@ src/slices.o: ../src/slices.C \
 
 /home/fforcher/ROOT/v6-06-08/include/TH1D.h:
 
-/home/fforcher/ROOT/v6-06-08/include/TRandom.h:
+../src/dbg_macro.h:
 
-/home/fforcher/ROOT/v6-06-08/include/TRandom3.h:
+../src/DatiChanneling.h:
 
-/home/fforcher/ROOT/v6-06-08/include/TCanvas.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TPad.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TVirtualPad.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TAttPad.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TVirtualX.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TAttText.h:
-
-/home/fforcher/ROOT/v6-06-08/include/GuiTypes.h:
-
-/home/fforcher/ROOT/v6-06-08/include/Buttons.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TQObject.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TQObjectEmitVA.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TQConnection.h:
-
-/home/fforcher/ROOT/v6-06-08/include/Varargs.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TInterpreter.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TDictionary.h:
-
-/home/fforcher/ROOT/v6-06-08/include/ESTLType.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TVirtualMutex.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TAttBBox2D.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TPoint.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TAttCanvas.h:
-
-/home/fforcher/ROOT/v6-06-08/include/TCanvasImp.h:
-
-../src/./dbg_macro.h:
+/home/fforcher/ROOT/v6-06-08/include/TROOT.h:

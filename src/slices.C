@@ -8,7 +8,7 @@
 #include <iostream>
 #include <sstream>
 #include <cmath>
-//#include <map>
+#include <map>
 #include <string>
 #include <memory>
 #include <fstream>
@@ -23,7 +23,7 @@
 #include <TCanvas.h>
 
 
-//#include "./dbg_macro.h"
+#include "./dbg_macro.h"
 //#include "./my_typedefs.h"
 
 
@@ -50,7 +50,7 @@ using std::cerr;
 //		 ) {
 
 //void slices(string nome_cristallo, string pathfiledati_root, Double_t cut1, Double_t cut2, TH1D*& hist, bool makepng) {
-void slices(std::string nome_cristallo, std::string exp_or_sim, Double_t cut1, Double_t cut2, TH1D*& hist, bool makepng) {
+void slices(std::string nome_cristallo, std::string exp_or_sim, Double_t cut1, Double_t cut2, TH1D*& hist, std::map<std::string, double> otherparams, bool makepng) {
 	//auto nome_cristallo = string("ST101");
 
 	auto pathfiledati_root = string("ForFrancesco/") + nome_cristallo + "_" + exp_or_sim
@@ -116,6 +116,36 @@ void slices(std::string nome_cristallo, std::string exp_or_sim, Double_t cut1, D
 
 		auto nomefilepng = "Varie/Video_" + nome_cristallo+"_"+exp_or_sim + "/"+ nomehisto + ".png";
 		c_slices->SaveAs(nomefilepng.c_str());
+	}
+
+	//TODO Save to txt file the slice data FindBin
+	int lowYrange;
+	int highYrange;
+	if (otherparams.empty()) {
+		lowYrange = -40;
+		highYrange = 30;
+	} else {
+		lowYrange  = otherparams.at("lowYrange_slices");
+		highYrange = otherparams.at("highYrange_slices");
+	}
+	auto minbinofrange = h2D->GetYaxis()->FindBin(lowYrange);
+	auto maxbinofrange = h2D->GetYaxis()->FindBin(highYrange);
+	auto nbinshist = h2D->GetYaxis()->GetLast();
+	DBG( std::clog << "minbinofrange: " << minbinofrange << std::endl; , ; )
+	DBG( std::clog << "maxbinofrange: " << maxbinofrange << std::endl; , ; )
+	DBG( std::clog << "nbinshist: " << nbinshist << std::endl; , ; )
+
+
+	Double_t* data_hist = new Double_t[nbinshist];
+	//for (auto i = 0; i < nbinshist; i++) data_hist[i] = hist->GetBinContent(i + 1);
+	for (auto i = minbinofrange; i < maxbinofrange; i++) data_hist[i] = hist->GetBinContent(i + 1);
+
+	std::string nomefile_datitxt = "ForFrancesco/"+nome_cristallo
+									+"_"+exp_or_sim+"/"+
+									"txt_data/"+nomehisto+".txt";
+	std::ofstream txt_file(nomefile_datitxt);
+	for (auto i = minbinofrange; i < maxbinofrange; i++) {
+		txt_file << hist->GetXaxis()->GetBinCenter(i+1) << "    " << data_hist[i] << endl;
 	}
 
 }

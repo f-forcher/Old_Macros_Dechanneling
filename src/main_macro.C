@@ -674,9 +674,9 @@ int main_macro(int argc, char* argv[]) {
 
 	std::map<std::string, double> ST101_par;
 	ST101_par["chi2_threshold"] = 80;
-	ST101_par["chi2_threshold"] = 80;
-
-
+	ST101_par["lowYrange_slices"] = -40; // murad. What range save of the slices
+	ST101_par["highYrange_slices"] = 30; // murad. What range save of the slices
+	//TODO passarlo anche a slices dentro analisi
 
 
 	clog << "\n\n\n***********************************************************\n"

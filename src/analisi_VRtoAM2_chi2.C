@@ -52,24 +52,13 @@ void analisi_VRtoAM_chi2(std::string nome_cristallo, std::string exp_or_sim, int
 	auto deltaslice = 2; //[murad]
 	auto chi2_threshold = other_params.at("chi2_threshold");
 
+	{
+		system( "rm -f Varie/Video/*.png" );
+		system( "rm -f Varie/Video/GIF_slices.gif" );
+		system( "rm -f Varie/Video/GIF_slices.gif" );
 
-	system( "rm -f Varie/Video/*.png" );
-	system( "rm -f Varie/Video/GIF_slices.gif" );
-	vector<TH1D*> vhist;
-	vhist.reserve( 32 );
-	for (int i = 161; i < 189; i = i + 1) {
-		TH1D* thistogram;
-		slices( nome_cristallo, exp_or_sim, i-1, i + 1, thistogram, false );
-		vhist.push_back( thistogram );
-	}
-
-	// Requires imagemagick
-	// sudo apt-get install imagemagick
-	auto gifreturnval = system( "convert -delay 20 -loop 0 Varie/Video/*.png Varie/Video/GIF_slices.gif" );
-	if (bool( gifreturnval )) {
-		clog << "[WARNING]: Failed making the .gif" << endl;
-		clog << "[WARNING]: Maybe you have to install imagemagick?" << endl;
-		clog << "[WARNING]: sudo apt-get install imagemagick" << endl;
+		string txt_files_remove = "rm -f ForFrancesco/" + nome_cristallo+"_"+exp_or_sim + "/txt_data/*.txt";
+		system(txt_files_remove.c_str());
 	}
 
 	TH1D* hVR;
@@ -192,8 +181,6 @@ void analisi_VRtoAM_chi2(std::string nome_cristallo, std::string exp_or_sim, int
 		Double_t* dataHighRes = new Double_t[nbinsTRANS];
 		for (auto i = 0; i < nbinsTRANS; i++) dataTRANS[i] = hTRANS->GetBinContent(i + 1);
 
-		//Write the data to a text file for the python scripts
-		//+nome_cristallo+ "_" +exp_or_sim+ "/" + nomehisto + ".png"
 
 
 		TH1D *hSmooth = (TH1D*)(hTRANS->Clone());
@@ -212,9 +199,8 @@ void analisi_VRtoAM_chi2(std::string nome_cristallo, std::string exp_or_sim, int
 			fDoubleGaussTest->SetParameter( 3, hTRANS->GetMaximum() / 2.0 );
 			fDoubleGaussTest->SetParameter( 4, meanAM  );
 			fDoubleGaussTest->SetParameter( 5, expectedsigma );
-
-
 		}
+
 		//  ** Test fits
 		TFitResultPtr FRptr_fGaussTest = hTRANS->Fit( fGaussTest, "ISREM0+" );
 		TFitResultPtr FRptr_fDoubleGaussTest = hTRANS->Fit( fDoubleGaussTest, "ISREM0+" );

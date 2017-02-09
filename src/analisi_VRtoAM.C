@@ -55,7 +55,7 @@ void analisi_VRtoAM(std::string nome_cristallo, std::string exp_or_sim, int star
 	vhist.reserve( 32 );
 	for (int i = 161; i < 189; i = i + 1) {
 		TH1D* thistogram;
-		slices( nome_cristallo, exp_or_sim, i-1, i + 1, thistogram, false );
+		slices( nome_cristallo, exp_or_sim, i-1, i + 1, thistogram, {},false );
 		vhist.push_back( thistogram );
 	}
 

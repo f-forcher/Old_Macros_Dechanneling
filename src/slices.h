@@ -9,6 +9,7 @@
 #define SLICES_H_
 
 #include <string>
+#include <map>
 
 // Per poter usare questa macro sia compilando che eseguendo.
 // https://root.cern.ch/root/htmldoc/guides/users-guide/ROOTUsersGuide.html#moving-between-interpreter-and-compiler
@@ -18,7 +19,9 @@ namespace mions {
 
 
 //void slices(string nome_cristallo, string pathfiledati_root, Double_t cut1, Double_t cut2, TH1D*& hist, bool makepng = false);
-void slices(std::string nome_cristallo, std::string exp_or_sim, Double_t cut1, Double_t cut2, TH1D*& hist, bool makepng = false);
+void slices(std::string nome_cristallo, std::string exp_or_sim,
+		Double_t cut1, Double_t cut2,
+		TH1D*& hist, std::map<std::string, double> otherparams = {}, bool makepng = false);
 
 }
 #else
