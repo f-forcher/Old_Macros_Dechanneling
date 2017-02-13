@@ -35,7 +35,7 @@ print("c1: ", r_c1[0][0], "c2:", r_c2[0][0])
 
 # TODO perche se le flatto non funziona?
 m1, m2 = r_m1, r_m2
-m1, m2 = r_c1, r_c2
+c1, c2 = r_c1, r_c2
 
 
 #fig = plt.figure(figsize = (5, 5))
