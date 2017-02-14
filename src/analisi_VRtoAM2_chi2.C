@@ -279,6 +279,7 @@ void analisi_VRtoAM_chi2(std::string nome_cristallo, std::string exp_or_sim, int
 			// This is the VR or AM one, starting
 			fVRAM->SetParameter( 0, hTRANS->GetMaximum() / 2.0 );
 			fVRAM->SetParameter( 1, meanVR  );
+//			fVRAM->SetParLimits( 1, meanVR - 4, meanVR + 4  );
 			fVRAM->SetParameter( 2, expectedsigma);
 
 			if (nfound == 2) {
@@ -286,6 +287,7 @@ void analisi_VRtoAM_chi2(std::string nome_cristallo, std::string exp_or_sim, int
 				// on the right (bigger X coordinate, near zero)
 				fVRAM->SetParameter( 3, hTRANS->GetMaximum() / 2.0 );
 				fVRAM->SetParameter( 4, meanAM );
+//				fVRAM->SetParLimits( 4, meanAM - 4, meanAM + 4  );
 				fVRAM->SetParameter( 5, expectedsigma);
 			}
 		}
