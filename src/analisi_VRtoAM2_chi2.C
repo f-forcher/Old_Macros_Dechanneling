@@ -159,7 +159,7 @@ void analisi_VRtoAM_chi2(std::string nome_cristallo, std::string exp_or_sim, int
 		//TODO fit totale
 
 		//slices( 160 + i + 11 - 1, 160 + i + 11 + 1, hTRANS );
-		slices( nome_cristallo, exp_or_sim, start_analysis + i /*- 1*/, start_analysis + i + deltaslice - 1, hTRANS );
+		slices( nome_cristallo, exp_or_sim, start_analysis + i /*- 1*/, start_analysis + i + deltaslice, hTRANS );
 
 
 		//hTRANS->Scale(1.0/hTRANS->Integral()); c1
