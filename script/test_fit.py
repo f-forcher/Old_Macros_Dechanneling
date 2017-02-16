@@ -7,6 +7,7 @@ import matplotlib.mlab
 import numpy as np
 from pylab import *
 import random
+import collections
 
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
@@ -25,6 +26,13 @@ deltaslice = 2
 data_folder = "ForFrancesco/" + crystal_name +"_"+ exp_or_sim + "/txt_data/"
 
 cur_slice = from_slice
+
+# Maps/dicts containing the relative weights of each mixture with cur_slice as key
+# (real) example:
+#        weights_AM = {-190: 0.73387685, -188: 0.681326581759, ...}
+#        weights_VR = {-190: 0.26612315, -188: 0.318673418241, ...}
+weights_AM = collections.OrderedDict()
+weights_VR = collections.OrderedDict()
 while (cur_slice < to_slice):
 
     slice_name = "Slices_" + str(cur_slice) + "_" + str(cur_slice + deltaslice) + "_" + crystal_name
@@ -93,19 +101,27 @@ while (cur_slice < to_slice):
     print("c1: ", r_c1[0][0], "c2:", r_c2[0][0])
 
     # Flatten variables
-    # m1, m2 = r_m1[0], r_m2[0]
-    # c1,  c2 = r_c1[0][0], r_c2[0][0]
+    m1, m2 = r_m1[0], r_m2[0]
+    c1,  c2 = r_c1[0][0], r_c2[0][0]
 
-    # TODO perche se le flatto non funziona?
-    m1, m2 = r_m1, r_m2
-    c1, c2 = r_c1, r_c2
+    # m1, m2 = r_m1, r_m2
+    # c1, c2 = r_c1, r_c2
+
+    # Save the weights in the right array
+    AM_mean = 0 # [murad], should be close to zero, TODO maybe take the mean from the first slice
+    if (abs(m1-AM_mean) < abs(m2-AM_mean)):
+        weights_AM[cur_slice] = w1
+        weights_VR[cur_slice] = w2
+    else:
+        weights_AM[cur_slice] = w2
+        weights_VR[cur_slice] = w1
 
 
     #fig = plt.figure(figsize = (5, 5))
     #plt.subplot(111)
     # gauss_test = 0.5*matplotlib.mlab.normpdf(x, -20, 8)
-    gauss1 = w1*matplotlib.mlab.normpdf(x,m1,np.sqrt(c1))[0]
-    gauss2 = w2*matplotlib.mlab.normpdf(x,m2,np.sqrt(c2))[0]
+    gauss1 = w1*matplotlib.mlab.normpdf(x,m1,np.sqrt(c1))
+    gauss2 = w2*matplotlib.mlab.normpdf(x,m2,np.sqrt(c2))
     gauss_tot = gauss1 + gauss2
 
 
@@ -129,6 +145,24 @@ while (cur_slice < to_slice):
 
     # Update cur_slice counter. Yeah maybe there's a more snakey way, don't care for now
     cur_slice = cur_slice + deltaslice
+
+print("weights_AM:")
+pp.pprint(weights_AM)
+print("weights_VR:")
+pp.pprint(weights_VR)
+
+from scipy import stats
+x_AM = list(weights_AM.keys() )
+
+slopeAM, interceptAM, r_valueAM, p_valueAM, std_errAM = stats.linregress(list(weights_AM.keys() ), list(weights_AM.values() ))
+print("slopeAM: ", slopeAM, "interceptAM: ", interceptAM)
+print("First extreme: ", interceptAM / slopeAM, (interceptAM - 1) / slopeAM)
+
+
+plt.clf()
+plt.plot(list(weights_AM.keys()),list(weights_AM.values() ),".",label = "AM Probability", color='b')
+plt.plot(list(weights_VR.keys()),list(weights_VR.values() ),".",label = "VR Probability", color='b')
+plt.show()
 
 
 s = input('--> ')
