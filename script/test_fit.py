@@ -33,6 +33,12 @@ cur_slice = from_slice
 #        weights_VR = {-190: 0.26612315, -188: 0.318673418241, ...}
 weights_AM = collections.OrderedDict()
 weights_VR = collections.OrderedDict()
+
+clf = mixture.GaussianMixture(n_components=2, covariance_type='full',verbose=2,verbose_interval=10,
+                              random_state=random.SystemRandom().randrange(0,4095),
+                              means_init=[[-17],[0]], weights_init=[1 / 2, 1 / 2],
+#                              init_params="kmeans",
+                              tol=1e-5 )
 while (cur_slice < to_slice):
 
     slice_name = "Slices_" + str(cur_slice) + "_" + str(cur_slice + deltaslice) + "_" + crystal_name
@@ -79,11 +85,7 @@ while (cur_slice < to_slice):
 
 
 
-    clf = mixture.GaussianMixture(n_components=2, covariance_type='full',verbose=2,verbose_interval=10,
-    #                              means_init=[[-17],[0]], weights_init=[1 / 2, 1 / 2],
-    #                              random_state=random.SystemRandom().randrange(0,4095),
-                                  init_params="kmeans",
-                                  tol=1e-5 )
+
     clf.fit(nd_distribution.reshape(-1, 1))
 
 
@@ -151,17 +153,30 @@ pp.pprint(weights_AM)
 print("weights_VR:")
 pp.pprint(weights_VR)
 
-from scipy import stats
-x_AM = list(weights_AM.keys() )
 
+
+# Fit weights/proprotions
+from scipy import stats
 slopeAM, interceptAM, r_valueAM, p_valueAM, std_errAM = stats.linregress(list(weights_AM.keys() ), list(weights_AM.values() ))
 print("slopeAM: ", slopeAM, "interceptAM: ", interceptAM)
 print("First extreme: ", interceptAM / slopeAM, (interceptAM - 1) / slopeAM)
 
 
+x_AM = list( weights_AM.keys() )
+y_AM = list( weights_AM.values() )
+x_VR = list( weights_VR.keys() )
+y_VR = list( weights_VR.values() )
+
+x_fitAM = np.linspace(-(interceptAM - 1) / slopeAM,-interceptAM / slopeAM,100)
+y_fitAM = [slopeAM*xx + interceptAM for xx in x_fitAM]
+
 plt.clf()
-plt.plot(list(weights_AM.keys()),list(weights_AM.values() ),".",label = "AM Probability", color='b')
-plt.plot(list(weights_VR.keys()),list(weights_VR.values() ),".",label = "VR Probability", color='b')
+plt.plot(x_AM, y_AM,".",label = "AM Data", color='b')
+plt.plot(x_fitAM, y_fitAM,"-",label = "AM Proportion", color='b')
+
+
+plt.plot(x_VR,y_VR,".",label = "VR Probability", color='g')
+plt.legend()
 plt.show()
 
 
