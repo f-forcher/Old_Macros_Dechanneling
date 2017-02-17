@@ -42,7 +42,7 @@ clf = mixture.GaussianMixture(n_components=2, covariance_type='tied',verbose=2,v
                               init_params="kmeans",
                               tol=1e-5, max_iter = 1000 )
 
-# clf = mixture.GaussianMixture(n_components=1, covariance_type='full',verbose=2,verbose_interval=10,
+# clf1 = mixture.GaussianMixture(n_components=1, covariance_type='full',verbose=2,verbose_interval=10,
 #                             random_state=random.SystemRandom().randrange(0,4095),
 #                             means_init=[[-17],[0]],
 # #                              weights_init=[1 / 2, 1 / 2],
@@ -93,10 +93,11 @@ while (cur_slice < to_slice):
 
 
 
-
-    # Fit the two peaks
+    # Fit the two peaks and save the BIC
     clf.fit(nd_distribution.reshape(-1, 1))
     BIC_list[cur_slice]= clf.bic(nd_distribution.reshape(-1, 1))
+
+
 
     # "Unflattened" variables
     r_m1, r_m2 = clf.means_
@@ -172,7 +173,7 @@ pp.pprint(BIC_list)
 from scipy import stats
 slopeAM, interceptAM, r_valueAM, p_valueAM, std_errAM = stats.linregress(list(weights_AM.keys() ), list(weights_AM.values() ))
 print("slopeAM: ", slopeAM, "interceptAM: ", interceptAM)
-print("First extreme: ", interceptAM / slopeAM, (interceptAM - 1) / slopeAM)
+print("Transition extrema (lin fit): ", -(interceptAM - 1) / slopeAM, "-",-interceptAM / slopeAM)
 
 
 x_AM = list( weights_AM.keys() )
@@ -180,7 +181,7 @@ y_AM = list( weights_AM.values() )
 x_VR = list( weights_VR.keys() )
 y_VR = list( weights_VR.values() )
 
-x_fitAM = np.linspace(-(interceptAM - 1) / slopeAM,-interceptAM / slopeAM,100)
+x_fitAM = np.linspace(-(interceptAM - 1) / slopeAM,-interceptAM / slopeAM, 100)
 y_fitAM = [slopeAM*xx + interceptAM for xx in x_fitAM]
 
 plt.clf()

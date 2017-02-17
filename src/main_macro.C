@@ -676,6 +676,11 @@ int main_macro(int argc, char* argv[]) {
 	ST101_par["chi2_threshold"] = 80;
 	ST101_par["lowYrange_slices"] = -40; // murad. What range save of the slices
 	ST101_par["highYrange_slices"] = 30; // murad. What range save of the slices
+
+	std::map<std::string, double> STF45_par;
+	ST101_par["chi2_threshold"] = 80;
+	ST101_par["lowYrange_slices"] = -40; // murad. What range save of the slices
+	ST101_par["highYrange_slices"] = 30; // murad. What range save of the slices
 	//TODO passarlo anche a slices dentro analisi
 
 
@@ -685,8 +690,11 @@ int main_macro(int argc, char* argv[]) {
 	//analisi_VRtoAM("STF99","exp",-150, 50);
 	//analisi_VRtoAM("STF45", "exp", 160, 30);
 
-	//analisi_VRtoAM_chi2("STF99","exp",-160, 90, STF99_par);
-	analisi_VRtoAM_chi2("ST101","exp",-210, 80, ST101_par);
+	analisi_VRtoAM_chi2("STF99","exp",-160, 90, STF99_par);
+	//analisi_VRtoAM_chi2("ST101","exp",-210, 80, ST101_par);
+
+	// TODO Non funziona...
+	//analisi_VRtoAM_chi2("STF45","exp",160, 30, STF45_par);
 
 
 	}
