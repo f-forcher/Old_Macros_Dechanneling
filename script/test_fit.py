@@ -21,7 +21,7 @@ crystal_name = sys.argv[1]
 exp_or_sim = sys.argv[2]
 from_slice = int(sys.argv[3]) # [murad] Has to be an existing slice, for now
 to_slice = int(sys.argv[4])
-deltaslice = 2
+deltaslice = 1
 
 data_folder = "ForFrancesco/" + crystal_name +"_"+ exp_or_sim + "/txt_data/"
 
@@ -33,12 +33,21 @@ cur_slice = from_slice
 #        weights_VR = {-190: 0.26612315, -188: 0.318673418241, ...}
 weights_AM = collections.OrderedDict()
 weights_VR = collections.OrderedDict()
+BIC_list = collections.OrderedDict()
 
-clf = mixture.GaussianMixture(n_components=2, covariance_type='full',verbose=2,verbose_interval=10,
+clf = mixture.GaussianMixture(n_components=2, covariance_type='tied',verbose=2,verbose_interval=10,
                               random_state=random.SystemRandom().randrange(0,4095),
-                              means_init=[[-17],[0]], weights_init=[1 / 2, 1 / 2],
-#                              init_params="kmeans",
-                              tol=1e-5 )
+                              means_init=[[-17],[0]],
+#                              weights_init=[1 / 2, 1 / 2],
+                              init_params="kmeans",
+                              tol=1e-5, max_iter = 1000 )
+
+# clf = mixture.GaussianMixture(n_components=1, covariance_type='full',verbose=2,verbose_interval=10,
+#                             random_state=random.SystemRandom().randrange(0,4095),
+#                             means_init=[[-17],[0]],
+# #                              weights_init=[1 / 2, 1 / 2],
+#                             init_params="kmeans",
+#                             tol=1e-5, max_iter = 1000 )
 while (cur_slice < to_slice):
 
     slice_name = "Slices_" + str(cur_slice) + "_" + str(cur_slice + deltaslice) + "_" + crystal_name
@@ -85,14 +94,16 @@ while (cur_slice < to_slice):
 
 
 
-
+    # Fit the two peaks
     clf.fit(nd_distribution.reshape(-1, 1))
-
+    BIC_list[cur_slice]= clf.bic(nd_distribution.reshape(-1, 1))
 
     # "Unflattened" variables
     r_m1, r_m2 = clf.means_
     w1, w2 = clf.weights_
-    r_c1, r_c2 = clf.covariances_
+#    r_c1, r_c2 = clf.covariances_
+    r_c1 = clf.covariances_
+    r_c2 = clf.covariances_
     print("means_: ", clf.means_)
     print("weights_: ", clf.weights_)
     print("covariances_: ", clf.covariances_)
@@ -148,11 +159,13 @@ while (cur_slice < to_slice):
     # Update cur_slice counter. Yeah maybe there's a more snakey way, don't care for now
     cur_slice = cur_slice + deltaslice
 
-print("weights_AM:")
-pp.pprint(weights_AM)
-print("weights_VR:")
-pp.pprint(weights_VR)
+# print("weights_AM:")
+# pp.pprint(weights_AM)
+# print("weights_VR:")
+# pp.pprint(weights_VR)
 
+print("BICs:")
+pp.pprint(BIC_list)
 
 
 # Fit weights/proprotions
@@ -171,11 +184,11 @@ x_fitAM = np.linspace(-(interceptAM - 1) / slopeAM,-interceptAM / slopeAM,100)
 y_fitAM = [slopeAM*xx + interceptAM for xx in x_fitAM]
 
 plt.clf()
-plt.plot(x_AM, y_AM,".",label = "AM Data", color='b')
-plt.plot(x_fitAM, y_fitAM,"-",label = "AM Proportion", color='b')
+plt.plot(x_AM, y_AM,linestyle = "solid", label = "AM Data", color='b')
+plt.plot(x_fitAM, y_fitAM, linestyle = "solid", label = "AM fit", color='b')
 
 
-plt.plot(x_VR,y_VR,".",label = "VR Probability", color='g')
+plt.plot(x_VR,y_VR, linestyle = "solid", label = "VR data", color='g')
 plt.legend()
 plt.show()
 

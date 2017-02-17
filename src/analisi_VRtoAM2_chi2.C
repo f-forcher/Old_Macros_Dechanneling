@@ -49,7 +49,7 @@ void analisi_VRtoAM_chi2(std::string nome_cristallo, std::string exp_or_sim, int
 
 
 
-	auto deltaslice = 2; //[murad]
+	auto deltaslice = 1; //[murad]
 	auto chi2_threshold = other_params.at("chi2_threshold");
 
 	{
