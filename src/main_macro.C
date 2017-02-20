@@ -690,11 +690,11 @@ int main_macro(int argc, char* argv[]) {
 	//analisi_VRtoAM("STF99","exp",-150, 50);
 	//analisi_VRtoAM("STF45", "exp", 160, 30);
 
-	analisi_VRtoAM_chi2("STF99","exp",-160, 90, STF99_par);
+	//analisi_VRtoAM_chi2("STF99","exp",-160, 90, STF99_par);
 	//analisi_VRtoAM_chi2("ST101","exp",-210, 80, ST101_par);
 
 	// TODO Non funziona...
-	//analisi_VRtoAM_chi2("STF45","exp",160, 30, STF45_par);
+	analisi_VRtoAM_chi2("STF45","exp",160, 30, STF45_par);
 
 
 	}
