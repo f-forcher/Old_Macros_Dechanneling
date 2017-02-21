@@ -4,6 +4,7 @@ import sys
 import matplotlib.pyplot as plt
 plt.ion()
 import matplotlib.mlab
+from matplotlib.markers import MarkerStyle
 import numpy as np
 from pylab import *
 import random
@@ -17,6 +18,23 @@ crystal_name = sys.argv[1]
 exp_or_sim = sys.argv[2]
 from_slice = int(sys.argv[3])  # [murad] Has to be an existing slice, for now
 to_slice = int(sys.argv[4])
+# Crystal orientation:
+# Triangle pointing to the right ="R"
+#  **
+#   | \
+# --___--
+# Triangle pointing to the left ="L"
+#      **
+#    / |
+# --___--
+if sys.argv[5] == "R":
+    crystal_orientation = "R"
+elif sys.argv[5] == "L":
+    crystal_orientation = "L"
+else:
+    raise ValueError(
+        "[ERROR]: crystal_orientation (fourth CLI argument) should be either R or L!"
+    )
 deltaslice = 1
 
 data_folder = "ForFrancesco/" + crystal_name + "_" + exp_or_sim + "/txt_data/"
@@ -127,12 +145,23 @@ while (cur_slice < to_slice):
 
     # Save the weights in the right array
     AM_mean = 0  # [murad], should be close to zero, TODO maybe take the mean from the first slice
-    if (abs(m1 - AM_mean) < abs(m2 - AM_mean)):
-        weights_AM[cur_slice] = w1
-        weights_VR[cur_slice] = w2
-    else:
-        weights_AM[cur_slice] = w2
-        weights_VR[cur_slice] = w1
+
+    if crystal_orientation == "R":
+        # Leftmost (lower X) slice is in VR ___---
+        if (m1 < m2):
+            weights_VR[cur_slice] = w1
+            weights_AM[cur_slice] = w2
+        else:
+            weights_VR[cur_slice] = w2
+            weights_AM[cur_slice] = w1
+    elif crystal_orientation == "L":
+        #Leftmost slice is in AM ---___
+        if (m1 < m2):
+            weights_AM[cur_slice] = w1
+            weights_VR[cur_slice] = w2
+        else:
+            weights_AM[cur_slice] = w2
+            weights_VR[cur_slice] = w1
 
     #fig = plt.figure(figsize = (5, 5))
     #plt.subplot(111)
@@ -190,14 +219,25 @@ y_AM = list(weights_AM.values())
 x_VR = list(weights_VR.keys())
 y_VR = list(weights_VR.values())
 
-x_fitAM = np.linspace(-(interceptAM - 1) / slopeAM, -interceptAM / slopeAM, 100)
+x_fitAM = np.linspace(-(interceptAM - 1) / slopeAM, -interceptAM / slopeAM,
+                      100)
 y_fitAM = [slopeAM * xx + interceptAM for xx in x_fitAM]
 
 plt.clf()
-plt.plot(x_AM, y_AM, linestyle="solid", label="AM Data", color='g')
-plt.plot(x_fitAM, y_fitAM, linestyle="solid", label="AM fit", color='b')
 
-plt.plot(x_VR, y_VR, linestyle="solid", label="VR data", color='r')
+# http://matplotlib.org/api/markers_api.html marker numbers
+if crystal_orientation == "R":
+    marker_AM = 6
+    marker_VR = 11
+elif crystal_orientation == "R":
+    marker_AM = 11
+    marker_VR = 6
+
+
+plt.plot(x_AM, y_AM, linestyle="solid", marker=marker_AM, label="AM Data", color='g')
+plt.plot(x_VR, y_VR, linestyle="solid", marker=marker_VR, label="VR data", color='r')
+
+plt.plot(x_fitAM, y_fitAM, linestyle="solid", label="AM fit", color='b')
 
 plt.legend()
 plt.show()
