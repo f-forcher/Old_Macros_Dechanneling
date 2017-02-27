@@ -18,7 +18,8 @@ void read_histograms(string nome_cristallo,
 					 string nomefiledati_dat,
 		 	 	 	 string nomefiledati_root,
 					 TH1D*& histogram5,
-					 TH1D*& histogram10
+					 TH1D*& histogram10,
+					 double xcorrection = 0
 					 );
 
 }

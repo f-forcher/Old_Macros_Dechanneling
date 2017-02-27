@@ -40,7 +40,8 @@ void read_histograms(string nome_cristallo,
 					 string nomefiledati_dat,
 		 	 	 	 string nomefiledati_root,
 					 TH1D*& histogram5,
-					 TH1D*& histogram10
+					 TH1D*& histogram10,
+					 double xcorrection
 					 ) {
 
 
@@ -102,7 +103,7 @@ void read_histograms(string nome_cristallo,
 		for (ULong64_t i = 0; i < datisize; ++i) {
 
 			ev = dati.getEvent( i );
-			Double_t x_entrata = ev[0];
+			Double_t x_entrata = ev[0] - xcorrection;
 			Double_t x_uscita = ev[2];
 
 			if (x_entrata > -5 and x_entrata < 5) {
