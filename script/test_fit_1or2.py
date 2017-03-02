@@ -76,16 +76,6 @@ clf = mixture.GaussianMixture(
     init_params="kmeans",
     tol=1e-5,
     max_iter=1000)
-
-# clf1 = mixture.GaussianMixture(
-#     n_components=1,
-#     covariance_type='tied',
-#     verbose=2,
-#     verbose_interval=10,
-#     random_state=random.SystemRandom().randrange(0, 4095),
-#     init_params="kmeans",
-#     tol=1e-5,
-#     max_iter=1000)
 while (cur_slice < to_slice):
 
     slice_name = "Slices_" + str(cur_slice) + "_" + str(
@@ -130,11 +120,8 @@ while (cur_slice < to_slice):
     # Create normalized histogram
     yn = y / np.sum(y)
 
-    # Fit the two peaks and save the BIC
+    # Fit the two peaks
     clf.fit(nd_distribution.reshape(-1, 1))
-    # clf1.fit(nd_distribution.reshape(-1, 1))
-    # BIC_list[cur_slice] = clf.bic(nd_distribution.reshape(-1, 1))
-    # BIC1_list[cur_slice] = clf1.bic(nd_distribution.reshape(-1, 1))
 
     # "Unflattened" variables
     r_m1, r_m2 = clf.means_
@@ -198,23 +185,12 @@ while (cur_slice < to_slice):
     # Update cur_slice counter. Yeah maybe there's a more snakey way, don't care for now
     cur_slice = cur_slice + deltaslice
 
+
+
 print("weights_AM:")
 pp.pprint(weights_AM)
 print("weights_VR:")
 pp.pprint(weights_VR)
-
-# print("BICs:")
-# pp.pprint(BIC_list)
-# print("BIC1s:")
-# pp.pprint(BIC1_list)
-# BICdiff = collections.OrderedDict()
-# for k in BIC_list.keys():
-#     BICdiff[k] = BIC_list[k] - BIC1_list[k]
-# print("BIC diffs:")
-# pp.pprint(BICdiff)
-
-
-
 
 # Fit weights/proportions
 from scipy.optimize import curve_fit
@@ -240,11 +216,6 @@ y_fitAM = [erf_to_fit(xx, AM_parameters[0], AM_parameters[1]) for xx in x_AM]
 y_fitVR = [1-yy for yy in y_fitAM]
 
 
-
-
-
-
-
 # http://matplotlib.org/api/markers_api.html marker numbers
 if crystal_orientation == "R":
     marker_AM = 6
@@ -252,6 +223,7 @@ if crystal_orientation == "R":
 elif crystal_orientation == "L":
     marker_AM = 11
     marker_VR = 6
+
 
 
 # Plot results
@@ -263,9 +235,9 @@ plt.plot(x_VR, y_VR, linestyle="dotted", marker=marker_VR, label="VR data", colo
 plt.plot(x_AM, y_fitAM, linestyle="solid", label="AM fit", color='Navy')
 plt.plot(x_VR, y_fitVR, linestyle="solid", label="VR fit", color='BlueViolet')
 
-#plt.axvline(x=144.667+ 9.5, linestyle="dashed") # TODO
-#plt.axvline(x=144.667 + 9.5+ 9.5, linestyle="dashed") #TODO
-#plt.axvline(x=144.667 + 2*9.5+ 9.5, linestyle="dashed") #TODO
+plt.axvline(x=144.667+ 9.5, linestyle="dashed") # TODO
+plt.axvline(x=144.667 + 9.5+ 9.5, linestyle="dashed") #TODO
+plt.axvline(x=144.667 + 2*9.5+ 9.5, linestyle="dashed") #TODO
 
 
 plt.title(crystal_name + "_" + exp_or_sim)
@@ -275,8 +247,8 @@ plt.show()
 
 # Plot means
 plt.figure()
-#plt.axhline(y=0, linestyle="dashed")
-#splt.axhline(y=-12.53, linestyle="dashed") #TODO
+plt.axhline(y=0, linestyle="dashed")
+plt.axhline(y=-12.53, linestyle="dashed") #TODO
 plt.plot(x_AM, y_meansAM, linestyle="dotted", marker="+", label="AM means", color='Crimson')
 plt.plot(x_AM, y_meansVR, linestyle="dotted", marker="+", label="VR means", color='RoyalBlue')
 plt.legend()
