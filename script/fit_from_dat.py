@@ -148,31 +148,17 @@ while (cur_slice < to_slice):
 
     # Save the weights in the right array
     # AM_mean = 0  # [murad], should be close to zero, TODO maybe take the mean from the first slice
-    if crystal_orientation == "R":
-        # Leftmost (lower X) slice is in VR ___---
-        if (m1 < m2):
-            weights_VR[cur_slice] = w1
-            weights_AM[cur_slice] = w2
-            means_VR[cur_slice] = m1
-            means_AM[cur_slice] = m2
-        else:
-            weights_VR[cur_slice] = w2
-            weights_AM[cur_slice] = w1
-            means_VR[cur_slice] = m2
-            means_AM[cur_slice] = m1
-    elif crystal_orientation == "L":
-        #Leftmost slice is in AM ---___
-        if (m1 < m2):
-            weights_AM[cur_slice] = w1
-            weights_VR[cur_slice] = w2
-            means_AM[cur_slice] = m1
-            means_VR[cur_slice] = m2
-
-        else:
-            weights_AM[cur_slice] = w2
-            weights_VR[cur_slice] = w1
-            means_AM[cur_slice] = m2
-            means_VR[cur_slice] = m1
+    # lower Y slice is in VR ___---
+    if (m1 < m2):
+        weights_VR[cur_slice] = w1
+        weights_AM[cur_slice] = w2
+        means_VR[cur_slice] = m1
+        means_AM[cur_slice] = m2
+    else:
+        weights_VR[cur_slice] = w2
+        weights_AM[cur_slice] = w1
+        means_VR[cur_slice] = m2
+        means_AM[cur_slice] = m1
 
     #fig = plt.figure(figsize = (5, 5))
     #plt.subplot(111)
@@ -181,7 +167,7 @@ while (cur_slice < to_slice):
     gauss2 = w2 * matplotlib.mlab.normpdf(x, m2, np.sqrt(c2))
     gauss_tot = gauss1 + gauss2
 
-    plt.plot(x, yn, "-.", label="Data", color='b')
+    plt.plot(x, yn, linestyle="dashed", drawstyle="steps-mid", label="Data", color='b')
     plt.plot(x, gauss1, label="Gauss1", color='g')
     plt.plot(x, gauss2, label="Gauss2", color='g')
     plt.plot(x, gauss_tot, label="Gauss_tot", color='r')
@@ -202,20 +188,20 @@ while (cur_slice < to_slice):
     # Update cur_slice counter. Yeah maybe there's a more snakey way, don't care for now
     cur_slice = cur_slice + deltaslice
 
-# print("weights_AM:")
-# pp.pprint(weights_AM)
-# print("weights_VR:")
-# pp.pprint(weights_VR)
+print("weights_AM:")
+pp.pprint(weights_AM)
+print("weights_VR:")
+pp.pprint(weights_VR)
 
-print("BICs:")
-pp.pprint(BIC_list)
-print("BIC1s:")
-pp.pprint(BIC1_list)
-BICdiff = collections.OrderedDict()
-for k in BIC_list.keys():
-    BICdiff[k] = BIC_list[k] - BIC1_list[k]
-print("BIC diffs:")
-pp.pprint(BICdiff)
+# print("BICs:")
+# pp.pprint(BIC_list)
+# print("BIC1s:")
+# pp.pprint(BIC1_list)
+# BICdiff = collections.OrderedDict()
+# for k in BIC_list.keys():
+#     BICdiff[k] = BIC_list[k] - BIC1_list[k]
+# print("BIC diffs:")
+# pp.pprint(BICdiff)
 
 
 
@@ -255,35 +241,36 @@ if crystal_orientation == "R":
     marker_AM = 6
     marker_VR = 11
 elif crystal_orientation == "L":
-    marker_AM = 6
-    marker_VR = 11
+    marker_AM = 11
+    marker_VR = 6
 
 
 # Plot results
 # TODO generalize to other crystals
 plt.clf()
-plt.plot(x_AM, y_AM, linestyle="solid", marker=marker_AM, label="AM Data", color='g')
-plt.plot(x_VR, y_VR, linestyle="solid", marker=marker_VR, label="VR data", color='r')
+plt.plot(x_AM, y_AM, linestyle="dotted", marker=marker_AM, label="AM Data", color='g')
+plt.plot(x_VR, y_VR, linestyle="dotted", marker=marker_VR, label="VR data", color='r')
 
-plt.plot(x_AM, y_fitAM, linestyle="solid", label="AM fit", color='b')
-plt.plot(x_AM, y_fitVR, linestyle="solid", label="VR fit", color='c')
+plt.plot(x_AM, y_fitAM, linestyle="solid", label="AM fit", color='Navy')
+plt.plot(x_VR, y_fitVR, linestyle="solid", label="VR fit", color='BlueViolet')
 
-plt.axvline(x=144.667+ 9.5, linestyle="dashed") # TODO
-plt.axvline(x=144.667 + 9.5+ 9.5, linestyle="dashed") #TODO
-plt.axvline(x=144.667 + 2*9.5+ 9.5, linestyle="dashed") #TODO
+#plt.axvline(x=144.667+ 9.5, linestyle="dashed") # TODO
+#plt.axvline(x=144.667 + 9.5+ 9.5, linestyle="dashed") #TODO
+#plt.axvline(x=144.667 + 2*9.5+ 9.5, linestyle="dashed") #TODO
 
 
-plt.title(crystal_name + "_" + exp_or_sim)
+plt.title(crystal_name + " " + exp_or_sim)
 plt.legend()
 plt.show()
 
 
 # Plot means
 plt.figure()
-plt.axhline(y=0, linestyle="dashed")
-plt.axhline(y=-12.53, linestyle="dashed") #TODO
-plt.plot(x_AM, y_meansAM, "o", linestyle="solid", label="AM means", color='b')
-plt.plot(x_AM, y_meansVR, "o", linestyle="solid", label="VR means", color='b')
+#plt.axhline(y=0, linestyle="dashed")
+#splt.axhline(y=-12.53, linestyle="dashed") #TODO
+plt.plot(x_AM, y_meansAM, linestyle="dotted", marker="+", label="AM means", color='Crimson')
+plt.plot(x_AM, y_meansVR, linestyle="dotted", marker="+", label="VR means", color='RoyalBlue')
+plt.title(crystal_name + " " + exp_or_sim)
 plt.legend()
 plt.show()
 
