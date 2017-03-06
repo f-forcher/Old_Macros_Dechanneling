@@ -8,7 +8,7 @@ from matplotlib.markers import MarkerStyle
 import numpy as np
 from pylab import *
 import random
-import math #erf
+import math  #erf
 import collections
 
 import pprint
@@ -45,9 +45,35 @@ else:
     raise ValueError(
         "[ERROR]: dat_or_root (fifth CLI argument) should be either .dat or .root!"
     )
-
-
 deltaslice = 1
+
+# Calculate the various thetas for the crystal
+
+crystal_params_fields = ("Crystal,raggio_curvatura5[m],raggio_curvatura5_err[m],"
+"raggio_curvatura10[m],raggio_curvatura10_err[m],bending_angle5[microrad],bending_angle5_err[microrad],"
+"bending_angle10[microrad],bending_angle10_err[microrad],thickness[mm],slopeDc5[1/microrad],"
+"slopeDc5_err[1/microrad],slopeDc10[1/microrad],slopeDc10_err[1/microrad],dechanneling_lenght5[m],"
+"dechanneling_lenght5_err[m],dechanneling_lenght10[m],dechanneling_lenght10_err[m]").split(',')
+crystal_params_raw = np.genfromtxt("crystal_calc_table.txt",
+dtype="a5,f8,f8,f8,f8,f8,f8,f8,f8,f8,f8,f8,f8,f8,f8,f8,f8,f8",
+names=crystal_params_fields
+)
+
+# Double dict comphrehension!!
+# Make a double entry table out of the crystal_params_raw numpy array, i.e.
+# crystal_params['STF45']['raggio_curvatura5[m]'] = 13.8248
+crystal_params = {row[0].decode("utf-8"): {crystal_params_fields[i]: row[i] for i in range(len(row)) } for row in crystal_params_raw}
+
+
+
+particle_energy = 400e9 # [eV] TODO generalize to pions!
+critical_radius = 1 #[m] TODO at 400 GeV
+pot_well = 21.34 #[eV] Potential well between crystal planes
+theta_bending = crystal_params[crystal_name]['bending_angle10[microrad]']
+crystal_curvature_radius = crystal_params[crystal_name]['raggio_curvatura10[m]']
+theta_c = math.sqrt(2*pot_well/particle_energy) * (1 - critical_radius/crystal_curvature_radius)*1e6 # [murad]
+c1_thetavr, c2_thetavr = (-1.5, 1.66666)
+theta_vr =  c1_thetavr * theta_c * (1 - c2_thetavr*critical_radius/crystal_curvature_radius) # [murad]
 
 data_folder = "ForFrancesco/" + crystal_name + "_" + exp_or_sim + "/txt_data/"
 
@@ -164,7 +190,13 @@ while (cur_slice < to_slice):
     gauss2 = w2 * matplotlib.mlab.normpdf(x, m2, np.sqrt(c2))
     gauss_tot = gauss1 + gauss2
 
-    plt.plot(x, yn, linestyle="dashed", drawstyle="steps-mid", label="Data", color='b')
+    plt.plot(
+        x,
+        yn,
+        linestyle="dashed",
+        drawstyle="steps-mid",
+        label="Data",
+        color='b')
     plt.plot(x, gauss1, label="Gauss1", color='g')
     plt.plot(x, gauss2, label="Gauss2", color='g')
     plt.plot(x, gauss_tot, label="Gauss_tot", color='r')
@@ -185,8 +217,6 @@ while (cur_slice < to_slice):
     # Update cur_slice counter. Yeah maybe there's a more snakey way, don't care for now
     cur_slice = cur_slice + deltaslice
 
-
-
 print("weights_AM:")
 pp.pprint(weights_AM)
 print("weights_VR:")
@@ -195,9 +225,12 @@ pp.pprint(weights_VR)
 # Fit weights/proportions
 from scipy.optimize import curve_fit
 from scipy.special import erf
+
+
 def erf_to_fit(xx, m, x0):
-    return 0.5*erf(m*(xx - x0)) + 0.5
+    return 0.5 * erf(m * (xx - x0)) + 0.5
     #return m*xx + x0
+
 
 x_AM = list(weights_AM.keys())
 y_AM = list(weights_AM.values())
@@ -207,59 +240,77 @@ y_VR = list(weights_VR.values())
 y_meansAM = list(means_AM.values())
 y_meansVR = list(means_VR.values())
 
-
-AM_parameters, AM_par_covars = curve_fit(erf_to_fit, x_AM, y_AM, p0=[1,(from_slice + to_slice)/2])
-
+AM_parameters, AM_par_covars = curve_fit(
+    erf_to_fit, x_AM, y_AM, p0=[1, (from_slice + to_slice) / 2])
 
 #x_fitAM = np.linspace(-(interceptAM - 1) / slopeAM, -interceptAM / slopeAM, 100)
 y_fitAM = [erf_to_fit(xx, AM_parameters[0], AM_parameters[1]) for xx in x_AM]
-y_fitVR = [1-yy for yy in y_fitAM]
-
+y_fitVR = [1 - yy for yy in y_fitAM]
 
 # http://matplotlib.org/api/markers_api.html marker numbers
 if crystal_orientation == "R":
     marker_AM = 6
     marker_VR = 11
+    or_sign = 1 # Orientation sign, to plot correctly the theta vertical bars
 elif crystal_orientation == "L":
     marker_AM = 11
     marker_VR = 6
-
-
+    or_sign = -1
 
 # Plot results
 # TODO generalize to other crystals
 plt.clf()
-plt.plot(x_AM, y_AM, linestyle="dotted", marker=marker_AM, label="AM Data", color='g')
-plt.plot(x_VR, y_VR, linestyle="dotted", marker=marker_VR, label="VR data", color='r')
+plt.plot(
+    x_AM,
+    y_AM,
+    linestyle="dotted",
+    marker=marker_AM,
+    label="AM Data",
+    color='g')
+plt.plot(
+    x_VR,
+    y_VR,
+    linestyle="dotted",
+    marker=marker_VR,
+    label="VR data",
+    color='r')
 
 plt.plot(x_AM, y_fitAM, linestyle="solid", label="AM fit", color='Navy')
 plt.plot(x_VR, y_fitVR, linestyle="solid", label="VR fit", color='BlueViolet')
 
-plt.axvline(x=144.667+ 9.5, linestyle="dashed") # TODO
-plt.axvline(x=144.667 + 9.5+ 9.5, linestyle="dashed") #TODO
-plt.axvline(x=144.667 + 2*9.5+ 9.5, linestyle="dashed") #TODO
-
+plt.axvline(x=or_sign*(theta_bending + theta_c), linestyle="dashed")  # TODO
+plt.axvline(x=or_sign*(theta_bending + theta_c + theta_c), linestyle="dashed")  #TODO
+plt.axvline(x=or_sign*(theta_bending + theta_c + 2*theta_c), linestyle="dashed")  #TODO
 
 plt.title(crystal_name + "_" + exp_or_sim)
 plt.legend()
 plt.show()
 
-
 # Plot means
 plt.figure()
 plt.axhline(y=0, linestyle="dashed")
-plt.axhline(y=-12.53, linestyle="dashed") #TODO
-plt.plot(x_AM, y_meansAM, linestyle="dotted", marker="+", label="AM means", color='Crimson')
-plt.plot(x_AM, y_meansVR, linestyle="dotted", marker="+", label="VR means", color='RoyalBlue')
+plt.axhline(y=theta_vr, linestyle="dashed")  #TODO
+plt.plot(
+    x_AM,
+    y_meansAM,
+    linestyle="dotted",
+    marker="+",
+    label="AM means",
+    color='Crimson')
+plt.plot(
+    x_AM,
+    y_meansVR,
+    linestyle="dotted",
+    marker="+",
+    label="VR means",
+    color='RoyalBlue')
 plt.legend()
 plt.show()
-
-
 
 print("Covars matrix")
 pp.pprint(AM_par_covars)
 print()
-print("m: ", AM_parameters[0], "-> c=1/m: ", 1/AM_parameters[0])
+print("m: ", AM_parameters[0], "-> c=1/m: ", 1 / AM_parameters[0])
 print("x0: ", AM_parameters[1])
 s = input('--> ')
 
