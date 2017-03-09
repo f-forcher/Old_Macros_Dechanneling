@@ -696,6 +696,7 @@ int main_macro(int argc, char* argv[]) {
 
 	// TODO Non funziona...
 	//analisi_VRtoAM_chi2("STF45","exp",150, 40, STF45_par);
+	analisi_VRtoAM_chi2("STF45","simVRAM",140, 25, STF45_par);
 	//analisi_VRtoAM_chi2("STF45","sim",130, 30, STF45_par);
 
 

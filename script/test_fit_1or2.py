@@ -87,6 +87,8 @@ weights_AM = collections.OrderedDict()
 weights_VR = collections.OrderedDict()
 means_AM = collections.OrderedDict()
 means_VR = collections.OrderedDict()
+sigma2s_AM = collections.OrderedDict()
+sigma2s_VR = collections.OrderedDict() #sigma2s_AM and sigma2s_VR should be equal if we fit with tied covariance (s1=s2)
 BIC_list = collections.OrderedDict()
 BIC1_list = collections.OrderedDict()
 BICdiff = collections.OrderedDict()
@@ -177,11 +179,15 @@ while (cur_slice < to_slice):
         weights_AM[cur_slice] = w2
         means_VR[cur_slice] = m1
         means_AM[cur_slice] = m2
+        sigma2s_VR[cur_slice] = c1
+        sigma2s_AM[cur_slice] = c2
     else:
         weights_VR[cur_slice] = w2
         weights_AM[cur_slice] = w1
         means_VR[cur_slice] = m2
         means_AM[cur_slice] = m1
+        sigma2s_VR[cur_slice] = c2
+        sigma2s_AM[cur_slice] = c1
 
     #fig = plt.figure(figsize = (5, 5))
     #plt.subplot(111)
@@ -230,7 +236,8 @@ from scipy.special import erf
 def erf_to_fit(xx, m, x0):
     return 0.5 * erf(m * (xx - x0)) + 0.5
     #return m*xx + x0
-
+def parabola_to_fit(xx, a, b, c):
+    return a*xx*xx + b*xx + c
 
 x_AM = list(weights_AM.keys())
 y_AM = list(weights_AM.values())
@@ -240,11 +247,19 @@ y_VR = list(weights_VR.values())
 y_meansAM = list(means_AM.values())
 y_meansVR = list(means_VR.values())
 
+y_sigmas = [np.sqrt(xx) for xx in sigma2s_VR.values()]
+
+
 AM_parameters, AM_par_covars = curve_fit(
     erf_to_fit, x_AM, y_AM, p0=[1, (from_slice + to_slice) / 2])
+Means_parameters, Means_params_covars = curve_fit(
+    parabola_to_fit, x_AM, y_meansAM, p0=None)
+
+
 
 #x_fitAM = np.linspace(-(interceptAM - 1) / slopeAM, -interceptAM / slopeAM, 100)
 y_fitAM = [erf_to_fit(xx, AM_parameters[0], AM_parameters[1]) for xx in x_AM]
+y_fitMeansAM = [parabola_to_fit(xx, Means_parameters[0], Means_parameters[1], Means_parameters[2]) for xx in x_AM]
 y_fitVR = [1 - yy for yy in y_fitAM]
 
 # http://matplotlib.org/api/markers_api.html marker numbers
@@ -278,11 +293,11 @@ plt.plot(
 plt.plot(x_AM, y_fitAM, linestyle="solid", label="AM fit", color='Navy')
 plt.plot(x_VR, y_fitVR, linestyle="solid", label="VR fit", color='BlueViolet')
 
-plt.axvline(x=or_sign*(theta_bending + theta_c), linestyle="dashed")  # TODO
-plt.axvline(x=or_sign*(theta_bending + theta_c + theta_c), linestyle="dashed")  #TODO
-plt.axvline(x=or_sign*(theta_bending + theta_c + 2*theta_c), linestyle="dashed")  #TODO
+plt.axvline(x=or_sign*(theta_bending + theta_c*0), linestyle="dashed", color='Chartreuse')  # TODO
+plt.axvline(x=or_sign*(theta_bending + theta_c*0 + theta_c), linestyle="dashed")  #TODO
+plt.axvline(x=or_sign*(theta_bending + theta_c*0 + 2*theta_c), linestyle="dashed")  #TODO
 
-plt.title(crystal_name + "_" + exp_or_sim)
+plt.title(crystal_name + "_" + exp_or_sim + ": weights")
 plt.legend()
 plt.show()
 
@@ -304,14 +319,41 @@ plt.plot(
     marker="+",
     label="VR means",
     color='RoyalBlue')
+plt.plot(
+    x_AM,
+    y_fitMeansAM,
+    linestyle="solid",
+    label="VR means",
+    color='Aqua')
+plt.title(crystal_name + "_" + exp_or_sim + ": means")
 plt.legend()
 plt.show()
 
-print("Covars matrix")
-pp.pprint(AM_par_covars)
-print()
+# Plot sigmas
+plt.figure()
+plt.plot(
+    x_AM,
+    y_sigmas,
+    linestyle="solid",
+    label="Sigmas",
+    color='BlueViolet')
+plt.title(crystal_name + "_" + exp_or_sim + ": sigmas")
+plt.legend()
+plt.show()
+
+print("Weights erf fit parameters: ")
 print("m: ", AM_parameters[0], "-> c=1/m: ", 1 / AM_parameters[0])
 print("x0: ", AM_parameters[1])
+
+print("Covars matrix weights erf fit: ")
+pp.pprint(AM_par_covars)
+print()
+
+print("Means parabola fit parameters: ")
+print("a: ", Means_parameters[0])
+print("b: ", Means_parameters[1])
+print("c: ", Means_parameters[2])
+
 s = input('--> ')
 
 #fig.savefig('gaussian_fit.pdf')
