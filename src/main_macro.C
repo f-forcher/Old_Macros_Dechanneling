@@ -685,18 +685,21 @@ int main_macro(int argc, char* argv[]) {
 	//TODO passarlo anche a slices dentro analisi
 
 
+
 	clog << "\n\n\n***********************************************************\n"
 			"Now analyzing the VR to AM transition\n\n\n";
 	//analisi_VRtoAM("ST101","exp",-210, 75);//70
 	//analisi_VRtoAM("STF99","exp",-150, 50);
 	//analisi_VRtoAM("STF45", "exp", 160, 30);
 
-	analisi_VRtoAM_chi2("STF99","exp",-160, 90, STF99_par);
+	//analisi_VRtoAM_chi2("STF99","exp",-160, 90, STF99_par);
+	analisi_VRtoAM_chi2("STF99","simVRAM", 120, 25, STF99_par);
 	//analisi_VRtoAM_chi2("ST101","exp",-210, 80, ST101_par);
+	//analisi_VRtoAM_chi2("ST101","simVRAM", 150, 40, ST101_par);
 
 	// TODO Non funziona...
 	//analisi_VRtoAM_chi2("STF45","exp",150, 40, STF45_par);
-	analisi_VRtoAM_chi2("STF45","simVRAM",140, 25, STF45_par);
+	//analisi_VRtoAM_chi2("STF45","simVRAM",140, 25, STF45_par);
 	//analisi_VRtoAM_chi2("STF45","sim",130, 30, STF45_par);
 
 
