@@ -672,6 +672,10 @@ int main_macro(int argc, char* argv[]) {
 	// Parameters of STF45
 	std::map<std::string, double> STF99_par;
 	STF99_par["chi2_threshold"] = 1;
+	STF99_par["lowYrange_slices"] = -40; // murad. What range save of the slices
+	STF99_par["highYrange_slices"] = 30; // murad. What range save of the slices
+	STF99_par["flipright"] = 1; // yes, rotate this crystal ()
+
 
 	std::map<std::string, double> ST101_par;
 	ST101_par["chi2_threshold"] = 80;
