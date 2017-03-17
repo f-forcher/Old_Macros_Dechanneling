@@ -54,6 +54,15 @@ enum class FieldCrystalDataTable510 {
 	numoffields
 };
 
+//Enum for the flip_histo_file function, about flipping/reflecting an histogram about its axes
+enum class HistogramFlippingDirections {
+	identity = 0, 		// Leave the histogram unchanged
+	horizontal,			// Flip it in the horizontal direction, around the Y axis (f(x,y) -> f(-x,y) )
+	vertical,			// Flip it in the vertical direction around the X axis (f(x,-y) -> f(x,-y) )
+	horizontal_vertical	// Flip it in both directions (=point reflection about origin, f(x,y) ->  f(-x,-y))
+};
+
+
 // Data for crystals distinguishing cuts at 5 and 10 microrads.
 // NB 6 as the number of fields in the enum above
 using CrystalDataTable510 = std::map<std::string, std::array<Double_t, (int)FieldCrystalDataTable510::numoffields> >;
@@ -93,6 +102,7 @@ constexpr Double_t ANGSTROM_ = 1e-10; // Angstrom in metri (1 Ang = 1e-9 m)
  *   @E: incoming particle energy [eV]
  */
 
+//TODO constexpr gives some problems with clang it seems, from the use of pow...
 constexpr Double_t electronic_dechanneling(UShort_t Z, Double_t E_GeV) {
 	using std::pow;
 	using std::log;

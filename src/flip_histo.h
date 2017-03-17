@@ -24,9 +24,9 @@ namespace mions {
  * @return: the horizontally flipped histogram
  *
  */
-TH2* flip_histo(TH2*& histogram);
+TH2* flip_histo(const TH2* histogram);
 
-
+}
 #else
 // Altrimenti includi il file della macro. Nel compilatore naturalmente direbbe multiple definition quando linka l'altro
 // file.

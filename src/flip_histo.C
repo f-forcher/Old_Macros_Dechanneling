@@ -33,11 +33,11 @@ using std::cerr;
  * @return: the horizontally flipped histogram
  *
  */
-TH2* flip_histo(TH2*& histogram) {
+TH2* flip_histo(const TH2* histogram) {
 	auto name_orig = histogram->GetName();
 	auto title_orig = histogram->GetTitle();
-	TAxis* xAxis_orig = histogram->GetXaxis();
-	TAxis* yAxis_orig = histogram->GetYaxis();
+	const TAxis* xAxis_orig = histogram->GetXaxis();
+	const TAxis* yAxis_orig = histogram->GetYaxis();
 	auto numXbin = histogram->GetNbinsX();
 	auto numYbin = histogram->GetNbinsY();
 	auto xMin_orig = xAxis_orig->GetXmin();

@@ -7,6 +7,9 @@ C_UPPER_SRCS += \
 ../src/analisi_VRtoAM.C \
 ../src/analisi_VRtoAM2_chi2.C \
 ../src/dech.C \
+../src/flip_histo.C \
+../src/flip_histo_file.C \
+../src/flip_histo_vert.C \
 ../src/main_macro.C \
 ../src/mia_dech.C \
 ../src/read_histograms.C \
@@ -22,6 +25,9 @@ C_UPPER_DEPS += \
 ./src/analisi_VRtoAM.d \
 ./src/analisi_VRtoAM2_chi2.d \
 ./src/dech.d \
+./src/flip_histo.d \
+./src/flip_histo_file.d \
+./src/flip_histo_vert.d \
 ./src/main_macro.d \
 ./src/mia_dech.d \
 ./src/read_histograms.d \
@@ -34,6 +40,9 @@ OBJS += \
 ./src/analisi_VRtoAM.o \
 ./src/analisi_VRtoAM2_chi2.o \
 ./src/dech.o \
+./src/flip_histo.o \
+./src/flip_histo_file.o \
+./src/flip_histo_vert.o \
 ./src/main.o \
 ./src/main_macro.o \
 ./src/mia_dech.o \
