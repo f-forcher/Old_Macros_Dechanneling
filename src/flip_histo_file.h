@@ -1,12 +1,12 @@
 /*
- * flip_histo.h
+ * flip_histo_file.h
  *
  *  Created on: Mar 15, 2017
  *      Author: fforcher
  */
 
-#ifndef FLIP_HISTO_H_
-#define FLIP_HISTO_H_
+#ifndef FLIP_HISTO_FILE_H_
+#define FLIP_HISTO_FILE_H_
 
 #include <TH2.h>
 
@@ -18,20 +18,20 @@ namespace mions {
 
 
 /*
- * Function to flip a 2D histogram horizontally (around the Y axis):
+ * Function to flip a 2D histogram (either vertically or horizontally) in a file
  * @params:
- * 			histogram: the histogram to flip
- * @return: the horizontally flipped histogram
+ *
+ * @return: 0 if success, some err code otherwise
  *
  */
-TH2* flip_histo(TH2*& histogram);
+int flip_histo_file(/*TODO*/);
 
 
 #else
 // Altrimenti includi il file della macro. Nel compilatore naturalmente direbbe multiple definition quando linka l'altro
 // file.
 
-#include "flip_histo.C"
+#include "flip_histo_file.C"
 
 #endif
 

@@ -1,5 +1,5 @@
 /*
- * flip_histo.C
+ * flip_histo_vert.C
  *
  *  Created on: Mar 15, 2017
  *      Author: fforcher
@@ -27,13 +27,13 @@ using std::cerr;
 
 
 /*
- * Function to flip a 2D histogram horizontally (around the Y axis):
+ * Code to flip a 2D histogram vertically (around the X axis):
  * @params:
  * 			histogram: the histogram to flip
  * @return: the horizontally flipped histogram
  *
  */
-TH2* flip_histo(TH2*& histogram) {
+TH2* flip_histo_vert(TH2*& histogram) {
 	auto name_orig = histogram->GetName();
 	auto title_orig = histogram->GetTitle();
 	TAxis* xAxis_orig = histogram->GetXaxis();
@@ -48,14 +48,15 @@ TH2* flip_histo(TH2*& histogram) {
 	TH2* flipped_histo = new TH2D(
 	/* name */ name_orig,
 	/* title */ title_orig,
-	/* X-dimension */ numXbin, -xMax_orig, -xMin_orig, //Flipped x-axis
-	/* Y-dimension */ numYbin, yMin_orig,  yMax_orig );
+	/* X-dimension */ numXbin, xMin_orig, xMax_orig, //Flipped x-axis
+	/* Y-dimension */ numYbin, -yMax_orig, -yMin_orig );
 
+	//In root, bin=0 is the underflow, and then bin = nBins + 1 is the overflow
 	for (auto i = 0; i <= numXbin + 1; i++) {
 		for (auto j = 0; j <= numYbin + 1; j++) {
 			auto old_val_ij = histogram->GetBinContent( i, j );
 			//swap
-			flipped_histo->SetBinContent(numXbin + 1 - i, j, old_val_ij);
+			flipped_histo->SetBinContent(i, numYbin + 1 - j, old_val_ij);
 		}
 	}
 

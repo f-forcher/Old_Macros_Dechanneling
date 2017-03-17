@@ -674,13 +674,14 @@ int main_macro(int argc, char* argv[]) {
 	STF99_par["chi2_threshold"] = 1;
 	STF99_par["lowYrange_slices"] = -40; // murad. What range save of the slices
 	STF99_par["highYrange_slices"] = 30; // murad. What range save of the slices
-	STF99_par["flipright"] = 1; // yes, rotate this crystal ()
+	// STF99_par["flipright"] = 1; // yes, rotate this crystal
 
 
 	std::map<std::string, double> ST101_par;
 	ST101_par["chi2_threshold"] = 80;
 	ST101_par["lowYrange_slices"] = -40; // murad. What range save of the slices
 	ST101_par["highYrange_slices"] = 30; // murad. What range save of the slices
+	// STF99_par["flipright"] = 1; // yes, rotate this crystal
 
 	std::map<std::string, double> STF45_par;
 	STF45_par["chi2_threshold"] = 80;
