@@ -7,6 +7,7 @@ C_UPPER_SRCS += \
 ../src/analisi_VRtoAM.C \
 ../src/analisi_VRtoAM2_chi2.C \
 ../src/dech.C \
+../src/electronic_dechanneling.C \
 ../src/flip_histo.C \
 ../src/flip_histo_file.C \
 ../src/flip_histo_vert.C \
@@ -25,6 +26,7 @@ C_UPPER_DEPS += \
 ./src/analisi_VRtoAM.d \
 ./src/analisi_VRtoAM2_chi2.d \
 ./src/dech.d \
+./src/electronic_dechanneling.d \
 ./src/flip_histo.d \
 ./src/flip_histo_file.d \
 ./src/flip_histo_vert.d \
@@ -40,6 +42,7 @@ OBJS += \
 ./src/analisi_VRtoAM.o \
 ./src/analisi_VRtoAM2_chi2.o \
 ./src/dech.o \
+./src/electronic_dechanneling.o \
 ./src/flip_histo.o \
 ./src/flip_histo_file.o \
 ./src/flip_histo_vert.o \

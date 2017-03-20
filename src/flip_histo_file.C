@@ -37,6 +37,8 @@ using std::cerr;
  */
 int flip_histo_file(std::string name_file, std::string name_histo_toflip, HistogramFlippingDirections flipdir) {
 
+	DBG(clog << "[LOG]: flipping histogram \"" << name_histo_toflip << "\" in file\""<< name_file << "\"" << endl;, ;)
+
 	using EFD = HistogramFlippingDirections;
 	using std::string;
 	// Steps to modify an histo in a root file
@@ -59,24 +61,29 @@ int flip_histo_file(std::string name_file, std::string name_histo_toflip, Histog
 	file_root->cd();
 	// 4) Get the histo
 	TH2* histo_toflip = (TH2*)file_root->Get(name_histo_toflip.c_str());
+	if (histo_toflip == nullptr) {
+		cerr << "[ERROR]: histogram not found in the file!";
+		return -2;
+	}
 
 
 	// 5) Modify it
 
-	//Delete the old histo with the old name and...
-	std::string name_oldhisto_todelete = name_histo_toflip + string(";*");
-	file_root->Delete(name_oldhisto_todelete.c_str());
-
-	// ...write it back with a new name
+	// Change the name of the old histo and write it back
 	std::string name_oldhisto_newname = name_histo_toflip + string("_old_flipped");
 	histo_toflip->SetName(name_oldhisto_newname.c_str());
 	histo_toflip->Write();
+
+	//Delete with the old name and...
+	std::string name_oldhisto_todelete = name_histo_toflip + string(";*");
+	file_root->Delete(name_oldhisto_todelete.c_str());
 
 	// Check in which direction(s) to flip the histograms
 	TH2* new_histo;
 	TH2* new_histo_horiz; //Temporary histo for the double flip
 	switch (flipdir) {
 		case EFD::identity:
+			DBG(clog << "[LOG]: leaving histogram unchanged" << endl;, ;)
 			new_histo = (TH2*)histo_toflip->Clone();// Do "nothing"
 
 			// Name the new histo as the old one
@@ -87,6 +94,7 @@ int flip_histo_file(std::string name_file, std::string name_histo_toflip, Histog
 
 			break;
 		case EFD::horizontal:
+			DBG(clog << "[LOG]: flipping histogram horizontally" << endl;, ;)
 			new_histo = flip_histo(histo_toflip);// Flip it horizontally
 
 			// Name the new histo as the old one
@@ -97,6 +105,7 @@ int flip_histo_file(std::string name_file, std::string name_histo_toflip, Histog
 
 			break;
 		case EFD::vertical:
+			DBG(clog << "[LOG]: flipping histogram vertically" << endl;, ;)
 			new_histo = flip_histo_vert(histo_toflip);// Flip it vertically
 
 			// Name the new histo as the old one
@@ -107,6 +116,7 @@ int flip_histo_file(std::string name_file, std::string name_histo_toflip, Histog
 
 			break;
 		case EFD::horizontal_vertical:
+			DBG(clog << "[LOG]: flipping histogram both horizontally and vertically" << endl;, ;)
 			new_histo_horiz = flip_histo(histo_toflip); // First flip it horizontally...
 			new_histo = flip_histo_vert(new_histo_horiz);    // ...then vertically
 			// Name the new histo as the old one

@@ -43,7 +43,8 @@
 #include "dech.h"
 #include "analisi_VRtoAM.h"
 #include "analisi_VRtoAM_chi2.h"
-
+#include "electronic_dechanneling.h"
+#include "flip_histo_file.h"
 
 
 
@@ -85,6 +86,7 @@ int main_macro(int argc, char* argv[]) {
 	using mions::electronic_dechanneling;
 	using mions::analisi_VRtoAM;
 	using mions::analisi_VRtoAM_chi2;
+	using mions::flip_histo_file;
 	using std::pow;
 
 
@@ -707,8 +709,9 @@ int main_macro(int argc, char* argv[]) {
 	//analisi_VRtoAM_chi2("STF45","simVRAM",140, 25, STF45_par);
 	//analisi_VRtoAM_chi2("STF45","sim",130, 30, STF45_par);
 
-
 	}
+
+	//flip_histo_file("Varie/test.root","h1", mions::HistogramFlippingDirections::horizontal_vertical);
 	return 0;
 }
 
