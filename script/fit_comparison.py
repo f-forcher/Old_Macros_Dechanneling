@@ -19,7 +19,7 @@ crystal_name = sys.argv[1]
 quale_sim = sys.argv[2]
 from_slice = int(sys.argv[3])  # [murad] Has to be an existing slice, for now
 to_slice = int(sys.argv[4])
-dat_or_root = sys.argv[5]
+#dat_or_root = sys.argv[5]
 # Crystal orientation:
 # Triangle pointing to the right ="R"
 #  **
@@ -29,30 +29,8 @@ dat_or_root = sys.argv[5]
 #      **
 #    / |
 # --___--
-if sys.argv[5] == "R":
-    crystal_orientation_exp = "R"
-elif sys.argv[5] == "L":
-    crystal_orientation_exp = "L"
-else:
-    raise ValueError(
-        "[ERROR]: crystal_orientation (fourth CLI argument) should be either R or L!"
-    )
-if sys.argv[6] == "R":
-    crystal_orientation_sim = "R"
-elif sys.argv[6] == "L":
-    crystal_orientation_sim = "L"
-else:
-    raise ValueError(
-        "[ERROR]: crystal_orientation (fifth CLI argument) should be either R or L!"
-    )
-if sys.argv[6] == ".root":
-    dat_or_root = ".root"
-elif sys.argv[6] == ".dat":
-    dat_or_root = ".dat"
-else:
-    raise ValueError(
-        "[ERROR]: dat_or_root (fifth CLI argument) should be either .dat or .root!"
-    )
+crystal_orientation = "R"
+
 deltaslice = 1
 
 # Calculate the various thetas for the crystal
@@ -120,6 +98,13 @@ clf = mixture.GaussianMixture(
     init_params="kmeans",
     tol=1e-5,
     max_iter=1000)
+data_folder = data_folder_exp
+weights_AM = weights_AM_exp
+weights_VR = weights_VR_exp
+means_AM   = means_AM_exp
+means_VR   = means_VR_exp
+sigma2s_AM = sigma2s_AM_exp
+sigma2s_VR = sigma2s_VR_exp
 while (cur_slice < to_slice):
 
     slice_name = "Slices_" + str(cur_slice) + "_" + str(
@@ -253,6 +238,13 @@ clf = mixture.GaussianMixture(
     init_params="kmeans",
     tol=1e-5,
     max_iter=1000)
+data_folder = data_folder_sim
+weights_AM = weights_AM_sim
+weights_VR = weights_VR_sim
+means_AM   = means_AM_sim
+means_VR   = means_VR_sim
+sigma2s_AM = sigma2s_AM_sim
+sigma2s_VR = sigma2s_VR_sim
 while (cur_slice < to_slice):
 
     slice_name = "Slices_" + str(cur_slice) + "_" + str(
@@ -386,32 +378,51 @@ from scipy.special import erf
 
 def erf_to_fit(xx, m, x0):
     return 0.5 * erf(m * (xx - x0)) + 0.5
-    #return m*xx + x0
+
+# Only exp are a parabola,
 def parabola_to_fit(xx, a, b, c):
     return a*xx*xx + b*xx + c
 
-x_AM = list(weights_AM.keys())
-y_AM = list(weights_AM.values())
-x_VR = list(weights_VR.keys())
-y_VR = list(weights_VR.values())
+x_AM_exp = list(weights_AM_exp.keys())
+y_AM_exp = list(weights_AM_exp.values())
+x_VR_exp = list(weights_VR_exp.keys())
+y_VR_exp = list(weights_VR_exp.values())
 
-y_meansAM = list(means_AM.values())
-y_meansVR = list(means_VR.values())
+y_meansAM_exp = list(means_AM_exp.values())
+y_meansVR_exp = list(means_VR_exp.values())
 
-y_sigmas = [np.sqrt(xx) for xx in sigma2s_VR.values()]
+y_sigmas_exp = [np.sqrt(xx) for xx in sigma2s_VR_exp.values()]
+
+x_AM_sim = list(weights_AM_sim.keys())
+y_AM_sim = list(weights_AM_sim.values())
+x_VR_sim = list(weights_VR_sim.keys())
+y_VR_sim = list(weights_VR_sim.values())
+
+y_meansAM_sim = list(means_AM_sim.values())
+y_meansVR_sim = list(means_VR_sim.values())
+
+y_sigmas_sim = [np.sqrt(xx) for xx in sigma2s_VR_sim.values()]
 
 
-AM_parameters, AM_par_covars = curve_fit(
-    erf_to_fit, x_AM, y_AM, p0=[1, (from_slice + to_slice) / 2])
+AM_parameters_exp, AM_par_covars_exp = curve_fit(
+    erf_to_fit, x_AM_exp, y_AM_exp, p0=[1, (from_slice + to_slice) / 2])
+AM_parameters_sim, AM_par_covars_sim = curve_fit(
+    erf_to_fit, x_AM_sim, y_AM_sim, p0=[1, (from_slice + to_slice) / 2])
+
+# Only exp data
 Means_parameters, Means_params_covars = curve_fit(
-    parabola_to_fit, x_AM, y_meansAM, p0=None)
+    parabola_to_fit, x_AM_exp, y_meansAM_exp, p0=None)
 
 
 
 #x_fitAM = np.linspace(-(interceptAM - 1) / slopeAM, -interceptAM / slopeAM, 100)
-y_fitAM = [erf_to_fit(xx, AM_parameters[0], AM_parameters[1]) for xx in x_AM]
-y_fitMeansAM = [parabola_to_fit(xx, Means_parameters[0], Means_parameters[1], Means_parameters[2]) for xx in x_AM]
-y_fitVR = [1 - yy for yy in y_fitAM]
+y_fitAM_exp = [erf_to_fit(xx, AM_parameters_exp[0], AM_parameters_exp[1]) for xx in x_AM_exp]
+y_fitVR_exp = [1 - yy for yy in y_fitAM_exp]
+
+y_fitAM_sim = [erf_to_fit(xx, AM_parameters_sim[0], AM_parameters_sim[1]) for xx in x_AM_sim]
+y_fitVR_sim = [1 - yy for yy in y_fitAM_sim]
+
+y_fitMeansAM = [parabola_to_fit(xx, Means_parameters[0], Means_parameters[1], Means_parameters[2]) for xx in x_AM_exp]
 
 # http://matplotlib.org/api/markers_api.html marker numbers
 if crystal_orientation == "R":
@@ -424,25 +435,42 @@ elif crystal_orientation == "L":
     or_sign = -1
 
 # Plot results
-# TODO generalize to other crystals
 plt.clf()
 plt.plot(
-    x_AM,
-    y_AM,
+    x_AM_exp,
+    y_AM_exp,
     linestyle="dotted",
     marker=marker_AM,
-    label="AM Data",
-    color='g')
+    label="AM Data exp",
+    color='DarkGreen')
 plt.plot(
-    x_VR,
-    y_VR,
+    x_VR_exp,
+    y_VR_exp,
     linestyle="dotted",
     marker=marker_VR,
-    label="VR data",
+    label="VR data exp",
+    color='DarkRed')
+plt.plot(
+    x_AM_sim,
+    y_AM_sim,
+    linestyle="dashdot",
+    marker=marker_AM,
+    label="AM Data sim",
+    color='g')
+plt.plot(
+    x_VR_sim,
+    y_VR_sim,
+    linestyle="dashdot",
+    marker=marker_VR,
+    label="VR data sim",
     color='r')
 
-plt.plot(x_AM, y_fitAM, linestyle="solid", label="AM fit", color='Navy')
-plt.plot(x_VR, y_fitVR, linestyle="solid", label="VR fit", color='BlueViolet')
+
+plt.plot(x_AM_exp, y_fitAM_exp, linestyle="solid", label="exp AM fit", color='Navy')
+plt.plot(x_VR_exp, y_fitVR_exp, linestyle="solid", label="exp VR fit", color='BlueViolet')
+plt.plot(x_AM_sim, y_fitAM_sim, linestyle="solid", label="sim AM fit", color='Navy')
+plt.plot(x_VR_sim, y_fitVR_sim, linestyle="solid", label="sim VR fit", color='BlueViolet')
+
 
 plt.axvline(x=or_sign*(theta_bending + theta_c*0), linestyle="dashed", color='Chartreuse')  # TODO
 plt.axvline(x=or_sign*(theta_bending + theta_c*0 + theta_c), linestyle="dashed")  #TODO
@@ -452,29 +480,44 @@ plt.title(crystal_name + "_" + quale_sim + ": weights")
 plt.legend()
 plt.show()
 
-# Plot means
+# Plot (exp) means
 plt.figure()
 plt.axhline(y=0, linestyle="dashed")
 plt.axhline(y=theta_vr, linestyle="dashed")  #TODO
 plt.plot(
-    x_AM,
-    y_meansAM,
+    x_AM_exp,
+    y_meansAM_exp,
     linestyle="dotted",
     marker="+",
-    label="AM means",
+    label="Exp AM means",
     color='Crimson')
 plt.plot(
-    x_AM,
-    y_meansVR,
+    x_AM_exp,
+    y_meansVR_exp,
     linestyle="dotted",
     marker="+",
-    label="VR means",
+    label="Exp VR means",
     color='RoyalBlue')
 plt.plot(
-    x_AM,
+    x_AM_sim,
+    y_meansAM_sim,
+    linestyle="dotted",
+    marker="x",
+    label="Sim AM means",
+    color='Red')
+plt.plot(
+    x_AM_sim,
+    y_meansVR_sim,
+    linestyle="dotted",
+    marker="x",
+    label="Sim VR means",
+    color='Blue')
+
+plt.plot(
+    x_AM_exp,
     y_fitMeansAM,
     linestyle="solid",
-    label="VR means",
+    label="VR means fit",
     color='Aqua')
 plt.title(crystal_name + "_" + quale_sim + ": means")
 plt.legend()
@@ -483,24 +526,37 @@ plt.show()
 # Plot sigmas
 plt.figure()
 plt.plot(
-    x_AM,
-    y_sigmas,
+    x_AM_exp,
+    y_sigmas_exp,
     linestyle="solid",
-    label="Sigmas",
+    label="Experimental Sigmas",
+    color='Blue')
+plt.plot(
+    x_AM_sim,
+    y_sigmas_sim,
+    linestyle="dashed",
+    label="Simulation Sigmas",
     color='BlueViolet')
 plt.title(crystal_name + "_" + quale_sim + ": sigmas")
 plt.legend()
 plt.show()
 
-print("Weights erf fit parameters: ")
-print("m: ", AM_parameters[0], "-> c=1/m: ", 1 / AM_parameters[0])
-print("x0: ", AM_parameters[1])
-
-print("Covars matrix weights erf fit: ")
-pp.pprint(AM_par_covars)
+print("Exp weights erf fit parameters: ")
+print("m: ", AM_parameters_exp[0], "-> c=1/m: ", 1 / AM_parameters_exp[0])
+print("x0: ", AM_parameters_exp[1])
+print("Exp covariance matrix: ")
+pp.pprint(AM_par_covars_exp)
 print()
 
-print("Means parabola fit parameters: ")
+print("Sim weights erf fit parameters: ")
+print("m: ", AM_parameters_sim[0], "-> c=1/m: ", 1 / AM_parameters_sim[0])
+print("x0: ", AM_parameters_sim[1])
+print("Sim covariance matrix: ")
+pp.pprint(AM_par_covars_sim)
+print()
+
+
+print("(Exp) Means parabola fit parameters: ")
 print("a: ", Means_parameters[0])
 print("b: ", Means_parameters[1])
 print("c: ", Means_parameters[2])

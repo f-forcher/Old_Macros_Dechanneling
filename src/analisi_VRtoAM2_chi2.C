@@ -429,7 +429,7 @@ void analisi_VRtoAM_chi2(std::string nome_cristallo, std::string exp_or_sim, int
 		if (i < regVRAM) {
 			// VR
 			// Should be only one peak here
-			assert( peaks.size() == 1 );
+			//assert( peaks.size() == 1 );
 			mVR.emplace( i, peaks[0] ); // Get the only peak at position (slice) thetax = i
 
 		} else if (i >= regVRAM and i < regAM and peaks.size() == 2) {
@@ -458,7 +458,7 @@ void analisi_VRtoAM_chi2(std::string nome_cristallo, std::string exp_or_sim, int
 		} else if (i >= regAM) {
 			// AM
 			// Should be only one peak here
-			assert( peaks.size() == 1 );
+			// assert( peaks.size() == 1 );
 
 			mAM.emplace( i, peaks[0] );
 		}
