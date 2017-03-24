@@ -262,6 +262,9 @@ y_fitAM = [erf_to_fit(xx, AM_parameters[0], AM_parameters[1]) for xx in x_AM]
 y_fitMeansAM = [parabola_to_fit(xx, Means_parameters[0], Means_parameters[1], Means_parameters[2]) for xx in x_AM]
 y_fitVR = [1 - yy for yy in y_fitAM]
 
+y_simgen = [erf_to_fit(xx, 1/(1.41421356*2*theta_c), theta_bending + theta_c) for xx in x_AM]
+
+
 # http://matplotlib.org/api/markers_api.html marker numbers
 if crystal_orientation == "R":
     marker_AM = 6
@@ -292,6 +295,8 @@ plt.plot(
 
 plt.plot(x_AM, y_fitAM, linestyle="solid", label="AM fit", color='Navy')
 plt.plot(x_VR, y_fitVR, linestyle="solid", label="VR fit", color='BlueViolet')
+plt.plot(x_AM, y_simgen, linestyle="dashed", label="Theoretical model", color='DarkOrange')
+
 
 plt.axvline(x=or_sign*(theta_bending + theta_c*0), linestyle="dashed", color='Chartreuse')  # TODO
 plt.axvline(x=or_sign*(theta_bending + theta_c*0 + theta_c), linestyle="dashed")  #TODO

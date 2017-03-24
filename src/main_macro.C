@@ -699,15 +699,18 @@ int main_macro(int argc, char* argv[]) {
 	//analisi_VRtoAM("STF99","exp",-150, 50);
 	//analisi_VRtoAM("STF45", "exp", 160, 30);
 
-	//analisi_VRtoAM_chi2("STF99","exp", 120, 25, STF99_par);
+	//analisi_VRtoAM_chi2("STF99","exp", 100, 60, STF99_par);
 	//analisi_VRtoAM_chi2("STF99","simVRAM", 120, 25, STF99_par);
-	analisi_VRtoAM_chi2("ST101","exp",150, 40, ST101_par);
+	//analisi_VRtoAM_chi2("STF99","simVRAM3", 100, 60, STF99_par);
+	//analisi_VRtoAM_chi2("ST101","exp",150, 40, ST101_par);
 	//analisi_VRtoAM_chi2("ST101","simVRAM", 150, 40, ST101_par);
+	//analisi_VRtoAM_chi2("ST101","simVRAM3", 150, 40, ST101_par);
+	analisi_VRtoAM_chi2("ST101","simVRAM4", 150, 40, ST101_par);
 
 	// TODO Non funziona...
 	//analisi_VRtoAM_chi2("STF45","exp",150, 40, STF45_par);
 
-	analisi_VRtoAM_chi2("STF45","simVRAM",150, 30, STF45_par);
+	//analisi_VRtoAM_chi2("STF45","simVRAM",150, 30, STF45_par);
 	//analisi_VRtoAM_chi2("STF45","sim",130, 30, STF45_par);
 
 	//analisi_VRtoAM_chi2("STF45","simVRAM",140, 25, STF45_par);

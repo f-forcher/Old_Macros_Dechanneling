@@ -97,6 +97,7 @@ clf = mixture.GaussianMixture(
     #                              weights_init=[1 / 2, 1 / 2],
     init_params="kmeans",
     tol=1e-5,
+    #warm_start=True,
     max_iter=1000)
 data_folder = data_folder_exp
 weights_AM = weights_AM_exp
@@ -215,7 +216,7 @@ while (cur_slice < to_slice):
     # plt.plot(np.random.rand(10))
     # plt.show()
 
-    figure_folder = "script/python_video/" + crystal_name + "_" + quale_sim + "/"
+    figure_folder = "script/python_video/" + crystal_name + "_exp" + "/"
     #plt.savefig(figure_folder + "gaussian_fit.png", dpi=300)
 
     plt.savefig(figure_folder + slice_name + ".png", dpi=300)
@@ -422,6 +423,8 @@ y_fitVR_exp = [1 - yy for yy in y_fitAM_exp]
 y_fitAM_sim = [erf_to_fit(xx, AM_parameters_sim[0], AM_parameters_sim[1]) for xx in x_AM_sim]
 y_fitVR_sim = [1 - yy for yy in y_fitAM_sim]
 
+y_simgen = [erf_to_fit(xx, 1/(1.41421356*2*theta_c), theta_bending + theta_c) for xx in x_AM_sim]
+
 y_fitMeansAM = [parabola_to_fit(xx, Means_parameters[0], Means_parameters[1], Means_parameters[2]) for xx in x_AM_exp]
 
 # http://matplotlib.org/api/markers_api.html marker numbers
@@ -468,8 +471,10 @@ plt.plot(
 
 plt.plot(x_AM_exp, y_fitAM_exp, linestyle="solid", label="exp AM fit", color='Navy')
 plt.plot(x_VR_exp, y_fitVR_exp, linestyle="solid", label="exp VR fit", color='BlueViolet')
-plt.plot(x_AM_sim, y_fitAM_sim, linestyle="solid", label="sim AM fit", color='Navy')
-plt.plot(x_VR_sim, y_fitVR_sim, linestyle="solid", label="sim VR fit", color='BlueViolet')
+plt.plot(x_AM_sim, y_fitAM_sim, linestyle="dashed", label="sim AM fit", color='Navy')
+plt.plot(x_VR_sim, y_fitVR_sim, linestyle="dashed", label="sim VR fit", color='BlueViolet')
+
+plt.plot(x_VR_sim, y_simgen, linestyle="dashed", label="Simulation Generatrix", color='DarkOrange')
 
 
 plt.axvline(x=or_sign*(theta_bending + theta_c*0), linestyle="dashed", color='Chartreuse')  # TODO
