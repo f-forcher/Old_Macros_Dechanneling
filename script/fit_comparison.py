@@ -39,9 +39,9 @@ crystal_params_fields = ("Crystal,raggio_curvatura5[m],raggio_curvatura5_err[m],
 "raggio_curvatura10[m],raggio_curvatura10_err[m],bending_angle5[microrad],bending_angle5_err[microrad],"
 "bending_angle10[microrad],bending_angle10_err[microrad],thickness[mm],slopeDc5[1/microrad],"
 "slopeDc5_err[1/microrad],slopeDc10[1/microrad],slopeDc10_err[1/microrad],dechanneling_lenght5[m],"
-"dechanneling_lenght5_err[m],dechanneling_lenght10[m],dechanneling_lenght10_err[m]").split(',')
+"dechanneling_lenght5_err[m],dechanneling_lenght10[m],dechanneling_lenght10_err[m],particle_type,particle_energy[GeV]").split(',')
 crystal_params_raw = np.genfromtxt("crystal_calc_table.txt",
-dtype="a5,f8,f8,f8,f8,f8,f8,f8,f8,f8,f8,f8,f8,f8,f8,f8,f8,f8",
+dtype="a5,f8,f8,f8,f8,f8,f8,f8,f8,f8,f8,f8,f8,f8,f8,f8,f8,f8,f8,f8",
 names=crystal_params_fields
 )
 
@@ -52,7 +52,7 @@ crystal_params = {row[0].decode("utf-8"): {crystal_params_fields[i]: row[i] for 
 
 
 
-particle_energy = 400e9 # [eV] TODO generalize to pions!
+particle_energy = crystal_params[crystal_name]['particle_energy[GeV]'] * 1e9 # [eV] TODO generalize to pions!
 critical_radius = 1 #[m] TODO at 400 GeV
 pot_well = 21.34 #[eV] Potential well between crystal planes
 theta_bending = crystal_params[crystal_name]['bending_angle10[microrad]']

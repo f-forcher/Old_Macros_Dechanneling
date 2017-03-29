@@ -505,6 +505,9 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 	//Create key with name nome_cristallo
 	auto& crystal_calc_ref = dati_cristalli_calcolati[nome_cristallo];
 
+	auto particle_type_number = dati_cristalli_orig.at( nome_cristallo )[(int) FieldCrystalDataTable::particle_type_number];
+	auto particle_energy = dati_cristalli_orig.at( nome_cristallo )[(int) FieldCrystalDataTable::particle_energy];
+
 	using FCDT = FieldCrystalDataTable510;
 	crystal_calc_ref[(int) FCDT::bending_angle5] = bending_angle5;
 	crystal_calc_ref[(int) FCDT::bending_angle5_err] = bending_angle5_err;
@@ -523,6 +526,8 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 	crystal_calc_ref[(int) FCDT::dechanneling_lenght5_err] = map5["dechanneling_lenght_err"];
 	crystal_calc_ref[(int) FCDT::dechanneling_lenght10] = map10["dechanneling_lenght"];
 	crystal_calc_ref[(int) FCDT::dechanneling_lenght10_err] = map10["dechanneling_lenght_err"];
+	crystal_calc_ref[(int) FCDT::particle_type_number] = particle_type_number;
+	crystal_calc_ref[(int) FCDT::particle_energy] = particle_energy;
 
 	/*
 	 * Test con somma
@@ -726,6 +731,8 @@ void mia_dech(std::string nome_cristallo, std::shared_ptr<std::ofstream> output_
 	crystal_calctot_ref[(int) FCDT::dechanneling_lenght5_err] = map5_tot["dechanneling_lenght_err"];
 	crystal_calctot_ref[(int) FCDT::dechanneling_lenght10] = map10_tot["dechanneling_lenght"];
 	crystal_calctot_ref[(int) FCDT::dechanneling_lenght10_err] = map10_tot["dechanneling_lenght_err"];
+	crystal_calctot_ref[(int) FCDT::particle_type_number] = particle_type_number;
+	crystal_calctot_ref[(int) FCDT::particle_energy] = particle_energy;
 
 	//TCanvas* mio_c1 = new TCanvas();
 	//vCanvases.push_back(new TCanvas(nome_cristallo.c_str()));

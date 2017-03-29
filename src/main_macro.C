@@ -272,7 +272,9 @@ int main_macro(int argc, char* argv[]) {
 			<< "dechanneling_lenght5[m],"
 			<< "dechanneling_lenght5_err[m],"
 			<< "dechanneling_lenght10[m],"
-			<< "dechanneling_lenght10_err[m]"
+			<< "dechanneling_lenght10_err[m],"
+			<< "particle_type,"  // -1000=protons, -2000 pions, -3000 Lead Ions
+			<< "particle_energy[GeV]"
 			<< endl;
 
 	ROOT_PROJDIR = gDirectory;
@@ -301,6 +303,11 @@ int main_macro(int argc, char* argv[]) {
 			Double_t raggio_curvatura;
 			Double_t bending_angle;
 			Double_t thickness;
+			Double_t particle_type_number;
+			Double_t particle_energy;
+
+
+
 
 			std::getline( file_raggi_cristalli, riga_estratta );
 			//cout << riga_estratta << endl;
@@ -310,6 +317,9 @@ int main_macro(int argc, char* argv[]) {
 			ss >> raggio_curvatura;
 			ss >> bending_angle;
 			ss >> thickness;
+			ss >> particle_type_number;
+			ss >> particle_energy;
+
 
 			if (cristallo != string( "" )) {
 				DBG( clog << cristallo << ": Rc " << raggio_curvatura << " Thb " << bending_angle << endl; ;, ; )
@@ -317,7 +327,7 @@ int main_macro(int argc, char* argv[]) {
 				//map_dati_crist[cristallo][(int)FieldCrystalDataTable::bending_angle] = bending_angle;
 
 				// The other elements will be initialized to zero
-				map_dati_crist_orig[cristallo] = {raggio_curvatura, bending_angle, thickness};
+				map_dati_crist_orig[cristallo] = {raggio_curvatura, bending_angle, thickness, particle_type_number, particle_energy};
 			}
 
 			ss.clear();
@@ -702,18 +712,21 @@ int main_macro(int argc, char* argv[]) {
 	//analisi_VRtoAM_chi2("STF99","exp", 100, 60, STF99_par);
 	//analisi_VRtoAM_chi2("STF99","simVRAM", 120, 25, STF99_par);
 	//analisi_VRtoAM_chi2("STF99","simVRAM3", 100, 60, STF99_par);
+	//analisi_VRtoAM_chi2("STF99","simVRAM5", 100, 60, STF99_par);
 	//analisi_VRtoAM_chi2("ST101","exp",150, 40, ST101_par);
 	//analisi_VRtoAM_chi2("ST101","simVRAM", 150, 40, ST101_par);
 	//analisi_VRtoAM_chi2("ST101","simVRAM3", 150, 40, ST101_par);
-	analisi_VRtoAM_chi2("ST101","simVRAM4", 150, 40, ST101_par);
+	//analisi_VRtoAM_chi2("ST101","simVRAM4", 150, 40, ST101_par);
+	//analisi_VRtoAM_chi2("ST101","simVRAM5", 150, 40, ST101_par);
 
 	// TODO Non funziona...
-	//analisi_VRtoAM_chi2("STF45","exp",150, 40, STF45_par);
+	//analisi_VRtoAM_chi2("STF45","exp",140, 50, STF45_par);
 
 	//analisi_VRtoAM_chi2("STF45","simVRAM",150, 30, STF45_par);
 	//analisi_VRtoAM_chi2("STF45","sim",130, 30, STF45_par);
 
 	//analisi_VRtoAM_chi2("STF45","simVRAM",140, 25, STF45_par);
+	analisi_VRtoAM_chi2("STF45","simVRAM5",140, 40, STF45_par);
 	}
 
 	//flip_histo_file("Varie/test.root","h1", mions::HistogramFlippingDirections::horizontal_vertical);

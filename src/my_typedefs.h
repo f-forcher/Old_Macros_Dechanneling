@@ -20,6 +20,8 @@ enum class FieldCrystalDataTable {
 	raggio_curvatura = 0, //important 0 because it will be used to access an array
 	bending_angle,
 	thickness,
+	particle_type_number, // -1000=protons, -2000 pions, -3000 Lead Ions
+	particle_energy,
 	// A little trick: as long as the elements of the enum are numbered progressively from zero,
 	// numoffields contains the number of elements preceding it.
 	// The enum itself is +1 bigger than the data fields but this should not be a problem
@@ -48,6 +50,8 @@ enum class FieldCrystalDataTable510 {
 	dechanneling_lenght5_err,
 	dechanneling_lenght10,
 	dechanneling_lenght10_err,
+	particle_type_number,  // -1000=protons, -2000 pions, -3000 Lead Ions
+	particle_energy,
 	// A little trick: as long as the elements of the enum are numbered progressively from zero,
 	// numoffields contains the number of elements preceding it.
 	// The enum itself is +1 bigger than the data fields but this should not be a problem
