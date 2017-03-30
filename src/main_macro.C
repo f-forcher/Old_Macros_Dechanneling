@@ -726,7 +726,8 @@ int main_macro(int argc, char* argv[]) {
 	//analisi_VRtoAM_chi2("STF45","sim",130, 30, STF45_par);
 
 	//analisi_VRtoAM_chi2("STF45","simVRAM",140, 25, STF45_par);
-	analisi_VRtoAM_chi2("STF45","simVRAM5",140, 40, STF45_par);
+	analisi_VRtoAM_chi2("STF45","oldVRAM",140, 40, STF45_par);
+	//analisi_VRtoAM_chi2("STF45","simVRAM5",140, 40, STF45_par);
 	}
 
 	//flip_histo_file("Varie/test.root","h1", mions::HistogramFlippingDirections::horizontal_vertical);

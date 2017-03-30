@@ -468,20 +468,31 @@ plt.plot(
     label="VR data sim",
     color='r')
 
+# Plot model
+# plt.plot([from_slice,theta_bending], [1,1], linestyle="solid", label="", color='Navy')
+# plt.plot([theta_bending,theta_bending + 2*theta_c], [1,0], linestyle="solid", label="Simulation VR weights (without noise)", color='Navy')
+# plt.plot([theta_bending + 2*theta_c,to_slice], [0,0], linestyle="solid", label="", color='Navy')
+#
+# plt.plot([from_slice,theta_bending], [0,0], linestyle="solid", label="", color='DarkOrange')
+# plt.plot([theta_bending,theta_bending + 2*theta_c], [0,1], linestyle="solid", label="Simulation AM weights (without noise)", color='DarkOrange')
+# plt.plot([theta_bending + 2*theta_c,to_slice], [1,1], linestyle="solid", label="", color='DarkOrange')
 
-plt.plot(x_AM_exp, y_fitAM_exp, linestyle="solid", label="exp AM fit", color='Navy')
-plt.plot(x_VR_exp, y_fitVR_exp, linestyle="solid", label="exp VR fit", color='BlueViolet')
-plt.plot(x_AM_sim, y_fitAM_sim, linestyle="dashed", label="sim AM fit", color='Navy')
-plt.plot(x_VR_sim, y_fitVR_sim, linestyle="dashed", label="sim VR fit", color='BlueViolet')
+# Plot the fits
+# plt.plot(x_AM_exp, y_fitAM_exp, linestyle="solid", label="exp AM fit", color='Navy')
+# plt.plot(x_VR_exp, y_fitVR_exp, linestyle="solid", label="exp VR fit", color='BlueViolet')
+# plt.plot(x_AM_sim, y_fitAM_sim, linestyle="dashed", label="sim AM fit", color='Navy')
+# plt.plot(x_VR_sim, y_fitVR_sim, linestyle="dashed", label="sim VR fit", color='BlueViolet')
+#
+# plt.plot(x_VR_sim, y_simgen, linestyle="dashed", label="Simulation Generatrix", color='DarkOrange')
 
-plt.plot(x_VR_sim, y_simgen, linestyle="dashed", label="Simulation Generatrix", color='DarkOrange')
-
-
-plt.axvline(x=or_sign*(theta_bending + theta_c*0), linestyle="dashed", color='Chartreuse')  # TODO
-plt.axvline(x=or_sign*(theta_bending + theta_c*0 + theta_c), linestyle="dashed")  #TODO
-plt.axvline(x=or_sign*(theta_bending + theta_c*0 + 2*theta_c), linestyle="dashed")  #TODO
+# Plot the characteristic angles of the transition region
+plt.axvline(x=or_sign*(theta_bending), linestyle="dashed", color='Crimson')  # TODO
+plt.axvline(x=or_sign*(theta_bending + theta_c), linestyle="dashed")  #TODO
+plt.axvline(x=or_sign*(theta_bending + 2*theta_c), linestyle="dashed")  #TODO
 
 plt.title(crystal_name + "_" + quale_sim + ": weights")
+plt.xlabel(r'$\theta_{x}\ [\mu rad]$')
+plt.ylabel('Probability')
 plt.legend()
 plt.show()
 
@@ -517,14 +528,19 @@ plt.plot(
     marker="x",
     label="Sim VR means",
     color='Blue')
-
-plt.plot(
-    x_AM_exp,
-    y_fitMeansAM,
-    linestyle="solid",
-    label="VR means fit",
-    color='Aqua')
+# Plot means
+# plt.plot(
+#     x_AM_exp,
+#     y_fitMeansAM,
+#     linestyle="solid",
+#     label="VR means fit",
+#     color='Aqua')
+plt.axvline(x=or_sign*(theta_bending), linestyle="dashed", color='Crimson')  # TODO
+plt.axvline(x=or_sign*(theta_bending + theta_c), linestyle="dashed")  #TODO
+plt.axvline(x=or_sign*(theta_bending + 2*theta_c), linestyle="dashed")  #TODO
 plt.title(crystal_name + "_" + quale_sim + ": means")
+plt.xlabel(r'$\theta_{x}\ [\mu rad]$')
+plt.xlabel(r'$\Delta\theta_{x}\ [\mu rad]$')
 plt.legend()
 plt.show()
 
@@ -542,7 +558,13 @@ plt.plot(
     linestyle="dashed",
     label="Simulation Sigmas",
     color='BlueViolet')
+# Plot the characteristic angles of the transition region
+plt.axvline(x=or_sign*(theta_bending), linestyle="dashed", color='Crimson')  # TODO
+plt.axvline(x=or_sign*(theta_bending + theta_c), linestyle="dashed")  #TODO
+plt.axvline(x=or_sign*(theta_bending + 2*theta_c), linestyle="dashed")  #TODO
 plt.title(crystal_name + "_" + quale_sim + ": sigmas")
+plt.xlabel(r'$\theta_{x}\ [\mu rad]$')
+plt.ylabel(r'Slice sigma [$\mu$rad]]')
 plt.legend()
 plt.show()
 
