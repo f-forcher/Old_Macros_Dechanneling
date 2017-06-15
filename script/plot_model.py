@@ -57,11 +57,11 @@ plt.axvline(x=theta_bending + theta_c, linestyle="dashed", label=r"$\theta_{b}  
 plt.axvline(x=theta_bending + 2*theta_c, linestyle="dashed", label=r"$\theta_{b}  + 2 \theta_c$")
 
 plt.plot([from_slice,theta_bending], [1,1], linestyle="solid", label="", color='Navy')
-plt.plot([theta_bending,theta_bending + 2*theta_c], [1,0], linestyle="solid", label="Simulation VR weights (without noise)", color='Navy')
+plt.plot([theta_bending,theta_bending + 2*theta_c], [1,0], linestyle="solid", label="VR weights", color='Navy')
 plt.plot([theta_bending + 2*theta_c,to_slice], [0,0], linestyle="solid", label="", color='Navy')
 
 plt.plot([from_slice ,theta_bending], [0,0], linestyle="solid", label="", color='DarkOrange')
-plt.plot([theta_bending,theta_bending + 2*theta_c], [0,1], linestyle="solid", label="Simulation AM weights (without noise)", color='DarkOrange')
+plt.plot([theta_bending,theta_bending + 2*theta_c], [0,1], linestyle="solid", label="AM weights", color='DarkOrange')
 plt.plot([theta_bending + 2*theta_c,to_slice], [1,1], linestyle="solid", label="", color='DarkOrange')
 
 

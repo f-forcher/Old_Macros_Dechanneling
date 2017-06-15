@@ -540,7 +540,7 @@ plt.axvline(x=or_sign*(theta_bending + theta_c), linestyle="dashed")  #TODO
 plt.axvline(x=or_sign*(theta_bending + 2*theta_c), linestyle="dashed")  #TODO
 plt.title(crystal_name + "_" + quale_sim + ": means")
 plt.xlabel(r'$\theta_{x}\ [\mu rad]$')
-plt.xlabel(r'$\Delta\theta_{x}\ [\mu rad]$')
+plt.ylabel(r'$\Delta\theta_{x}\ [\mu rad]$')
 plt.legend()
 plt.show()
 
