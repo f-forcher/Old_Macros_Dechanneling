@@ -11,9 +11,67 @@ from pylab import *
 import random
 import math  #erf
 import collections
+import bisect, itertools # For the weighted sampling, from https://docs.python.org/3.5/library/random.html#examples-and-recipes
 
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
+
+def create_synth_dataset_from_histo(xhisto, yhisto, randseed):
+    '''
+    Create a synthetic dataset using drawing with replacement from the data histogram.
+    x: Histogram x values (bin centers)
+    y: histogram y values (bin content). Must be nonnegative integers and len(y) == len(x)
+    return: a list of N data ("raw" datapoints, NOT an histogram!) values
+            extracted from the real data with replacement.
+    '''
+    synth_dataset = []
+    data_cdf = list(itertools.accumulate(yhisto)) # data_cdf[i] = sum(y[i], 0, i) https://docs.python.org/3.5/library/random.html#examples-and-recipes
+    # randseed = random.SystemRandom().randrange(0, 9223372036854775807) # sys.maxsize = 2^63-1
+    random.seed(randseed)
+    extracted_num = random.random() * data_cdf[-1] #
+    for j in range(len(yhisto)):
+        extracted_num = random.random() * data_cdf[-1]
+        new_extracted_elem = xhisto[bisect.bisect(data_cdf,extracted_num)]
+        synth_dataset.append(new_extracted_elem)
+    return synth_dataset
+
+def transform_histo_to_dataset(xhisto,yhisto):
+    '''
+    Transforms (deterministically) an histogram into datapoints, because e.g.
+    scikit fits datapoints and not histograms.
+    x: Histogram x values (bin centers)
+    y: histogram y values (bin content). Must be nonnegative integers and len(y) == len(x)
+    return: a set of datapoints created as explained below
+
+    We have the data histogram, a 2D array with the sample density for every
+    x-centered bin, like
+    [
+       [-38, 2],
+       [-36, 1],
+       [-34, 3],
+       ...
+    ]
+    But scikit want samples, something like
+    [
+       [-38],
+       [-38],
+       [-36],
+       [-34],
+       [-34],
+       [-34],
+       ...
+    ]
+    So we create (deterministic) samples from the histogram,
+    simply by accumulating y (bin content) datapoints at each bin center x
+    '''
+    distribution = []
+    for i in range(len(y)):
+        posizione_col = x[i]
+        altezza_col = y[i]
+        for j in range(int(np.round(altezza_col))):
+            distribution.append(posizione_col)
+    return distribution
+
 
 # "Main"
 crystal_name = sys.argv[1]
@@ -107,153 +165,121 @@ clf = mixture.GaussianMixture(
     init_params="kmeans",
     tol=1e-5,
     max_iter=1000)
-# TODO finire bootstrap, in particolare fittare synth dataset e
+# TODO TODO finire bootstrap, in particolare scrivere funzione che fitta synth_dataset e tirarne fuori i valori
 while (cur_slice < to_slice):
+    slice_name = "Slices_" + str(cur_slice) + "_" + str(
+        cur_slice + deltaslice) + "_" + crystal_name
+    data = np.loadtxt(data_folder + slice_name + ".txt")
+    #data = np.loadtxt('ForFrancesco/ST101_exp/txt_data/Slices_-186_-184_ST101.txt')
+    #data = np.loadtxt('ForFrancesco/ST101_exp/txt_data/Slices_-142_-140_ST101.txt')
 
-    # Do the bootstrap totnumstrap amounts of time
-    totnumbootstrap = totnumbootstrap
-    for numbootstrap in range(1,totnumbootstrap):
-        slice_name = "Slices_" + str(cur_slice) + "_" + str(
-            cur_slice + deltaslice) + "_" + crystal_name
-        data = np.loadtxt(data_folder + slice_name + ".txt")
-        #data = np.loadtxt('ForFrancesco/ST101_exp/txt_data/Slices_-186_-184_ST101.txt')
-        #data = np.loadtxt('ForFrancesco/ST101_exp/txt_data/Slices_-142_-140_ST101.txt')
+    x = data[:, 0]
+    y = data[:, 1]
 
-        x = data[:, 0]
-        y = data[:, 1]
+    # We have the data histogram, a 2D array with the sample density for every
+    # x-centered bin, like
+    # [
+    #    [-38, 2],
+    #    [-36, 1],
+    #    [-34, 3],
+    #    ...
+    # ]
+    # But scikit want samples, something like
+    # [
+    #    [-38],
+    #    [-38],
+    #    [-36],
+    #    [-34],
+    #    [-34],
+    #    [-34],
+    #    ...
+    # ]
+    # So we create (deterministic) samples from the histogram
 
-        # We have the data histogram, a 2D array with the sample density for every
-        # x-centered bin, like
-        # [
-        #    [-38, 2],
-        #    [-36, 1],
-        #    [-34, 3],
-        #    ...
-        # ]
-        # But scikit want samples, something like
-        # [
-        #    [-38],
-        #    [-38],
-        #    [-36],
-        #    [-34],
-        #    [-34],
-        #    [-34],
-        #    ...
-        # ]
-        # So we create (deterministic) samples from the histogram
+    # TODO fittare i dati per i parametri veri, gli altri valori ovviamente vanno solo per gli intervalli/errori
+    distribution = transform_histo_to_dataset(x,y)
 
-        # Integrate the pdf/histogram, giving the cdf
-        partialsum = 0;
-        data_cdf = [] # cumulative
-        for i in range(0,len(data))
-            partialsum = partialsum + y[i]
-            data_cdf.append((x[i],partialsum))
+    #pp.pprint(distribution)
+    # Make the numpy array
+    nd_distribution = np.array(distribution)
 
-        # TODO meglio spostare in funzione apposita
-        # Draw with replacement from the distribution
-        # Generate a 0<random number<len(data) and check where it falls in the cumulative distribution
-        synth_distribution = [];
-        # synt_seed = random.SystemRandom().randrange(0, 4294967295) # 2**32-1
-        random.seed()
-        extracted_num = random.randint(0,len(y)) #
-        for j in range(len(y)):
-            i = 0
-            while extracted_num <= data_cdf[i][0]:
-                i++
-            new_extracted_elem = data_cdf[i][0] # ALso equivalent to x[i]
-            synth_dataset.push(new_extracted_elem)
+    # Create normalized histogram
+    yn = y / np.sum(y)
 
+    # Fit the two peaks
+    clf.fit(nd_distribution.reshape(-1, 1))
 
-        # TODO fittare i dati per i parametri veri, gli altri valori ovviamente vanno solo per gli intervalli/errori
-        # TODO quindi tenere questa
-        distribution = []
-        for i in range(len(y)):
-            posizione_col = x[i]
-            altezza_col = y[i]
-            for j in range(int(np.round(altezza_col))):
-                distribution.append(x[i])
+    # "Unflattened" variables
+    r_m1, r_m2 = clf.means_
+    w1, w2 = clf.weights_
+    #    r_c1, r_c2 = clf.covariances_
+    r_c1 = clf.covariances_
+    r_c2 = clf.covariances_
+    print("means_: ", clf.means_)
+    print("weights_: ", clf.weights_)
+    print("covariances_: ", clf.covariances_)
 
-        #pp.pprint(distribution)
-        # Make the numpy array
-        nd_distribution = np.array(distribution)
+    print("First peak: ", r_m1[0], "Second peak:", r_m2[0])
+    print("w1: ", w1, "w2:", w2)
+    print("c1: ", r_c1[0][0], "c2:", r_c2[0][0])
 
-        # Create normalized histogram
-        yn = y / np.sum(y)
+    # Flatten variables
+    m1, m2 = r_m1[0], r_m2[0]
+    c1, c2 = r_c1[0][0], r_c2[0][0]
 
-        # Fit the two peaks
-        clf.fit(nd_distribution.reshape(-1, 1))
+    # m1, m2 = r_m1, r_m2
+    # c1, c2 = r_c1, r_c2
 
-        # "Unflattened" variables
-        r_m1, r_m2 = clf.means_
-        w1, w2 = clf.weights_
-        #    r_c1, r_c2 = clf.covariances_
-        r_c1 = clf.covariances_
-        r_c2 = clf.covariances_
-        print("means_: ", clf.means_)
-        print("weights_: ", clf.weights_)
-        print("covariances_: ", clf.covariances_)
+    # Save the weights in the right array
+    # Lower Y is the VR peak
+    if (m1 < m2):
+        weights_VR[cur_slice] = w1
+        weights_AM[cur_slice] = w2
+        means_VR[cur_slice] = m1
+        means_AM[cur_slice] = m2
+        sigma2s_VR[cur_slice] = c1
+        sigma2s_AM[cur_slice] = c2
+    else:
+        weights_VR[cur_slice] = w2
+        weights_AM[cur_slice] = w1
+        means_VR[cur_slice] = m2
+        means_AM[cur_slice] = m1
+        sigma2s_VR[cur_slice] = c2
+        sigma2s_AM[cur_slice] = c1
 
-        print("First peak: ", r_m1[0], "Second peak:", r_m2[0])
-        print("w1: ", w1, "w2:", w2)
-        print("c1: ", r_c1[0][0], "c2:", r_c2[0][0])
+    #fig = plt.figure(figsize = (5, 5))
+    #plt.subplot(111)
+    # gauss_test = 0.5*matplotlib.mlab.normpdf(x, -20, 8)
+    gauss1 = w1 * matplotlib.mlab.normpdf(x, m1, np.sqrt(c1))
+    gauss2 = w2 * matplotlib.mlab.normpdf(x, m2, np.sqrt(c2))
+    gauss_tot = gauss1 + gauss2
 
-        # Flatten variables
-        m1, m2 = r_m1[0], r_m2[0]
-        c1, c2 = r_c1[0][0], r_c2[0][0]
+    plt.plot(
+        x,
+        yn,
+        linestyle="dashed",
+        drawstyle="steps-mid",
+        label="Data",
+        color='b')
+    plt.plot(x, gauss1, label="Gauss1", color='g')
+    plt.plot(x, gauss2, label="Gauss2", color='g')
+    plt.plot(x, gauss_tot, label="Gauss_tot", color='r')
 
-        # m1, m2 = r_m1, r_m2
-        # c1, c2 = r_c1, r_c2
+    plt.legend()
+    #plt.show()
 
-        # Save the weights in the right array
-        # Lower Y is the VR peak
-        if (m1 < m2):
-            weights_VR[cur_slice] = w1
-            weights_AM[cur_slice] = w2
-            means_VR[cur_slice] = m1
-            means_AM[cur_slice] = m2
-            sigma2s_VR[cur_slice] = c1
-            sigma2s_AM[cur_slice] = c2
-        else:
-            weights_VR[cur_slice] = w2
-            weights_AM[cur_slice] = w1
-            means_VR[cur_slice] = m2
-            means_AM[cur_slice] = m1
-            sigma2s_VR[cur_slice] = c2
-            sigma2s_AM[cur_slice] = c1
+    # plt.figure()  # New window, if needed.  No need to save it, as pyplot uses the concept of current figure
+    # plt.plot(np.random.rand(10))
+    # plt.show()
 
-        #fig = plt.figure(figsize = (5, 5))
-        #plt.subplot(111)
-        # gauss_test = 0.5*matplotlib.mlab.normpdf(x, -20, 8)
-        gauss1 = w1 * matplotlib.mlab.normpdf(x, m1, np.sqrt(c1))
-        gauss2 = w2 * matplotlib.mlab.normpdf(x, m2, np.sqrt(c2))
-        gauss_tot = gauss1 + gauss2
+    figure_folder = "script/python_video/" + crystal_name + "_" + exp_or_sim + "/"
+    #plt.savefig(figure_folder + "gaussian_fit.png", dpi=300)
 
-        plt.plot(
-            x,
-            yn,
-            linestyle="dashed",
-            drawstyle="steps-mid",
-            label="Data",
-            color='b')
-        plt.plot(x, gauss1, label="Gauss1", color='g')
-        plt.plot(x, gauss2, label="Gauss2", color='g')
-        plt.plot(x, gauss_tot, label="Gauss_tot", color='r')
+    plt.savefig(figure_folder + slice_name + ".png", dpi=300)
+    plt.clf()
 
-        plt.legend()
-        #plt.show()
-
-        # plt.figure()  # New window, if needed.  No need to save it, as pyplot uses the concept of current figure
-        # plt.plot(np.random.rand(10))
-        # plt.show()
-
-        figure_folder = "script/python_video/" + crystal_name + "_" + exp_or_sim + "/"
-        #plt.savefig(figure_folder + "gaussian_fit.png", dpi=300)
-
-        plt.savefig(figure_folder + slice_name + ".png", dpi=300)
-        plt.clf()
-
-        # Update cur_slice counter. Yeah maybe there's a more snakey way, don't care for now
-        cur_slice = cur_slice + deltaslice
+    # Update cur_slice counter. Yeah maybe there's a more snakey way, don't care for now
+    cur_slice = cur_slice + deltaslice
 
 print("weights_AM:")
 pp.pprint(weights_AM)
