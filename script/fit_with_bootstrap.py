@@ -16,7 +16,7 @@ import bisect, itertools # For the weighted sampling, from https://docs.python.o
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
-def create_synth_dataset_from_histo(xhisto, yhisto, randseed):
+def create_synth_dataset_from_histo(xhisto, yhisto, randseed=None):
     '''
     Create a synthetic dataset using drawing with replacement from the data histogram.
     x: Histogram x values (bin centers)
@@ -28,8 +28,8 @@ def create_synth_dataset_from_histo(xhisto, yhisto, randseed):
     data_cdf = list(itertools.accumulate(yhisto)) # data_cdf[i] = sum(y[i], 0, i) https://docs.python.org/3.5/library/random.html#examples-and-recipes
     # randseed = random.SystemRandom().randrange(0, 9223372036854775807) # sys.maxsize = 2^63-1
     random.seed(randseed)
-    extracted_num = random.random() * data_cdf[-1] #
-    for j in range(len(yhisto)):
+    extracted_num = random.random() * data_cdf[-1] # data_cdf[-1] = total number of events inside the histogram
+    for j in range(int(np.round(data_cdf[-1]))): # data_cdf[-1] = see above comment
         extracted_num = random.random() * data_cdf[-1]
         new_extracted_elem = xhisto[bisect.bisect(data_cdf,extracted_num)]
         synth_dataset.append(new_extracted_elem)
@@ -78,7 +78,7 @@ crystal_name = sys.argv[1]
 exp_or_sim = sys.argv[2]
 from_slice = int(sys.argv[3])  # [murad] Has to be an existing slice, for now
 to_slice = int(sys.argv[4])
-dat_or_root = sys.argv[5]
+#dat_or_root = sys.argv[5]
 # Crystal orientation:
 # Triangle pointing to the right ="R"
 #  **
@@ -96,14 +96,7 @@ else:
     raise ValueError(
         "[ERROR]: crystal_orientation (fourth CLI argument) should be either R or L!"
     )
-if sys.argv[6] == ".root":
-    dat_or_root = ".root"
-elif sys.argv[6] == ".dat":
-    dat_or_root = ".dat"
-else:
-    raise ValueError(
-        "[ERROR]: dat_or_root (fifth CLI argument) should be either .dat or .root!"
-    )
+
 deltaslice = 1
 
 # Calculate the various thetas for the crystal
@@ -152,6 +145,18 @@ BIC_list = collections.OrderedDict()
 BIC1_list = collections.OrderedDict()
 BICdiff = collections.OrderedDict()
 
+bootstrap_weights_AM = collections.OrderedDict()
+bootstrap_weights_VR = collections.OrderedDict()
+bootstrap_means_AM = collections.OrderedDict()
+bootstrap_means_VR = collections.OrderedDict()
+bootstrap_sigma2s_AM = collections.OrderedDict()
+bootstrap_sigma2s_VR = collections.OrderedDict() #sigma2s_AM and sigma2s_VR should be equal if we fit with tied covariance (s1=s2)
+
+# Format: {slice: weight_low} and {slice: weight_high} where weight_low and weight_high are the 15.87% and 84.13% percentiles (68.25% inside, 1 sigma)
+weightsAM_low_errorbar = collections.OrderedDict()
+weightsAM_high_errorbar = collections.OrderedDict()
+weightsVR_low_errorbar = collections.OrderedDict()
+weightsVR_high_errorbar = collections.OrderedDict()
 
 
 clf = mixture.GaussianMixture(
@@ -165,6 +170,17 @@ clf = mixture.GaussianMixture(
     init_params="kmeans",
     tol=1e-5,
     max_iter=1000)
+clf_boot = mixture.GaussianMixture(
+    n_components=2,
+    covariance_type='tied',
+    verbose=0,
+    verbose_interval=10,
+    random_state=random.SystemRandom().randrange(0, 4095),
+    means_init=[[-17], [0]],
+    #                              weights_init=[1 / 2, 1 / 2],
+    init_params="kmeans",
+    tol=1e-5,
+    max_iter=100)
 # TODO TODO finire bootstrap, in particolare scrivere funzione che fitta synth_dataset e tirarne fuori i valori
 while (cur_slice < to_slice):
     slice_name = "Slices_" + str(cur_slice) + "_" + str(
@@ -207,6 +223,8 @@ while (cur_slice < to_slice):
     yn = y / np.sum(y)
 
     # Fit the two peaks
+    # This reshape transforms (an np.array) [1,2,3] into [ [1], [2], [3] ]
+    # Scikit wants a list of datapoints, here the datapoints coordinate are 1D, hence each one is a single-element list (of features/coordinates)
     clf.fit(nd_distribution.reshape(-1, 1))
 
     # "Unflattened" variables
@@ -247,12 +265,80 @@ while (cur_slice < to_slice):
         sigma2s_VR[cur_slice] = c2
         sigma2s_AM[cur_slice] = c1
 
+
+
+
+
+
+    # fit the "synth_dataset"s and fill the synthetic parameters array
+    # Their structure is different from weights_AM etc:
+    # Instead of weights_AM = {-190: 0.73387685, -188: 0.681326581759, ...}
+    # we have bootstrap_weights_AM = {-190: [0.73387685, 0.754, 0.721, ...], -188: [0.681326581759. 0.692, 0.676, ...], ...}
+    # where to each slice an array is assocaited with all the N values from the fitting of the N synth_dataset
+    # TODO spostarli fuori? Per il momento sono leggermente inutili qua, come dict contengono un solo elemento d[cur_slice] = [array da numbootstrap elementi]
+    # bootstrap_weights_AM = collections.OrderedDict()
+    # bootstrap_weights_VR = collections.OrderedDict()
+    # bootstrap_means_AM = collections.OrderedDict()
+    # bootstrap_means_VR = collections.OrderedDict()
+    # bootstrap_sigma2s_AM = collections.OrderedDict()
+    # bootstrap_sigma2s_VR = collections.OrderedDict() #sigma2s_AM and sigma2s_VR should be equal if we fit with tied covariance (s1=s2)
+    numbootstrap = 100
+    for i in range(0,numbootstrap):
+        # synth_dataset = create_synth_dataset_from_histo(x, y, random.SystemRandom().randrange(0, 9223372036854775807))
+        synth_dataset = create_synth_dataset_from_histo(x, y)
+        np_synth_dataset = np.array(synth_dataset)
+        clf_boot.fit(np_synth_dataset.reshape(-1, 1))
+
+        # "Unflattened" variables
+        b_m1, b_m2 = clf_boot.means_
+        b_w1, b_w2 = clf_boot.weights_
+        #    r_c1, r_c2 = clf.covariances_
+        b_c1 = clf_boot.covariances_
+        b_c2 = clf_boot.covariances_
+
+        # Save the weights in the right array
+        # Lower Y is the VR peak
+        # setdefault return the value (which is actually a reference, important for our scope) if the key exists, otherwise it adds the key with the second argument as the value
+        # Here we use it to make an empty list the first time and filling it
+        if (m1 < m2):
+            bootstrap_weights_VR.setdefault(cur_slice, []).append(b_w1)
+            bootstrap_weights_AM.setdefault(cur_slice, []).append(b_w2)
+            bootstrap_means_VR.setdefault(cur_slice, []).append(b_m1[0])
+            bootstrap_means_AM.setdefault(cur_slice, []).append(b_m2[0])
+            bootstrap_sigma2s_VR.setdefault(cur_slice, []).append(b_c1[0][0])
+            bootstrap_sigma2s_AM.setdefault(cur_slice, []).append(b_c2[0][0])
+        else:
+            bootstrap_weights_VR.setdefault(cur_slice, []).append(b_w2)
+            bootstrap_weights_AM.setdefault(cur_slice, []).append(b_w1)
+            bootstrap_means_VR.setdefault(cur_slice, []).append(b_m2[0])
+            bootstrap_means_AM.setdefault(cur_slice, []).append(b_m1[0])
+            bootstrap_sigma2s_VR.setdefault(cur_slice, []).append(b_c2[0][0])
+            bootstrap_sigma2s_AM.setdefault(cur_slice, []).append(b_c1[0][0])
+
+
+    # Calculate the error intervals
+    low_weightsAM_percentile = np.percentile(np.array(bootstrap_weights_AM[cur_slice]),15.87) # 15.87% = Gaussian -infinity -> -1sigma
+    high_weightsAM_percentile = np.percentile(np.array(bootstrap_weights_AM[cur_slice]),84.13) # 84.13% = Gaussian -infinity -> 1sigma, -1s -> 1s = 68.25%
+    weightsAM_low_errorbar[cur_slice] = low_weightsAM_percentile
+    weightsAM_high_errorbar[cur_slice] = high_weightsAM_percentile
+
+    low_weightsVR_percentile = np.percentile(np.array(bootstrap_weights_VR[cur_slice]),15.87) # 15.87% = Gaussian -infinity -> -1sigma
+    high_weightsVR_percentile = np.percentile(np.array(bootstrap_weights_VR[cur_slice]),84.13) # 84.13% = Gaussian -infinity -> 1sigma, -1s -> 1s = 68.25%
+    weightsVR_low_errorbar[cur_slice] = low_weightsVR_percentile
+    weightsVR_high_errorbar[cur_slice] = high_weightsVR_percentile
+
+
+
+
+    '''Plot the single slices fitted'''
     #fig = plt.figure(figsize = (5, 5))
     #plt.subplot(111)
     # gauss_test = 0.5*matplotlib.mlab.normpdf(x, -20, 8)
-    gauss1 = w1 * matplotlib.mlab.normpdf(x, m1, np.sqrt(c1))
-    gauss2 = w2 * matplotlib.mlab.normpdf(x, m2, np.sqrt(c2))
+    double_freq_x = [0.5*xx for xx in range(int(2*x[0]), 2*int(x[-1]+1))]
+    gauss1 = w1 * matplotlib.mlab.normpdf(double_freq_x, m1, np.sqrt(c1))
+    gauss2 = w2 * matplotlib.mlab.normpdf(double_freq_x, m2, np.sqrt(c2))
     gauss_tot = gauss1 + gauss2
+
 
     plt.plot(
         x,
@@ -261,9 +347,16 @@ while (cur_slice < to_slice):
         drawstyle="steps-mid",
         label="Data",
         color='b')
-    plt.plot(x, gauss1, label="Gauss1", color='g')
-    plt.plot(x, gauss2, label="Gauss2", color='g')
-    plt.plot(x, gauss_tot, label="Gauss_tot", color='r')
+    plt.plot(double_freq_x, gauss1, label="Gauss1", color='g')
+    plt.plot(double_freq_x, gauss2, label="Gauss2", color='g')
+
+
+    for i in range(0,numbootstrap):
+        boot_tot = bootstrap_weights_VR[cur_slice][i] * matplotlib.mlab.normpdf(double_freq_x, bootstrap_means_VR[cur_slice][i], np.sqrt(bootstrap_sigma2s_VR[cur_slice][i])) + \
+        bootstrap_weights_AM[cur_slice][i] * matplotlib.mlab.normpdf(double_freq_x, bootstrap_means_AM[cur_slice][i], np.sqrt(bootstrap_sigma2s_AM[cur_slice][i]))
+        plt.plot(double_freq_x, boot_tot, color='DarkOrange',linewidth=0.2, alpha=0.1)
+
+    plt.plot(double_freq_x, gauss_tot, label="Gauss_tot", color='r', linewidth=0.2)
 
     plt.legend()
     #plt.show()
@@ -280,6 +373,14 @@ while (cur_slice < to_slice):
 
     # Update cur_slice counter. Yeah maybe there's a more snakey way, don't care for now
     cur_slice = cur_slice + deltaslice
+
+
+
+
+
+
+# np.percentile(np.array(sorted(bootstrap_weights_AM[174])),84.13)
+# np.percentile(np.array(sorted(bootstrap_weights_AM[174])),84.13)
 
 print("weights_AM:")
 pp.pprint(weights_AM)
@@ -307,6 +408,18 @@ y_meansVR = list(means_VR.values())
 
 y_sigmas = [np.sqrt(xx) for xx in sigma2s_VR.values()]
 
+# weightsAM_low_yerr = [y_AM - yerrl for yerrl in weightsAM_low_errorbar.values()]
+# weightsAM_high_yerr = [yerrh - y_AM for yerrh in weightsAM_high_errorbar.values()]
+# weightsVR_low_yerr = [y_VR - yerrl for yerrl in weightsVR_low_errorbar.values()]
+# weightsVR_high_yerr = [yerrh - y_VR for yerrh in weightsVR_high_errorbar.values()]
+
+weightsAM_low_yerr = [weights_AM[i] - weightsVR_low_errorbar[i] for i in x_AM]
+weightsAM_high_yerr = [weightsAM_high_errorbar[i] - weights_AM[i] for i in x_AM]
+weightsVR_low_yerr = [weights_VR[i] - weightsVR_low_errorbar[i] for i in x_VR]
+weightsVR_high_yerr = [weightsVR_high_errorbar[i] - weights_VR[i] for i in x_VR]
+
+weightsAM_yerr = [weightsAM_low_yerr, weightsAM_high_yerr]
+weightsVR_yerr = [weightsVR_low_yerr, weightsVR_high_yerr]
 
 AM_parameters, AM_par_covars = curve_fit(
     erf_to_fit, x_AM, y_AM, p0=[1, (from_slice + to_slice) / 2])
@@ -333,32 +446,38 @@ elif crystal_orientation == "L":
     marker_VR = 6
     or_sign = -1
 
+
+#PLOT
+# PLot theta_b, theta_b + theta_c, theta_b + 2theta_c
+plt.axvline(x=or_sign*(theta_bending + theta_c*0), linestyle="dashed", color='Chartreuse')  # TODO
+plt.axvline(x=or_sign*(theta_bending + theta_c*0 + theta_c), linestyle="dashed")  #TODO
+plt.axvline(x=or_sign*(theta_bending + theta_c*0 + 2*theta_c), linestyle="dashed")  #TODO
+
 # Plot results
-# TODO generalize to other crystals
 plt.clf()
-plt.plot(
+plt.errorbar(
     x_AM,
     y_AM,
+    yerr=weightsAM_yerr
     linestyle="dotted",
     marker=marker_AM,
     label="AM Data",
     color='g')
-plt.plot(
+plt.errorbar(
     x_VR,
     y_VR,
+    yerr=weightsVR_yerr,
     linestyle="dotted",
     marker=marker_VR,
     label="VR data",
     color='r')
 
-plt.plot(x_AM, y_fitAM, linestyle="solid", label="AM fit", color='Navy')
-plt.plot(x_VR, y_fitVR, linestyle="solid", label="VR fit", color='BlueViolet')
-plt.plot(x_AM, y_simgen, linestyle="dashed", label="Theoretical model", color='DarkOrange')
+
+#plt.plot(x_AM, y_fitAM, linestyle="solid", label="AM fit", color='Navy')
+#plt.plot(x_VR, y_fitVR, linestyle="solid", label="VR fit", color='BlueViolet')
+#plt.plot(x_AM, y_simgen, linestyle="dashed", label="Theoretical model", color='DarkOrange')
 
 
-plt.axvline(x=or_sign*(theta_bending + theta_c*0), linestyle="dashed", color='Chartreuse')  # TODO
-plt.axvline(x=or_sign*(theta_bending + theta_c*0 + theta_c), linestyle="dashed")  #TODO
-plt.axvline(x=or_sign*(theta_bending + theta_c*0 + 2*theta_c), linestyle="dashed")  #TODO
 
 plt.title(crystal_name + "_" + exp_or_sim + ": weights")
 plt.legend()
