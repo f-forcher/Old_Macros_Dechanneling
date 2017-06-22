@@ -183,9 +183,17 @@ clf_boot = mixture.GaussianMixture(
     max_iter=100)
 # TODO TODO finire bootstrap, in particolare scrivere funzione che fitta synth_dataset e tirarne fuori i valori
 while (cur_slice < to_slice):
-    slice_name = "Slices_" + str(cur_slice) + "_" + str(
-        cur_slice + deltaslice) + "_" + crystal_name
-    data = np.loadtxt(data_folder + slice_name + ".txt")
+    if crystal_name == "STF45":
+        slice_name = "Slices_" + str(cur_slice + 16) + "_" + str(
+            cur_slice + 16 + deltaslice) + "_" + crystal_name
+        data = np.loadtxt(data_folder + slice_name + ".txt")
+    else:
+        slice_name = "Slices_" + str(cur_slice) + "_" + str(
+            cur_slice + deltaslice) + "_" + crystal_name
+        data = np.loadtxt(data_folder + slice_name + ".txt")
+
+
+
     #data = np.loadtxt('ForFrancesco/ST101_exp/txt_data/Slices_-186_-184_ST101.txt')
     #data = np.loadtxt('ForFrancesco/ST101_exp/txt_data/Slices_-142_-140_ST101.txt')
 
@@ -282,7 +290,7 @@ while (cur_slice < to_slice):
     # bootstrap_means_VR = collections.OrderedDict()
     # bootstrap_sigma2s_AM = collections.OrderedDict()
     # bootstrap_sigma2s_VR = collections.OrderedDict() #sigma2s_AM and sigma2s_VR should be equal if we fit with tied covariance (s1=s2)
-    numbootstrap = 100
+    numbootstrap = 1000
     for i in range(0,numbootstrap):
         # synth_dataset = create_synth_dataset_from_histo(x, y, random.SystemRandom().randrange(0, 9223372036854775807))
         synth_dataset = create_synth_dataset_from_histo(x, y)
@@ -354,7 +362,7 @@ while (cur_slice < to_slice):
     for i in range(0,numbootstrap):
         boot_tot = bootstrap_weights_VR[cur_slice][i] * matplotlib.mlab.normpdf(double_freq_x, bootstrap_means_VR[cur_slice][i], np.sqrt(bootstrap_sigma2s_VR[cur_slice][i])) + \
         bootstrap_weights_AM[cur_slice][i] * matplotlib.mlab.normpdf(double_freq_x, bootstrap_means_AM[cur_slice][i], np.sqrt(bootstrap_sigma2s_AM[cur_slice][i]))
-        plt.plot(double_freq_x, boot_tot, color='DarkOrange',linewidth=0.2, alpha=0.1)
+        plt.plot(double_freq_x, boot_tot, color='DarkOrange',linewidth=0.8, alpha=0.1)
 
     plt.plot(double_freq_x, gauss_tot, label="Gauss_tot", color='r', linewidth=0.2)
 
@@ -413,7 +421,7 @@ y_sigmas = [np.sqrt(xx) for xx in sigma2s_VR.values()]
 # weightsVR_low_yerr = [y_VR - yerrl for yerrl in weightsVR_low_errorbar.values()]
 # weightsVR_high_yerr = [yerrh - y_VR for yerrh in weightsVR_high_errorbar.values()]
 
-weightsAM_low_yerr = [weights_AM[i] - weightsVR_low_errorbar[i] for i in x_AM]
+weightsAM_low_yerr = [weights_AM[i] - weightsAM_low_errorbar[i] for i in x_AM]
 weightsAM_high_yerr = [weightsAM_high_errorbar[i] - weights_AM[i] for i in x_AM]
 weightsVR_low_yerr = [weights_VR[i] - weightsVR_low_errorbar[i] for i in x_VR]
 weightsVR_high_yerr = [weightsVR_high_errorbar[i] - weights_VR[i] for i in x_VR]
@@ -438,12 +446,16 @@ y_simgen = [erf_to_fit(xx, 1/(1.41421356*2*theta_c), theta_bending + theta_c) fo
 
 # http://matplotlib.org/api/markers_api.html marker numbers
 if crystal_orientation == "R":
-    marker_AM = 6
-    marker_VR = 11
+    #marker_AM = 6
+    #marker_VR = 11
+    marker_AM = 'x'
+    marker_VR = 'x'
     or_sign = 1 # Orientation sign, to plot correctly the theta vertical bars
 elif crystal_orientation == "L":
-    marker_AM = 11
-    marker_VR = 6
+    #marker_AM = 6
+    #marker_VR = 11
+    marker_AM = '.'
+    marker_VR = '.'
     or_sign = -1
 
 
@@ -458,7 +470,7 @@ plt.clf()
 plt.errorbar(
     x_AM,
     y_AM,
-    yerr=weightsAM_yerr
+    yerr=weightsAM_yerr,
     linestyle="dotted",
     marker=marker_AM,
     label="AM Data",
