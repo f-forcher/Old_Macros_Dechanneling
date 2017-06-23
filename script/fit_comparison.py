@@ -10,9 +10,69 @@ from pylab import *
 import random
 import math  #erf
 import collections
+import bisect, itertools # For the weighted sampling, from https://docs.python.org/3.5/library/random.html#examples-and-recipes
+
+
 
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
+
+def create_synth_dataset_from_histo(xhisto, yhisto, randseed=None):
+    '''
+    Create a synthetic dataset using drawing with replacement from the data histogram.
+    x: Histogram x values (bin centers)
+    y: histogram y values (bin content). Must be nonnegative integers and len(y) == len(x)
+    return: a list of N data ("raw" datapoints, NOT an histogram!) values
+            extracted from the real data with replacement.
+    '''
+    synth_dataset = []
+    data_cdf = list(itertools.accumulate(yhisto)) # data_cdf[i] = sum(y[i], 0, i) https://docs.python.org/3.5/library/random.html#examples-and-recipes
+    # randseed = random.SystemRandom().randrange(0, 9223372036854775807) # sys.maxsize = 2^63-1
+    random.seed(randseed)
+    extracted_num = random.random() * data_cdf[-1] # data_cdf[-1] = total number of events inside the histogram
+    for j in range(int(np.round(data_cdf[-1]))): # data_cdf[-1] = see above comment
+        extracted_num = random.random() * data_cdf[-1]
+        new_extracted_elem = xhisto[bisect.bisect(data_cdf,extracted_num)]
+        synth_dataset.append(new_extracted_elem)
+    return synth_dataset
+
+def transform_histo_to_dataset(xhisto,yhisto):
+    '''
+    Transforms (deterministically) an histogram into datapoints, because e.g.
+    scikit fits datapoints and not histograms.
+    x: Histogram x values (bin centers)
+    y: histogram y values (bin content). Must be nonnegative integers and len(y) == len(x)
+    return: a set of datapoints created as explained below
+
+    We have the data histogram, a 2D array with the sample density for every
+    x-centered bin, like
+    [
+       [-38, 2],
+       [-36, 1],
+       [-34, 3],
+       ...
+    ]
+    But scikit want samples, something like
+    [
+       [-38],
+       [-38],
+       [-36],
+       [-34],
+       [-34],
+       [-34],
+       ...
+    ]
+    So we create (deterministic) samples from the histogram,
+    simply by accumulating y (bin content) datapoints at each bin center x
+    '''
+    distribution = []
+    for i in range(len(y)):
+        posizione_col = x[i]
+        altezza_col = y[i]
+        for j in range(int(np.round(altezza_col))):
+            distribution.append(posizione_col)
+    return distribution
+
 
 # "Main"
 crystal_name = sys.argv[1]
@@ -77,6 +137,19 @@ means_VR_exp   = collections.OrderedDict()
 sigma2s_AM_exp = collections.OrderedDict()
 sigma2s_VR_exp = collections.OrderedDict() #sigma2s_AM and sigma2s_VR should be equal if we fit with tied covariance (s1=s2)
 
+bootstrap_weights_AM_exp = collections.OrderedDict()
+bootstrap_weights_VR_exp = collections.OrderedDict()
+bootstrap_means_AM_exp   = collections.OrderedDict()
+bootstrap_means_VR_exp   = collections.OrderedDict()
+bootstrap_sigma2s_AM_exp = collections.OrderedDict()
+bootstrap_sigma2s_VR_exp = collections.OrderedDict() #sigma2s_AM and sigma2s_VR should be equal if we fit with tied covariance (s1=s2)
+
+# Format: {slice: weight_low} and {slice: weight_high} where weight_low and weight_high are the 15.87% and 84.13% percentiles (68.25% inside, 1 sigma)
+weightsAM_exp_low_errorbar  = collections.OrderedDict()
+weightsAM_exp_high_errorbar = collections.OrderedDict()
+weightsVR_exp_low_errorbar  = collections.OrderedDict()
+weightsVR_exp_high_errorbar = collections.OrderedDict()
+
 weights_AM_sim = collections.OrderedDict()
 weights_VR_sim = collections.OrderedDict()
 means_AM_sim   = collections.OrderedDict()
@@ -84,7 +157,21 @@ means_VR_sim   = collections.OrderedDict()
 sigma2s_AM_sim = collections.OrderedDict()
 sigma2s_VR_sim = collections.OrderedDict() #sigma2s_AM and sigma2s_VR should be equal if we fit with tied covariance (s1=s2)
 
+bootstrap_weights_AM_sim = collections.OrderedDict()
+bootstrap_weights_VR_sim = collections.OrderedDict()
+bootstrap_means_AM_sim = collections.OrderedDict()
+bootstrap_means_VR_sim = collections.OrderedDict()
+bootstrap_sigma2s_AM_sim = collections.OrderedDict()
+bootstrap_sigma2s_VR_sim = collections.OrderedDict() #sigma2s_AM and sigma2s_VR should be equal if we fit with tied covariance (s1=s2)
 
+# Format: {slice: weight_low} and {slice: weight_high} where weight_low and weight_high are the 15.87% and 84.13% percentiles (68.25% inside, 1 sigma)
+weightsAM_sim_low_errorbar  = collections.OrderedDict()
+weightsAM_sim_high_errorbar = collections.OrderedDict()
+weightsVR_sim_low_errorbar  = collections.OrderedDict()
+weightsVR_sim_high_errorbar = collections.OrderedDict()
+
+# How many bootstrap synthetic distribution to generate and fit
+numbootstrap = 10
 
 # FIT EXP
 clf = mixture.GaussianMixture(
@@ -99,6 +186,17 @@ clf = mixture.GaussianMixture(
     tol=1e-5,
     #warm_start=True,
     max_iter=1000)
+clf_boot = mixture.GaussianMixture(
+    n_components=2,
+    covariance_type='tied',
+    verbose=0,
+    verbose_interval=10,
+    random_state=random.SystemRandom().randrange(0, 4095),
+    means_init=[[-17], [0]],
+    #                              weights_init=[1 / 2, 1 / 2],
+    init_params="kmeans",
+    tol=1e-5,
+    max_iter=100)
 data_folder = data_folder_exp
 weights_AM = weights_AM_exp
 weights_VR = weights_VR_exp
@@ -106,11 +204,29 @@ means_AM   = means_AM_exp
 means_VR   = means_VR_exp
 sigma2s_AM = sigma2s_AM_exp
 sigma2s_VR = sigma2s_VR_exp
+bootstrap_weights_AM = bootstrap_weights_AM_exp
+bootstrap_weights_VR = bootstrap_weights_VR_exp
+bootstrap_means_AM   = bootstrap_means_AM_exp
+bootstrap_means_VR   = bootstrap_means_VR_exp
+bootstrap_sigma2s_AM = bootstrap_sigma2s_AM_exp
+bootstrap_sigma2s_VR = bootstrap_sigma2s_VR_exp #sigma2s_AM and sigma2s_VR should be equal if we fit with tied covariance (s1=s2)
+
+# Format: {slice: weight_low} and {slice: weight_high} where weight_low and weight_high are the 15.87% and 84.13% percentiles (68.25% inside, 1 sigma)
+weightsAM_low_errorbar  = weightsAM_exp_low_errorbar
+weightsAM_high_errorbar = weightsAM_exp_high_errorbar
+weightsVR_low_errorbar  = weightsVR_exp_low_errorbar
+weightsVR_high_errorbar = weightsVR_exp_high_errorbar
 while (cur_slice < to_slice):
 
-    slice_name = "Slices_" + str(cur_slice) + "_" + str(
-        cur_slice + deltaslice) + "_" + crystal_name
-    data = np.loadtxt(data_folder_exp + slice_name + ".txt")
+    # DUring STF45 data take, the goniometer was blocked, so we retranslate back the slices
+    if crystal_name == "STF45":
+        slice_name = "Slices_" + str(cur_slice + 16) + "_" + str(
+            cur_slice + 16 + deltaslice) + "_" + crystal_name
+        data = np.loadtxt(data_folder + slice_name + ".txt")
+    else:
+        slice_name = "Slices_" + str(cur_slice) + "_" + str(
+            cur_slice + deltaslice) + "_" + crystal_name
+        data = np.loadtxt(data_folder + slice_name + ".txt")
     #data = np.loadtxt('ForFrancesco/ST101_exp/txt_data/Slices_-186_-184_ST101.txt')
     #data = np.loadtxt('ForFrancesco/ST101_exp/txt_data/Slices_-142_-140_ST101.txt')
 
@@ -136,12 +252,8 @@ while (cur_slice < to_slice):
     #    ...
     # ]
     # So we create (deterministic) samples from the histogram
-    distribution = []
-    for i in range(len(y)):
-        posizione_col = x[i]
-        altezza_col = y[i]
-        for j in range(int(np.round(altezza_col))):
-            distribution.append(x[i])
+    # Make the datapoints
+    distribution = transform_histo_to_dataset(x,y)
 
     #pp.pprint(distribution)
     # Make the numpy array
@@ -151,6 +263,8 @@ while (cur_slice < to_slice):
     yn = y / np.sum(y)
 
     # Fit the two peaks
+    # This reshape transforms (an np.array) [1,2,3] into [ [1], [2], [3] ]
+    # Scikit wants a list of datapoints, here the datapoints coordinate are 1D, hence each one is a single-element list (of features/coordinates)
     clf.fit(nd_distribution.reshape(-1, 1))
 
     # "Unflattened" variables
@@ -191,36 +305,94 @@ while (cur_slice < to_slice):
         sigma2s_VR[cur_slice] = c2
         sigma2s_AM[cur_slice] = c1
 
-    #fig = plt.figure(figsize = (5, 5))
-    #plt.subplot(111)
-    # gauss_test = 0.5*matplotlib.mlab.normpdf(x, -20, 8)
-    gauss1 = w1 * matplotlib.mlab.normpdf(x, m1, np.sqrt(c1))
-    gauss2 = w2 * matplotlib.mlab.normpdf(x, m2, np.sqrt(c2))
-    gauss_tot = gauss1 + gauss2
+    # fit the "synth_dataset"s and fill the synthetic parameters array
+    # Their structure is different from weights_AM etc:
+    # Instead of weights_AM = {-190: 0.73387685, -188: 0.681326581759, ...}
+    # we have bootstrap_weights_AM = {-190: [0.73387685, 0.754, 0.721, ...], -188: [0.681326581759. 0.692, 0.676, ...], ...}
+    # where to each slice an array is assocaited with all the N values from the fitting of the N synth_dataset
+    # TODO spostarli fuori? Per il momento sono leggermente inutili qua, come dict contengono un solo elemento d[cur_slice] = [array da numbootstrap elementi]
+    # bootstrap_weights_AM = collections.OrderedDict()
+    # bootstrap_weights_VR = collections.OrderedDict()
+    # bootstrap_means_AM = collections.OrderedDict()
+    # bootstrap_means_VR = collections.OrderedDict()
+    # bootstrap_sigma2s_AM = collections.OrderedDict()
+    # bootstrap_sigma2s_VR = collections.OrderedDict() #sigma2s_AM and sigma2s_VR should be equal if we fit with tied covariance (s1=s2)
+    for i in range(0,numbootstrap):
+        # synth_dataset = create_synth_dataset_from_histo(x, y, random.SystemRandom().randrange(0, 9223372036854775807))
+        synth_dataset = create_synth_dataset_from_histo(x, y)
+        np_synth_dataset = np.array(synth_dataset)
+        clf_boot.fit(np_synth_dataset.reshape(-1, 1))
 
-    plt.plot(
-        x,
-        yn,
-        linestyle="dashed",
-        drawstyle="steps-mid",
-        label="Data",
-        color='b')
-    plt.plot(x, gauss1, label="Gauss1", color='g')
-    plt.plot(x, gauss2, label="Gauss2", color='g')
-    plt.plot(x, gauss_tot, label="Gauss_tot", color='r')
+        # "Unflattened" variables
+        b_m1, b_m2 = clf_boot.means_
+        b_w1, b_w2 = clf_boot.weights_
+        #    r_c1, r_c2 = clf.covariances_
+        b_c1 = clf_boot.covariances_
+        b_c2 = clf_boot.covariances_
 
-    plt.legend()
-    #plt.show()
+        # Save the weights in the right array
+        # Lower Y is the VR peak
+        # setdefault return the value (which is actually a reference, important for our scope) if the key exists, otherwise it adds the key with the second argument as the value
+        # Here we use it to make an empty list the first time and filling it
+        if (m1 < m2):
+            bootstrap_weights_VR.setdefault(cur_slice, []).append(b_w1)
+            bootstrap_weights_AM.setdefault(cur_slice, []).append(b_w2)
+            bootstrap_means_VR.setdefault(cur_slice, []).append(b_m1[0])
+            bootstrap_means_AM.setdefault(cur_slice, []).append(b_m2[0])
+            bootstrap_sigma2s_VR.setdefault(cur_slice, []).append(b_c1[0][0])
+            bootstrap_sigma2s_AM.setdefault(cur_slice, []).append(b_c2[0][0])
+        else:
+            bootstrap_weights_VR.setdefault(cur_slice, []).append(b_w2)
+            bootstrap_weights_AM.setdefault(cur_slice, []).append(b_w1)
+            bootstrap_means_VR.setdefault(cur_slice, []).append(b_m2[0])
+            bootstrap_means_AM.setdefault(cur_slice, []).append(b_m1[0])
+            bootstrap_sigma2s_VR.setdefault(cur_slice, []).append(b_c2[0][0])
+            bootstrap_sigma2s_AM.setdefault(cur_slice, []).append(b_c1[0][0])
 
-    # plt.figure()  # New window, if needed.  No need to save it, as pyplot uses the concept of current figure
-    # plt.plot(np.random.rand(10))
-    # plt.show()
 
-    figure_folder = "script/python_video/" + crystal_name + "_exp" + "/"
-    #plt.savefig(figure_folder + "gaussian_fit.png", dpi=300)
+    # Calculate the error intervals
+    low_weightsAM_percentile = np.percentile(np.array(bootstrap_weights_AM[cur_slice]),15.87) # 15.87% = Gaussian -infinity -> -1sigma
+    high_weightsAM_percentile = np.percentile(np.array(bootstrap_weights_AM[cur_slice]),84.13) # 84.13% = Gaussian -infinity -> 1sigma, -1s -> 1s = 68.25%
+    weightsAM_low_errorbar[cur_slice] = low_weightsAM_percentile
+    weightsAM_high_errorbar[cur_slice] = high_weightsAM_percentile
 
-    plt.savefig(figure_folder + slice_name + ".png", dpi=300)
-    plt.clf()
+    low_weightsVR_percentile = np.percentile(np.array(bootstrap_weights_VR[cur_slice]),15.87) # 15.87% = Gaussian -infinity -> -1sigma
+    high_weightsVR_percentile = np.percentile(np.array(bootstrap_weights_VR[cur_slice]),84.13) # 84.13% = Gaussian -infinity -> 1sigma, -1s -> 1s = 68.25%
+    weightsVR_low_errorbar[cur_slice] = low_weightsVR_percentile
+    weightsVR_high_errorbar[cur_slice] = high_weightsVR_percentile
+
+
+    # # Plot the slices >>>> OBSOLETE! use fit_with_bootstrap.py insteads
+    # #fig = plt.figure(figsize = (5, 5))
+    # #plt.subplot(111)
+    # # gauss_test = 0.5*matplotlib.mlab.normpdf(x, -20, 8)
+    # gauss1 = w1 * matplotlib.mlab.normpdf(x, m1, np.sqrt(c1))
+    # gauss2 = w2 * matplotlib.mlab.normpdf(x, m2, np.sqrt(c2))
+    # gauss_tot = gauss1 + gauss2
+    #
+    # plt.plot(
+    #     x,
+    #     yn,
+    #     linestyle="dashed",
+    #     drawstyle="steps-mid",
+    #     label="Data",
+    #     color='b')
+    # plt.plot(x, gauss1, label="Gauss1", color='g')
+    # plt.plot(x, gauss2, label="Gauss2", color='g')
+    # plt.plot(x, gauss_tot, label="Gauss_tot", color='r')
+    #
+    # plt.legend()
+    # #plt.show()
+    #
+    # # plt.figure()  # New window, if needed.  No need to save it, as pyplot uses the concept of current figure
+    # # plt.plot(np.random.rand(10))
+    # # plt.show()
+    #
+    # figure_folder = "script/python_video/" + crystal_name + "_exp" + "/"
+    # #plt.savefig(figure_folder + "gaussian_fit.png", dpi=300)
+    #
+    # plt.savefig(figure_folder + slice_name + ".png", dpi=300)
+    # plt.clf()
 
     # Update cur_slice counter. Yeah maybe there's a more snakey way, don't care for now
     cur_slice = cur_slice + deltaslice
@@ -239,6 +411,17 @@ clf = mixture.GaussianMixture(
     init_params="kmeans",
     tol=1e-5,
     max_iter=1000)
+clf_boot = mixture.GaussianMixture(
+    n_components=2,
+    covariance_type='tied',
+    verbose=0,
+    verbose_interval=10,
+    random_state=random.SystemRandom().randrange(0, 4095),
+    means_init=[[-17], [0]],
+    #                              weights_init=[1 / 2, 1 / 2],
+    init_params="kmeans",
+    tol=1e-5,
+    max_iter=100)
 data_folder = data_folder_sim
 weights_AM = weights_AM_sim
 weights_VR = weights_VR_sim
@@ -246,6 +429,19 @@ means_AM   = means_AM_sim
 means_VR   = means_VR_sim
 sigma2s_AM = sigma2s_AM_sim
 sigma2s_VR = sigma2s_VR_sim
+bootstrap_weights_AM = bootstrap_weights_AM_sim
+bootstrap_weights_VR = bootstrap_weights_VR_sim
+bootstrap_means_AM   = bootstrap_means_AM_sim
+bootstrap_means_VR   = bootstrap_means_VR_sim
+bootstrap_sigma2s_AM = bootstrap_sigma2s_AM_sim
+bootstrap_sigma2s_VR = bootstrap_sigma2s_VR_sim #sigma2s_AM and sigma2s_VR should be equal if we fit with tied covariance (s1=s2)
+
+# Format: {slice: weight_low} and {slice: weight_high} where weight_low and weight_high are the 15.87% and 84.13% percentiles (68.25% inside, 1 sigma)
+weightsAM_low_errorbar  = weightsAM_sim_low_errorbar
+weightsAM_high_errorbar = weightsAM_sim_high_errorbar
+weightsVR_low_errorbar  = weightsVR_sim_low_errorbar
+weightsVR_high_errorbar = weightsVR_sim_high_errorbar
+
 while (cur_slice < to_slice):
 
     slice_name = "Slices_" + str(cur_slice) + "_" + str(
@@ -331,36 +527,93 @@ while (cur_slice < to_slice):
         sigma2s_VR[cur_slice] = c2
         sigma2s_AM[cur_slice] = c1
 
-    #fig = plt.figure(figsize = (5, 5))
-    #plt.subplot(111)
-    # gauss_test = 0.5*matplotlib.mlab.normpdf(x, -20, 8)
-    gauss1 = w1 * matplotlib.mlab.normpdf(x, m1, np.sqrt(c1))
-    gauss2 = w2 * matplotlib.mlab.normpdf(x, m2, np.sqrt(c2))
-    gauss_tot = gauss1 + gauss2
+    # fit the "synth_dataset"s and fill the synthetic parameters array
+    # Their structure is different from weights_AM etc:
+    # Instead of weights_AM = {-190: 0.73387685, -188: 0.681326581759, ...}
+    # we have bootstrap_weights_AM = {-190: [0.73387685, 0.754, 0.721, ...], -188: [0.681326581759. 0.692, 0.676, ...], ...}
+    # where to each slice an array is assocaited with all the N values from the fitting of the N synth_dataset
+    # TODO spostarli fuori? Per il momento sono leggermente inutili qua, come dict contengono un solo elemento d[cur_slice] = [array da numbootstrap elementi]
+    # bootstrap_weights_AM = collections.OrderedDict()
+    # bootstrap_weights_VR = collections.OrderedDict()
+    # bootstrap_means_AM = collections.OrderedDict()
+    # bootstrap_means_VR = collections.OrderedDict()
+    # bootstrap_sigma2s_AM = collections.OrderedDict()
+    # bootstrap_sigma2s_VR = collections.OrderedDict() #sigma2s_AM and sigma2s_VR should be equal if we fit with tied covariance (s1=s2)
+    for i in range(0,numbootstrap):
+        # synth_dataset = create_synth_dataset_from_histo(x, y, random.SystemRandom().randrange(0, 9223372036854775807))
+        synth_dataset = create_synth_dataset_from_histo(x, y)
+        np_synth_dataset = np.array(synth_dataset)
+        clf_boot.fit(np_synth_dataset.reshape(-1, 1))
 
-    plt.plot(
-        x,
-        yn,
-        linestyle="dashed",
-        drawstyle="steps-mid",
-        label="Data",
-        color='b')
-    plt.plot(x, gauss1, label="Gauss1", color='g')
-    plt.plot(x, gauss2, label="Gauss2", color='g')
-    plt.plot(x, gauss_tot, label="Gauss_tot", color='r')
+        # "Unflattened" variables
+        b_m1, b_m2 = clf_boot.means_
+        b_w1, b_w2 = clf_boot.weights_
+        #    r_c1, r_c2 = clf.covariances_
+        b_c1 = clf_boot.covariances_
+        b_c2 = clf_boot.covariances_
 
-    plt.legend()
-    #plt.show()
+        # Save the weights in the right array
+        # Lower Y is the VR peak
+        # setdefault return the value (which is actually a reference, important for our scope) if the key exists, otherwise it adds the key with the second argument as the value
+        # Here we use it to make an empty list the first time and filling it
+        if (m1 < m2):
+            bootstrap_weights_VR.setdefault(cur_slice, []).append(b_w1)
+            bootstrap_weights_AM.setdefault(cur_slice, []).append(b_w2)
+            bootstrap_means_VR.setdefault(cur_slice, []).append(b_m1[0])
+            bootstrap_means_AM.setdefault(cur_slice, []).append(b_m2[0])
+            bootstrap_sigma2s_VR.setdefault(cur_slice, []).append(b_c1[0][0])
+            bootstrap_sigma2s_AM.setdefault(cur_slice, []).append(b_c2[0][0])
+        else:
+            bootstrap_weights_VR.setdefault(cur_slice, []).append(b_w2)
+            bootstrap_weights_AM.setdefault(cur_slice, []).append(b_w1)
+            bootstrap_means_VR.setdefault(cur_slice, []).append(b_m2[0])
+            bootstrap_means_AM.setdefault(cur_slice, []).append(b_m1[0])
+            bootstrap_sigma2s_VR.setdefault(cur_slice, []).append(b_c2[0][0])
+            bootstrap_sigma2s_AM.setdefault(cur_slice, []).append(b_c1[0][0])
 
-    # plt.figure()  # New window, if needed.  No need to save it, as pyplot uses the concept of current figure
-    # plt.plot(np.random.rand(10))
-    # plt.show()
 
-    figure_folder = "script/python_video/" + crystal_name + "_" + quale_sim + "/"
-    #plt.savefig(figure_folder + "gaussian_fit.png", dpi=300)
+    # Calculate the error intervals
+    low_weightsAM_percentile = np.percentile(np.array(bootstrap_weights_AM[cur_slice]),15.87) # 15.87% = Gaussian -infinity -> -1sigma
+    high_weightsAM_percentile = np.percentile(np.array(bootstrap_weights_AM[cur_slice]),84.13) # 84.13% = Gaussian -infinity -> 1sigma, -1s -> 1s = 68.25%
+    weightsAM_low_errorbar[cur_slice] = low_weightsAM_percentile
+    weightsAM_high_errorbar[cur_slice] = high_weightsAM_percentile
 
-    plt.savefig(figure_folder + slice_name + ".png", dpi=300)
-    plt.clf()
+    low_weightsVR_percentile = np.percentile(np.array(bootstrap_weights_VR[cur_slice]),15.87) # 15.87% = Gaussian -infinity -> -1sigma
+    high_weightsVR_percentile = np.percentile(np.array(bootstrap_weights_VR[cur_slice]),84.13) # 84.13% = Gaussian -infinity -> 1sigma, -1s -> 1s = 68.25%
+    weightsVR_low_errorbar[cur_slice] = low_weightsVR_percentile
+    weightsVR_high_errorbar[cur_slice] = high_weightsVR_percentile
+
+
+    # #fig = plt.figure(figsize = (5, 5))
+    # #plt.subplot(111)
+    # # gauss_test = 0.5*matplotlib.mlab.normpdf(x, -20, 8)
+    # gauss1 = w1 * matplotlib.mlab.normpdf(x, m1, np.sqrt(c1))
+    # gauss2 = w2 * matplotlib.mlab.normpdf(x, m2, np.sqrt(c2))
+    # gauss_tot = gauss1 + gauss2
+    #
+    # plt.plot(
+    #     x,
+    #     yn,
+    #     linestyle="dashed",
+    #     drawstyle="steps-mid",
+    #     label="Data",
+    #     color='b')
+    # plt.plot(x, gauss1, label="Gauss1", color='g')
+    # plt.plot(x, gauss2, label="Gauss2", color='g')
+    # plt.plot(x, gauss_tot, label="Gauss_tot", color='r')
+    #
+    # plt.legend()
+    # #plt.show()
+    #
+    # # plt.figure()  # New window, if needed.  No need to save it, as pyplot uses the concept of current figure
+    # # plt.plot(np.random.rand(10))
+    # # plt.show()
+    #
+    # figure_folder = "script/python_video/" + crystal_name + "_" + quale_sim + "/"
+    # #plt.savefig(figure_folder + "gaussian_fit.png", dpi=300)
+    #
+    # plt.savefig(figure_folder + slice_name + ".png", dpi=300)
+    # plt.clf()
 
     # Update cur_slice counter. Yeah maybe there's a more snakey way, don't care for now
     cur_slice = cur_slice + deltaslice
@@ -394,6 +647,16 @@ y_meansVR_exp = list(means_VR_exp.values())
 
 y_sigmas_exp = [np.sqrt(xx) for xx in sigma2s_VR_exp.values()]
 
+weightsAM_exp_low_yerr = [weights_AM_exp[i] - weightsAM_exp_low_errorbar[i] for i in x_AM_exp]
+weightsAM_exp_high_yerr = [weightsAM_exp_high_errorbar[i] - weights_AM_exp[i] for i in x_AM_exp]
+weightsVR_exp_low_yerr = [weights_VR_exp[i] - weightsVR_exp_low_errorbar[i] for i in x_VR_exp]
+weightsVR_exp_high_yerr = [weightsVR_exp_high_errorbar[i] - weights_VR_exp[i] for i in x_VR_exp]
+
+weightsAM_exp_yerr = [weightsAM_exp_low_yerr, weightsAM_exp_high_yerr]
+weightsVR_exp_yerr = [weightsVR_exp_low_yerr, weightsVR_exp_high_yerr]
+
+
+
 x_AM_sim = list(weights_AM_sim.keys())
 y_AM_sim = list(weights_AM_sim.values())
 x_VR_sim = list(weights_VR_sim.keys())
@@ -403,6 +666,16 @@ y_meansAM_sim = list(means_AM_sim.values())
 y_meansVR_sim = list(means_VR_sim.values())
 
 y_sigmas_sim = [np.sqrt(xx) for xx in sigma2s_VR_sim.values()]
+
+weightsAM_sim_low_yerr = [weights_AM_sim[i] - weightsAM_sim_low_errorbar[i] for i in x_AM_sim]
+weightsAM_sim_high_yerr = [weightsAM_sim_high_errorbar[i] - weights_AM_sim[i] for i in x_AM_sim]
+weightsVR_sim_low_yerr = [weights_VR_sim[i] - weightsVR_sim_low_errorbar[i] for i in x_VR_sim]
+weightsVR_sim_high_yerr = [weightsVR_sim_high_errorbar[i] - weights_VR_sim[i] for i in x_VR_sim]
+
+weightsAM_sim_yerr = [weightsAM_sim_low_yerr, weightsAM_sim_high_yerr]
+weightsVR_sim_yerr = [weightsVR_sim_low_yerr, weightsVR_sim_high_yerr]
+
+
 
 
 AM_parameters_exp, AM_par_covars_exp = curve_fit(
@@ -429,40 +702,51 @@ y_fitMeansAM = [parabola_to_fit(xx, Means_parameters[0], Means_parameters[1], Me
 
 # http://matplotlib.org/api/markers_api.html marker numbers
 if crystal_orientation == "R":
-    marker_AM = 6
-    marker_VR = 11
+    marker_AM = '.'
+    marker_VR = '.'
     or_sign = 1 # Orientation sign, to plot correctly the theta vertical bars
 elif crystal_orientation == "L":
-    marker_AM = 11
-    marker_VR = 6
+    marker_AM = '.'
+    marker_VR = '.'
     or_sign = -1
 
-# Plot results
+#PLOT
+# PLot theta_b, theta_b + theta_c, theta_b + 2theta_c
 plt.clf()
-plt.plot(
+plt.axvline(x=or_sign*(theta_bending + theta_c*0), linestyle="dashed", color='Chartreuse')  # TODO
+plt.axvline(x=or_sign*(theta_bending + theta_c*0 + theta_c), linestyle="dashed")  #TODO
+plt.axvline(x=or_sign*(theta_bending + theta_c*0 + 2*theta_c), linestyle="dashed")  #TODO
+
+
+# Plot results
+plt.errorbar(
     x_AM_exp,
     y_AM_exp,
+    yerr=weightsAM_exp_yerr,
     linestyle="dotted",
     marker=marker_AM,
     label="AM Data exp",
     color='DarkGreen')
-plt.plot(
+plt.errorbar(
     x_VR_exp,
     y_VR_exp,
+    yerr=weightsVR_exp_yerr,
     linestyle="dotted",
     marker=marker_VR,
     label="VR data exp",
     color='DarkRed')
-plt.plot(
+plt.errorbar(
     x_AM_sim,
     y_AM_sim,
+    yerr=weightsAM_sim_yerr,
     linestyle="dashdot",
     marker=marker_AM,
     label="AM Data sim",
     color='g')
-plt.plot(
+plt.errorbar(
     x_VR_sim,
     y_VR_sim,
+    yerr=weightsVR_sim_yerr,
     linestyle="dashdot",
     marker=marker_VR,
     label="VR data sim",
@@ -485,13 +769,9 @@ plt.plot(
 #
 # plt.plot(x_VR_sim, y_simgen, linestyle="dashed", label="Simulation Generatrix", color='DarkOrange')
 
-# Plot the characteristic angles of the transition region
-plt.axvline(x=or_sign*(theta_bending), linestyle="dashed", color='Crimson')  # TODO
-plt.axvline(x=or_sign*(theta_bending + theta_c), linestyle="dashed")  #TODO
-plt.axvline(x=or_sign*(theta_bending + 2*theta_c), linestyle="dashed")  #TODO
 
-plt.title(crystal_name + "_" + quale_sim + ": weights")
-plt.xlabel(r'$\theta_{x}\ [\mu rad]$')
+plt.title(crystal_name + " " + quale_sim + ": weights")
+plt.xlabel(r'$\theta_{in}\ [\mu rad]$')
 plt.ylabel('Probability')
 plt.legend()
 plt.show()

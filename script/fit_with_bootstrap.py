@@ -219,8 +219,7 @@ while (cur_slice < to_slice):
     #    ...
     # ]
     # So we create (deterministic) samples from the histogram
-
-    # TODO fittare i dati per i parametri veri, gli altri valori ovviamente vanno solo per gli intervalli/errori
+    # Make the datapoints
     distribution = transform_histo_to_dataset(x,y)
 
     #pp.pprint(distribution)
@@ -461,12 +460,13 @@ elif crystal_orientation == "L":
 
 #PLOT
 # PLot theta_b, theta_b + theta_c, theta_b + 2theta_c
+plt.clf()
 plt.axvline(x=or_sign*(theta_bending + theta_c*0), linestyle="dashed", color='Chartreuse')  # TODO
 plt.axvline(x=or_sign*(theta_bending + theta_c*0 + theta_c), linestyle="dashed")  #TODO
 plt.axvline(x=or_sign*(theta_bending + theta_c*0 + 2*theta_c), linestyle="dashed")  #TODO
 
 # Plot results
-plt.clf()
+# plt.clf()
 plt.errorbar(
     x_AM,
     y_AM,
