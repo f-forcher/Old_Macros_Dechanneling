@@ -33,11 +33,13 @@ critical_radius = 1 #[m] TODO at 400 GeV
 pot_well = 21.34 #[eV] Potential well between crystal planes
 theta_bending = crystal_params[crystal_name]['bending_angle10[microrad]']
 crystal_curvature_radius = crystal_params[crystal_name]['raggio_curvatura10[m]']
+crystal_thickness = crystal_params[crystal_name]['thickness[mm]']
 theta_c = math.sqrt(2*pot_well/particle_energy) * (1 - critical_radius/crystal_curvature_radius)*1e6 # [murad]
 c1_thetavr, c2_thetavr, c3_thetavr = (-1.5, 1.66666, 1.7)
 theta_vr =  c1_thetavr * theta_c * (1 - c2_thetavr*critical_radius/crystal_curvature_radius) # [murad]
 sigma_VR = c3_thetavr * theta_c * critical_radius / crystal_curvature_radius
-sigma_AM = 5
+silicon_radiation_length = 93.7 # [mm]
+sigma_AM = 13.6/400e3 * np.sqrt( crystal_thickness / silicon_radiation_length)*(1 + 0.038 * np.log(crystal_thickness / silicon_radiation_length))*1e6
 
 
 
@@ -69,6 +71,6 @@ plt.plot([theta_bending + 2*theta_c,to_slice], [0,0], linestyle="solid", label="
 
 plt.title("Theoretical model of the transition (STF45)")
 plt.xlabel(r'$\theta_{x}\ [\mu rad]$')
-plt.ylabel('Probability')
+plt.ylabel(r'$\Delta\theta_{x}\ [\mu rad]$')
 plt.legend()
 plt.show()

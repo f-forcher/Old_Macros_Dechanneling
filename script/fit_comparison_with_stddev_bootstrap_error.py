@@ -144,11 +144,14 @@ bootstrap_means_VR_exp   = collections.OrderedDict()
 bootstrap_sigma2s_AM_exp = collections.OrderedDict()
 bootstrap_sigma2s_VR_exp = collections.OrderedDict() #sigma2s_AM and sigma2s_VR should be equal if we fit with tied covariance (s1=s2)
 
-# Format: {slice: weight_low} and {slice: weight_high} where weight_low and weight_high are the 15.87% and 84.13% percentiles (68.25% inside, 1 sigma)
-weightsAM_exp_low_errorbar  = collections.OrderedDict()
-weightsAM_exp_high_errorbar = collections.OrderedDict()
-weightsVR_exp_low_errorbar  = collections.OrderedDict()
-weightsVR_exp_high_errorbar = collections.OrderedDict()
+# Format: {slice: weight_low} and {slice: weight_high} where errorbar is the standard deviation of bootstrapped parameter sets
+# weightsAM_exp_low_errorbar  = collections.OrderedDict()
+# weightsAM_exp_high_errorbar = collections.OrderedDict()
+# weightsVR_exp_low_errorbar  = collections.OrderedDict()
+# weightsVR_exp_high_errorbar = collections.OrderedDict()
+weightsAM_exp_errorbar = collections.OrderedDict()
+weightsVR_exp_errorbar = collections.OrderedDict()
+
 
 weights_AM_sim = collections.OrderedDict()
 weights_VR_sim = collections.OrderedDict()
@@ -165,13 +168,15 @@ bootstrap_sigma2s_AM_sim = collections.OrderedDict()
 bootstrap_sigma2s_VR_sim = collections.OrderedDict() #sigma2s_AM and sigma2s_VR should be equal if we fit with tied covariance (s1=s2)
 
 # Format: {slice: weight_low} and {slice: weight_high} where weight_low and weight_high are the 15.87% and 84.13% percentiles (68.25% inside, 1 sigma)
-weightsAM_sim_low_errorbar  = collections.OrderedDict()
-weightsAM_sim_high_errorbar = collections.OrderedDict()
-weightsVR_sim_low_errorbar  = collections.OrderedDict()
-weightsVR_sim_high_errorbar = collections.OrderedDict()
+# weightsAM_sim_low_errorbar  = collections.OrderedDict()
+# weightsAM_sim_high_errorbar = collections.OrderedDict()
+# weightsVR_sim_low_errorbar  = collections.OrderedDict()
+# weightsVR_sim_high_errorbar = collections.OrderedDict()
+weightsAM_sim_errorbar = collections.OrderedDict()
+weightsVR_sim_errorbar = collections.OrderedDict()
 
 # How many bootstrap synthetic distribution to generate and fit
-numbootstrap = 100
+numbootstrap = 400
 
 # FIT EXP
 clf = mixture.GaussianMixture(
@@ -212,10 +217,8 @@ bootstrap_sigma2s_AM = bootstrap_sigma2s_AM_exp
 bootstrap_sigma2s_VR = bootstrap_sigma2s_VR_exp #sigma2s_AM and sigma2s_VR should be equal if we fit with tied covariance (s1=s2)
 
 # Format: {slice: weight_low} and {slice: weight_high} where weight_low and weight_high are the 15.87% and 84.13% percentiles (68.25% inside, 1 sigma)
-weightsAM_low_errorbar  = weightsAM_exp_low_errorbar
-weightsAM_high_errorbar = weightsAM_exp_high_errorbar
-weightsVR_low_errorbar  = weightsVR_exp_low_errorbar
-weightsVR_high_errorbar = weightsVR_exp_high_errorbar
+weightsAM_errorbar  = weightsAM_exp_errorbar
+weightsVR_errorbar = weightsVR_exp_errorbar
 while (cur_slice < to_slice):
 
     # DUring STF45 data take, the goniometer was blocked, so we retranslate back the slices
@@ -351,15 +354,17 @@ while (cur_slice < to_slice):
 
 
     # Calculate the error intervals
-    low_weightsAM_percentile = np.percentile(np.array(bootstrap_weights_AM[cur_slice]),15.87) # 15.87% = Gaussian -infinity -> -1sigma
-    high_weightsAM_percentile = np.percentile(np.array(bootstrap_weights_AM[cur_slice]),84.13) # 84.13% = Gaussian -infinity -> 1sigma, -1s -> 1s = 68.25%
-    weightsAM_low_errorbar[cur_slice] = low_weightsAM_percentile
-    weightsAM_high_errorbar[cur_slice] = high_weightsAM_percentile
-
-    low_weightsVR_percentile = np.percentile(np.array(bootstrap_weights_VR[cur_slice]),15.87) # 15.87% = Gaussian -infinity -> -1sigma
-    high_weightsVR_percentile = np.percentile(np.array(bootstrap_weights_VR[cur_slice]),84.13) # 84.13% = Gaussian -infinity -> 1sigma, -1s -> 1s = 68.25%
-    weightsVR_low_errorbar[cur_slice] = low_weightsVR_percentile
-    weightsVR_high_errorbar[cur_slice] = high_weightsVR_percentile
+    # low_weightsAM_percentile = np.percentile(np.array(bootstrap_weights_AM[cur_slice]),15.87) # 15.87% = Gaussian -infinity -> -1sigma
+    # high_weightsAM_percentile = np.percentile(np.array(bootstrap_weights_AM[cur_slice]),84.13) # 84.13% = Gaussian -infinity -> 1sigma, -1s -> 1s = 68.25%
+    # weightsAM_low_errorbar[cur_slice] = low_weightsAM_percentile
+    # weightsAM_high_errorbar[cur_slice] = high_weightsAM_percentile
+    #
+    # low_weightsVR_percentile = np.percentile(np.array(bootstrap_weights_VR[cur_slice]),15.87) # 15.87% = Gaussian -infinity -> -1sigma
+    # high_weightsVR_percentile = np.percentile(np.array(bootstrap_weights_VR[cur_slice]),84.13) # 84.13% = Gaussian -infinity -> 1sigma, -1s -> 1s = 68.25%
+    # weightsVR_low_errorbar[cur_slice] = low_weightsVR_percentile
+    # weightsVR_high_errorbar[cur_slice] = high_weightsVR_percentile
+    weightsVR_errorbar[cur_slice] = np.std(bootstrap_weights_VR[cur_slice],ddof=1)
+    weightsAM_errorbar[cur_slice] = np.std(bootstrap_weights_AM[cur_slice],ddof=1)
 
 
     # # Plot the slices >>>> OBSOLETE! use fit_with_bootstrap.py insteads
@@ -437,10 +442,8 @@ bootstrap_sigma2s_AM = bootstrap_sigma2s_AM_sim
 bootstrap_sigma2s_VR = bootstrap_sigma2s_VR_sim #sigma2s_AM and sigma2s_VR should be equal if we fit with tied covariance (s1=s2)
 
 # Format: {slice: weight_low} and {slice: weight_high} where weight_low and weight_high are the 15.87% and 84.13% percentiles (68.25% inside, 1 sigma)
-weightsAM_low_errorbar  = weightsAM_sim_low_errorbar
-weightsAM_high_errorbar = weightsAM_sim_high_errorbar
-weightsVR_low_errorbar  = weightsVR_sim_low_errorbar
-weightsVR_high_errorbar = weightsVR_sim_high_errorbar
+weightsAM_errorbar  = weightsAM_sim_errorbar
+weightsVR_errorbar = weightsVR_sim_errorbar
 
 while (cur_slice < to_slice):
 
@@ -573,15 +576,17 @@ while (cur_slice < to_slice):
 
 
     # Calculate the error intervals
-    low_weightsAM_percentile = np.percentile(np.array(bootstrap_weights_AM[cur_slice]),15.87) # 15.87% = Gaussian -infinity -> -1sigma
-    high_weightsAM_percentile = np.percentile(np.array(bootstrap_weights_AM[cur_slice]),84.13) # 84.13% = Gaussian -infinity -> 1sigma, -1s -> 1s = 68.25%
-    weightsAM_low_errorbar[cur_slice] = low_weightsAM_percentile
-    weightsAM_high_errorbar[cur_slice] = high_weightsAM_percentile
-
-    low_weightsVR_percentile = np.percentile(np.array(bootstrap_weights_VR[cur_slice]),15.87) # 15.87% = Gaussian -infinity -> -1sigma
-    high_weightsVR_percentile = np.percentile(np.array(bootstrap_weights_VR[cur_slice]),84.13) # 84.13% = Gaussian -infinity -> 1sigma, -1s -> 1s = 68.25%
-    weightsVR_low_errorbar[cur_slice] = low_weightsVR_percentile
-    weightsVR_high_errorbar[cur_slice] = high_weightsVR_percentile
+    # low_weightsAM_percentile = np.percentile(np.array(bootstrap_weights_AM[cur_slice]),15.87) # 15.87% = Gaussian -infinity -> -1sigma
+    # high_weightsAM_percentile = np.percentile(np.array(bootstrap_weights_AM[cur_slice]),84.13) # 84.13% = Gaussian -infinity -> 1sigma, -1s -> 1s = 68.25%
+    # weightsAM_low_errorbar[cur_slice] = low_weightsAM_percentile
+    # weightsAM_high_errorbar[cur_slice] = high_weightsAM_percentile
+    #
+    # low_weightsVR_percentile = np.percentile(np.array(bootstrap_weights_VR[cur_slice]),15.87) # 15.87% = Gaussian -infinity -> -1sigma
+    # high_weightsVR_percentile = np.percentile(np.array(bootstrap_weights_VR[cur_slice]),84.13) # 84.13% = Gaussian -infinity -> 1sigma, -1s -> 1s = 68.25%
+    # weightsVR_low_errorbar[cur_slice] = low_weightsVR_percentile
+    # weightsVR_high_errorbar[cur_slice] = high_weightsVR_percentile
+    weightsVR_errorbar[cur_slice] = np.std(bootstrap_weights_VR[cur_slice],ddof=1)
+    weightsAM_errorbar[cur_slice] = np.std(bootstrap_weights_AM[cur_slice],ddof=1)
 
 
     # #fig = plt.figure(figsize = (5, 5))
@@ -647,13 +652,16 @@ y_meansVR_exp = list(means_VR_exp.values())
 
 y_sigmas_exp = [np.sqrt(xx) for xx in sigma2s_VR_exp.values()]
 
-weightsAM_exp_low_yerr = [weights_AM_exp[i] - weightsAM_exp_low_errorbar[i] for i in x_AM_exp]
-weightsAM_exp_high_yerr = [weightsAM_exp_high_errorbar[i] - weights_AM_exp[i] for i in x_AM_exp]
-weightsVR_exp_low_yerr = [weights_VR_exp[i] - weightsVR_exp_low_errorbar[i] for i in x_VR_exp]
-weightsVR_exp_high_yerr = [weightsVR_exp_high_errorbar[i] - weights_VR_exp[i] for i in x_VR_exp]
 
-weightsAM_exp_yerr = [weightsAM_exp_low_yerr, weightsAM_exp_high_yerr]
-weightsVR_exp_yerr = [weightsVR_exp_low_yerr, weightsVR_exp_high_yerr]
+weightsAM_exp_low_yerr = [weights_AM_exp[i] - weightsAM_exp_errorbar[i] for i in x_AM_exp]
+weightsAM_exp_high_yerr = [weightsAM_exp_errorbar[i] - weights_AM_exp[i] for i in x_AM_exp]
+weightsVR_exp_low_yerr = [weights_VR_exp[i] - weightsVR_exp_errorbar[i] for i in x_VR_exp]
+weightsVR_exp_high_yerr = [weightsVR_exp_errorbar[i] - weights_VR_exp[i] for i in x_VR_exp]
+
+# weightsAM_exp_yerr = [weightsAM_exp_low_yerr, weightsAM_exp_high_yerr]
+# weightsVR_exp_yerr = [weightsVR_exp_low_yerr, weightsVR_exp_high_yerr]
+weightsAM_exp_yerr = [list(weightsAM_exp_errorbar.values()), list(weightsAM_exp_errorbar.values())]
+weightsVR_exp_yerr = [list(weightsVR_exp_errorbar.values()), list(weightsVR_exp_errorbar.values())]
 
 
 
@@ -667,13 +675,15 @@ y_meansVR_sim = list(means_VR_sim.values())
 
 y_sigmas_sim = [np.sqrt(xx) for xx in sigma2s_VR_sim.values()]
 
-weightsAM_sim_low_yerr = [weights_AM_sim[i] - weightsAM_sim_low_errorbar[i] for i in x_AM_sim]
-weightsAM_sim_high_yerr = [weightsAM_sim_high_errorbar[i] - weights_AM_sim[i] for i in x_AM_sim]
-weightsVR_sim_low_yerr = [weights_VR_sim[i] - weightsVR_sim_low_errorbar[i] for i in x_VR_sim]
-weightsVR_sim_high_yerr = [weightsVR_sim_high_errorbar[i] - weights_VR_sim[i] for i in x_VR_sim]
+weightsAM_sim_low_yerr = [weights_AM_sim[i] - weightsAM_sim_errorbar[i] for i in x_AM_sim]
+weightsAM_sim_high_yerr = [weightsAM_sim_errorbar[i] - weights_AM_sim[i] for i in x_AM_sim]
+weightsVR_sim_low_yerr = [weights_VR_sim[i] - weightsVR_sim_errorbar[i] for i in x_VR_sim]
+weightsVR_sim_high_yerr = [weightsVR_sim_errorbar[i] - weights_VR_sim[i] for i in x_VR_sim]
 
-weightsAM_sim_yerr = [weightsAM_sim_low_yerr, weightsAM_sim_high_yerr]
-weightsVR_sim_yerr = [weightsVR_sim_low_yerr, weightsVR_sim_high_yerr]
+# weightsAM_sim_yerr = [weightsAM_sim_low_yerr, weightsAM_sim_high_yerr]
+# weightsVR_sim_yerr = [weightsVR_sim_low_yerr, weightsVR_sim_high_yerr]
+weightsAM_sim_yerr = [list(weightsAM_sim_errorbar.values()), list(weightsAM_sim_errorbar.values())]
+weightsVR_sim_yerr = [list(weightsVR_sim_errorbar.values()), list(weightsVR_sim_errorbar.values())]
 
 
 
